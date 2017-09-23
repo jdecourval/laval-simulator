@@ -2,7 +2,7 @@
 
 ## Introduction
 LAVAL COMPUTER is the first computer to implement the revolutionary LAVAL CPU architecture.
- Like every good acronym, LAVAL is recursively defined: Advanced Vectorized Architecture Laboratory.
+ Like every good acronym, LAVAL is recursively defined: Laval Advanced Vectorized Architecture Laboratory.
 
 Its a novel architecture set to revolutionize the computing world with its massively parallel architecture.
 Almost every implementation detail is configurable.

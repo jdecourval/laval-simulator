@@ -27,11 +27,13 @@ class Core
 
     struct Status2
     {
-        uint8_t membank: 4;
-        bool carry: 1;
-        bool negative: 1;
-        bool overflow: 1;
-        bool zero: 1;
+        // Bitfield could have been used but are pretty difficult to deal with
+        // since its then impossible to take member's address
+        uint8_t membank; //: 4;
+        bool carry; //: 1;
+        bool negative; //: 1;
+        bool overflow;// : 1;
+        bool zero; //: 1;
 
     };
 

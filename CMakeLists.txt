@@ -22,4 +22,7 @@ set(SOURCE_FILES
         sources/tools.h
         sources/tools.hpp
         )
+
 add_executable(simulator ${SOURCE_FILES})
+
+add_subdirectory(tests)

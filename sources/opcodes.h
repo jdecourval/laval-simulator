@@ -9,40 +9,19 @@
 template<uint8_t Op, uint8_t ArgSize>
 struct Instruction : public std::bitset<8>
 {
-    Instruction(uint8_t val)
-            : std::bitset<8>(val)
-    {
-    }
+    Instruction(uint8_t val);
 
-    static constexpr uint8_t mask()
-    {
-        return std::numeric_limits<uint8_t>::max() >> ArgSize << ArgSize;
-    }
+    static constexpr uint8_t mask();
 
-    static uint8_t opcode()
-    {
-        return Op;
-    }
+    static uint8_t opcode();
 
-    uint8_t argument()
-    {
-        return *this & (std::numeric_limits<uint8_t>::max() >> ArgSize);
-    }
+    uint8_t argument();
 
-    static bool validate(uint8_t arg)
-    {
-        return (arg & mask()) == opcode();
-    }
+    static bool validate(uint8_t arg);
 
-    uint8_t operator&(uint8_t other) const
-    {
-        return opcode() & other;
-    }
+    uint8_t operator&(uint8_t other) const;
 
-    uint8_t operator^(uint8_t other) const
-    {
-        return opcode() ^ other;
-    }
+    uint8_t operator^(uint8_t other) const;
 };
 
 
@@ -146,4 +125,5 @@ using CAD = Instruction<0b1000'0000, 5>;
 // Arg 2:1: Sync after
 using CSU = Instruction<0b1000'0000, 5>;
 
+#include "opcodes.hpp"
 #endif //SIMULATOR_OPCODES_H
