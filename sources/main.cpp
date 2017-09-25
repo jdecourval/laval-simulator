@@ -1,6 +1,6 @@
 
 
-#include "cpu.h"
+#include "../lib/cpu.h"
 
 int main()
 {

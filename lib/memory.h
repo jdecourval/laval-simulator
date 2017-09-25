@@ -3,7 +3,6 @@
 
 #include <array>
 #include "settings.h"
-#include "opcodes.h"
 
 using Memory_t = std::array<std::array<uint8_t, Settings::BANK_SIZE>, Settings::BANK_NUMBER>;
 
