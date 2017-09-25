@@ -2,6 +2,7 @@
 #define SIMULATOR_REGISTERS_H
 
 #include <optional>
+#include <tuple>
 
 struct Registers
 {

@@ -1,6 +1,5 @@
 #include "cpu.h"
 
-#include <cmath>
 #include <thread>
 #include <iostream>
 

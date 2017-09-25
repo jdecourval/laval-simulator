@@ -1,48 +1,9 @@
 #ifndef SIMULATOR_OPCODES_H
 #define SIMULATOR_OPCODES_H
 
-#include <array>
-#include <cassert>
-#include <functional>
-#include <memory>
-#include <fstream>
-#include <typeinfo>
-
+#include "instruction.h"
 #include "registers.h"
 
-
-
-struct InstructionBase
-{
-    virtual void operator()(Registers& registers) const = 0;
-};
-
-
-// TODO: Variadic arguments
-template<uint8_t... ArgSize>
-struct Instruction : public InstructionBase
-{
-    using Args = std::index_sequence<ArgSize...>;
-
-
-    Instruction()
-    {
-        static_assert(sizeof...(ArgSize) == 0, "Not Default Constructible");
-    }
-
-    explicit Instruction(uint8_t)
-    {
-        // TODO: Initialize args
-    }
-
-    uint8_t argument() const;
-
-
-protected:
-	static void sync(Registers& registers);
-
-    std::array<uint8_t, sizeof...(ArgSize)> args;
-};
 
 
 // 1 bits instructions
@@ -250,87 +211,6 @@ struct CSU : public Instruction<5>
 	void operator()(Registers& registers) const override;
 };
 
-class InstructionFactory
-{
-public:
-    InstructionFactory()
-    : dump("dump")
-    {
-        register_instruction<NOP>();
-        register_instruction<SYN>();
-        register_instruction<CTC>();
-        register_instruction<CTV>();
-        register_instruction<DBG>();
-        register_instruction<HCF>();
-        register_instruction<MXL>();
-        register_instruction<MXA>();
-        register_instruction<MXS>();
-        register_instruction<MUX>();
-        register_instruction<LCL>();
-        register_instruction<LCH>();
-        register_instruction<JLV>();
-        register_instruction<JEV>();
-        register_instruction<JGV>();
-        register_instruction<JMP>();
-        register_instruction<LSH>();
-        register_instruction<RSH>();
-        register_instruction<CAD>();
-        register_instruction<CSU>();
-    }
-
-	template<typename T>
-	void register_instruction()
-	{
-        register_helper<T>(typename T::Args{});
-	}
-
-    std::unique_ptr<InstructionBase> create(uint8_t val)
-	{
-        // Check if the instruction is valid
-        assert(val < counter);
-
-		return map.at(val)(val);
-	}
-
-private:
-    template <typename T, size_t... I>
-    void register_helper(std::index_sequence<I...>)
-    {
-        auto end = counter + 1L;
-
-        if constexpr (sizeof...(I) > 0)
-        {
-            end = ((1 << I) + ...) + counter;
-        }
-
-        assert(end <= 256);
-
-        auto begin = counter;
-
-        for (; counter<end; counter++)
-        {
-            map.at(counter) = [begin](uint8_t val) {
-                if constexpr (sizeof...(I) > 0)
-                {
-                    assert(val > begin);
-                    return std::make_unique<T>(val - begin);
-                } else if (sizeof...(I) == 0)
-                {
-                    assert(val == begin);
-                    return std::make_unique<T>();
-                }
-            };
-
-            dump << static_cast<int>(counter) << ":" << typeid(T).name() << std::endl;
-        }
-    }
-
-private:
-	std::array<std::function<std::unique_ptr<InstructionBase>(uint8_t)>, 256> map;
-	uint8_t counter = 0;
-    std::ofstream dump;
-
-};
 
 #include "opcodes.hpp"
 #endif //SIMULATOR_OPCODES_H

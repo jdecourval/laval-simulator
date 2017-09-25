@@ -9,6 +9,7 @@
 #include "memory.h"
 #include "opcodes.h"
 #include "registers.h"
+#include "instruction_factory.h"
 
 
 class CoreArray;

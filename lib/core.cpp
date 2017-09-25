@@ -2,10 +2,8 @@
 
 #include <iostream>
 #include <cmath>
-#include <cassert>
 
 #include "multidimensional_array.h"
-#include "opcodes.h"
 
 inline uint8_t operator "" _8(unsigned long long value)
 {
