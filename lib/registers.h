@@ -5,12 +5,22 @@
 
 struct Registers
 {
+    bool operator==(const Registers& other) const
+    {
+        return std::tie(val, preload, pc, status1, status2) == std::tie(other.val, other.preload, other.pc, other.status1, other.status2);
+    }
+
     struct Status1
     {
         // 3 bits are needed for 3D or 5 bits for 4D if we ignore diagonals
         uint8_t mux: 3;
         bool ctc: 1;
         bool sync: 1;
+
+        bool operator==(const Status1& other) const
+        {
+            return std::tie(mux, ctc, sync) == std::tie(other.mux, other.ctc, other.sync);
+        }
     };
 
     struct Status2
@@ -23,6 +33,10 @@ struct Registers
         bool overflow;// : 1;
         bool zero; //: 1;
 
+        bool operator==(const Status2& other) const
+        {
+            return std::tie(membank, carry, negative, overflow, zero) == std::tie(other.membank, other.carry, other.negative, other.overflow, other.zero);
+        }
     };
 
     // Registers

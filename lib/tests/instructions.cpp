@@ -3,8 +3,18 @@
 
 TEST_CASE("NOP")
 {
-    Core core;
-    NOP instruction;
+    SECTION("NOP does not affect registers")
+    {
+        Registers registers;
 
-    core.execute(instruction);
+        auto registers_copy = registers;
+
+        REQUIRE(registers_copy == registers);
+
+        NOP instruction;
+        instruction(registers);
+
+        REQUIRE(registers_copy == registers);
+    }
 }
+
