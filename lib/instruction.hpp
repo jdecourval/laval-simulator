@@ -39,7 +39,11 @@ void Instruction<ArgSizes...>::set_arg(uint8_t args_raw, uint8_t i)
 template<uint8_t... ArgSizes>
 void Instruction<ArgSizes...>::set_arg(uint8_t args_raw)
 {
-    set_arg<ArgSizes...>(args_raw, args.size());
+    // TODO: Convert assert to exceptions
+    // Too large argument
+    assert(args_raw <= bitmask<uint8_t>((ArgSizes + ...)));
+
+    set_arg<ArgSizes...>(args_raw, args.size() - 1);
 }
 
 template<uint8_t... ArgSizes>
@@ -49,7 +53,16 @@ void Instruction<ArgSizes...>::set_arg(uint8_t args_raw, uint8_t i)
     assert(LastArgSize > 0);
     assert(i == 0);
 
-    args.at(i) = args_raw & (1 << (LastArgSize - 1));
+    args.at(i) = args_raw & bitmask<uint8_t>(LastArgSize);
 
 }
 
+#include <climits>
+
+template<uint8_t... ArgSizes>
+template<typename R>
+constexpr R Instruction<ArgSizes...>::bitmask(unsigned int const onecount)
+{
+    return static_cast<R>(-(onecount != 0))
+           & (static_cast<R>(-1) >> ((sizeof(R) * CHAR_BIT) - onecount));
+}

@@ -15,14 +15,11 @@ set(SOURCE_FILES
         instruction.hpp
         instruction_factory.cpp
         instruction_factory.h
+        instruction_factory.hpp
         memory.h
-        memory.cpp
         multidimensional_array.h
         opcodes.h
-        opcodes.hpp
         opcodes.cpp
-        pool.h
-        pool.cpp
         registers.h
         settings.h
         tools.h

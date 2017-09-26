@@ -28,6 +28,9 @@ struct Instruction : public InstructionBase
 protected:
     static void sync(Registers& registers);
 
+    template <typename R>
+    static constexpr R bitmask(unsigned int const onecount);
+
 
 private:
     template<uint8_t LastArgSize>

@@ -32,11 +32,11 @@ struct Registers
         bool carry; //: 1;
         bool negative; //: 1;
         bool overflow;// : 1;
-        bool zero; //: 1;
+//        bool notzero; //: 1;  // Its not really worth it
 
         bool operator==(const Status2& other) const
         {
-            return std::tie(membank, carry, negative, overflow, zero) == std::tie(other.membank, other.carry, other.negative, other.overflow, other.zero);
+            return std::tie(membank, carry, negative, overflow) == std::tie(other.membank, other.carry, other.negative, other.overflow);
         }
     };
 

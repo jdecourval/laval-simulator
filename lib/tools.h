@@ -18,6 +18,8 @@ namespace Tools
 
     template<class T>
     size_t bitsof(const T& umax);
+
+
 }
 
 #include "tools.hpp"

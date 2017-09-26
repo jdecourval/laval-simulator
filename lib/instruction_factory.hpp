@@ -4,6 +4,11 @@ void InstructionFactory::register_instruction()
     register_helper<T>(typename T::Args{});
 }
 
+// The following function totally confuses CLion without this definition
+#ifdef __JETBRAINS_IDE__
+#define constexpr
+#endif
+
 template<typename T, size_t... I>
 void InstructionFactory::register_helper(std::index_sequence<I...>)
 {
@@ -26,10 +31,10 @@ void InstructionFactory::register_helper(std::index_sequence<I...>)
                 assert(val > begin);
                 return std::make_unique<T>(val - begin);
             } else if (sizeof...(I) == 0)
-        {
-            assert(val == begin);
-            return std::make_unique<T>();
-        }
+            {
+                assert(val == begin);
+                return std::make_unique<T>();
+            }
         };
 
         dump << static_cast<int>(counter) << ":" << typeid(T).name() << std::endl;

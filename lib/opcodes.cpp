@@ -95,7 +95,7 @@ void JLV::operator()(Registers& registers) const
 
 void JEV::operator()(Registers& registers) const
 {
-    if (registers.status2.zero)
+    if (registers.val == 0)
     {
         registers.status2.membank = get_argument(0);
         registers.pc = 0;
@@ -104,7 +104,7 @@ void JEV::operator()(Registers& registers) const
 
 void JGV::operator()(Registers& registers) const
 {
-    if (!registers.status2.negative && !registers.status2.zero)
+    if (!registers.status2.negative && registers.val != 0)
     {
         registers.status2.membank = get_argument(0);
         registers.pc = 0;
@@ -144,10 +144,11 @@ void RSH::operator()(Registers& registers) const
 
 void CAD::operator()(Registers& registers) const
 {
-    auto result = registers.status2.negative ? -registers.val : registers.val + static_cast<uint16_t>(get_argument(0) >> 1);
+    auto result = (registers.status2.negative ? static_cast<int8_t>(registers.val) : registers.val) + get_argument(0);
 
     registers.status2.carry = result > std::numeric_limits<decltype(registers.val)>().max();
     registers.val = static_cast<uint8_t>(result);
+    registers.status2.negative = result < 0;
 
     if (get_argument(0))
     {
@@ -158,7 +159,7 @@ void CAD::operator()(Registers& registers) const
 void CSU::operator()(Registers& registers) const
 {
     // TODO: Reuse code
-    auto result = registers.status2.negative ? -registers.val : registers.val - static_cast<uint16_t>(get_argument(0) >> 1);
+    auto result = (registers.status2.negative ? -registers.val : registers.val) - get_argument(0);
 
     registers.status2.carry = result > std::numeric_limits<decltype(registers.val)>().max();
     registers.val = static_cast<uint8_t>(result);

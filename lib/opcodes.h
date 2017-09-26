@@ -12,7 +12,7 @@
 // arg: none
 struct NOP : public Instruction<>
 {
-//    using Instruction<>::Instruction;
+    using Instruction<>::Instruction;
 
     void operator()(Registers& registers) const override;
 };
@@ -212,5 +212,4 @@ struct CSU : public Instruction<5>
 };
 
 
-#include "opcodes.hpp"
 #endif //SIMULATOR_OPCODES_H
