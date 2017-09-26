@@ -31,6 +31,68 @@ TEST_CASE("SYN")
     }
 }
 
+TEST_CASE("CTC")
+{
+    SECTION("CTC sets sync ctc flag")
+    {
+        Registers registers;
+        REQUIRE(!registers.status1.ctc);
+
+        CTC instruction;
+        instruction(registers);
+
+        REQUIRE(registers.status1.ctc);
+
+        instruction(registers);
+
+        REQUIRE(registers.status1.ctc);
+    }
+}
+
+TEST_CASE("CTV")
+{
+    SECTION("CTV unsets sync ctc flag")
+    {
+        Registers registers;
+        registers.status1.ctc = true;
+
+        CTV instruction;
+        instruction(registers);
+
+        REQUIRE(!registers.status1.ctc);
+
+        instruction(registers);
+
+        REQUIRE(!registers.status1.ctc);
+    }
+}
+
+TEST_CASE("MXL")
+{
+    Registers registers;
+    registers.preload = 5;
+
+    SECTION("Without sync")
+    {
+        MXL instruction({0});
+        instruction(registers);
+
+        REQUIRE(registers.preload == 5);
+        REQUIRE(registers.val == registers.preload);
+        REQUIRE(!registers.status1.sync);
+    }
+
+    SECTION("With sync")
+    {
+        MXL instruction({1});
+        instruction(registers);
+
+        REQUIRE(registers.preload == 5);
+        REQUIRE(registers.val == registers.preload);
+        REQUIRE(registers.status1.sync);
+    }
+}
+
 TEST_CASE("CAD")
 {
     Registers registers;
