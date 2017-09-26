@@ -55,7 +55,7 @@ void Instruction<ArgSizes...>::set_arg(uint8_t args_raw, uint8_t i)
 {
     assert(FirstArgSize > 0);
 
-    args.at(i) = args_raw & bitmask<uint8_t>(FirstArgSize) << SecondArgSize + (OtherArgSizes + ... + 0);
+    args.at(i) = args_raw & bitmask<uint8_t>(FirstArgSize) << (SecondArgSize + (OtherArgSizes + ... + 0));
 
     set_arg<SecondArgSize, OtherArgSizes...>(args_raw, static_cast<uint8_t>(i + 1));
 }

@@ -2,7 +2,7 @@
 
 Direction::Direction(uint8_t raw)
 {
-    for (auto i = 0; i < size(); i++)
+    for (auto i = 0u; i < size(); i++)
     {
         this->at(i) = static_cast<detail::Direction1D>(raw % 3 - 1);
         raw /= 3;
@@ -13,7 +13,7 @@ uint8_t Direction::dump()
 {
     uint8_t value = 0;
 
-    for (auto i = 0; i < size(); i++)
+    for (auto i = 0u; i < size(); i++)
     {
         value += (this->at(i) + 1) * std::pow(i + 1, 3);
     }

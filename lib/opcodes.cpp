@@ -1,7 +1,7 @@
 #include <iostream>
 #include "opcodes.h"
 
-void NOP::operator()(Registers& registers) const
+void NOP::operator()(Registers&) const
 {
 
 }
@@ -30,7 +30,7 @@ void DBG::operator()(Registers& registers) const
     std::cout << "mux: " << static_cast<int>(registers.status1.mux) << " -> " << static_cast<int>(*registers.preload) << std::endl;
 }
 
-void HCF::operator()(Registers& registers) const
+void HCF::operator()(Registers&) const
 {
     // TODO
 }

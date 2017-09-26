@@ -29,9 +29,9 @@ Cpu::Cpu()
 
 void Cpu::linkCores()
 {
-    size_t count = 0;
-    auto cores_ptr = &cores;
-    auto mem_ptr = &mem;
+//    size_t count = 0;
+//    auto cores_ptr = &cores;
+//    auto mem_ptr = &mem;
 //    cores.apply([cores_ptr, mem_ptr, &count](auto& core){core.link(cores_ptr, count++, mem_ptr);});
 }
 

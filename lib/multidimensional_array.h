@@ -16,6 +16,8 @@ public:
     CoreArray(std::vector<size_t> dimensions)
     {
         size = std::accumulate(dimensions.begin(), dimensions.end(), 0ull, std::multiplies<size_t>());
+        assert(size <= Tools::umaxof<size_t>() >> 1);
+
         cores = std::make_unique<Core[]>(size);
 
         for (size_t i = 1; i < dimensions.size(); i++)
@@ -46,9 +48,9 @@ public:
     {
         assert(offsets.size() == index_operands.size());
         auto index = std::inner_product(offsets.begin(), offsets.end(), index_operands.begin(), static_cast<long>(id));
-        index = Settings::WRAP && index >= size ? index - size : index;
+        index = Settings::WRAP && index >= static_cast<long>(size) ? index - size : index;
         index = Settings::WRAP && index < 0 ? index + size : index;
-        assert(index < size);
+        assert(index < static_cast<long>(size));
         assert(index >= 0);
         return cores[index];
     }
