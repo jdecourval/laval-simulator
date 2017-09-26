@@ -174,9 +174,9 @@ struct JMP : public Instruction<4>
 // Left circular shift
 // arg 1:4: shift amount
 // Arg 2:1: Sync after
-struct LSH : public Instruction<5>
+struct LSH : public Instruction<4, 1>
 {
-	using Instruction<5>::Instruction;
+	using Instruction<4, 1>::Instruction;
 
 	void operator()(Registers& registers) const override;
 };
@@ -184,9 +184,9 @@ struct LSH : public Instruction<5>
 // Right circular shift
 // arg 1:4: shift amount
 // Arg 2:1: Sync after
-struct RSH : public Instruction<5>
+struct RSH : public Instruction<4, 1>
 {
-	using Instruction<5>::Instruction;
+	using Instruction<4, 1>::Instruction;
 
 	void operator()(Registers& registers) const override;
 };
@@ -194,9 +194,9 @@ struct RSH : public Instruction<5>
 // Add a constant
 // arg 1:4: constant
 // Arg 2:1: Sync after
-struct CAD : public Instruction<5>
+struct CAD : public Instruction<4, 1>
 {
-	using Instruction<5>::Instruction;
+	using Instruction<4, 1>::Instruction;
 
 	void operator()(Registers& registers) const override;
 };
@@ -204,9 +204,9 @@ struct CAD : public Instruction<5>
 // Subtract a constant
 // arg 1:4: constant
 // Arg 2:1: Sync after
-struct CSU : public Instruction<5>
+struct CSU : public Instruction<4, 1>
 {
-	using Instruction<5>::Instruction;
+	using Instruction<4, 1>::Instruction;
 
 	void operator()(Registers& registers) const override;
 };

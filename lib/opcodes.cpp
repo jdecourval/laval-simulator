@@ -123,7 +123,7 @@ void LSH::operator()(Registers& registers) const
 
     registers.val <<= amount;
 
-    if (get_argument(0))
+    if (get_argument(1))
     {
         sync(registers);
     }
@@ -136,7 +136,7 @@ void RSH::operator()(Registers& registers) const
 
     registers.val >>= amount;
 
-    if (get_argument(0))
+    if (get_argument(1))
     {
         sync(registers);
     }
@@ -150,7 +150,7 @@ void CAD::operator()(Registers& registers) const
     registers.val = static_cast<uint8_t>(result);
     registers.status2.negative = result < 0;
 
-    if (get_argument(0))
+    if (get_argument(1))
     {
         sync(registers);
     }
@@ -164,7 +164,7 @@ void CSU::operator()(Registers& registers) const
     registers.status2.carry = result > std::numeric_limits<decltype(registers.val)>().max();
     registers.val = static_cast<uint8_t>(result);
 
-    if (get_argument(0))
+    if (get_argument(1))
     {
         sync(registers);
     }
