@@ -31,8 +31,11 @@ struct Instruction : public InstructionBase
 protected:
     static void sync(Registers& registers);
 
-    template <typename R>
-    static constexpr R bitmask(unsigned int const onecount);
+    template <typename T>
+    static constexpr T bitmask(unsigned int onecount);
+
+    template <typename T>
+    static constexpr bool checkcarry(T val);
 
 
 private:

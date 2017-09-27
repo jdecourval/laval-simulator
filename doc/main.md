@@ -39,5 +39,11 @@ It is a very low complexity core capable of executing a couple of different 8 bi
 LAVAL-M1 is the first version of the official embedded subset of LAVAL.
 Its made to have a very low memory requirement, power consumption and an high AL<sup>[1](#AL)</sup>.
 
+TODO: two complement
+
+TODO: Signed behaviours:
+- Shifts
+- Overflows
+
 <a name="AL">1</a>Annoyance level: Defined as (1 - Percentage of student who would repeat their programming experiments with the CPU architecture)
 

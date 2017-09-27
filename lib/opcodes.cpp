@@ -47,8 +47,11 @@ void MXL::operator()(Registers& registers) const
 
 void MXA::operator()(Registers& registers) const
 {
+    auto result = (registers.status2.negative ? static_cast<int8_t>(registers.val) : registers.val) + *registers.preload;
 
-    registers.val += *registers.preload;
+    registers.status2.carry = checkcarry(result);
+    registers.val = static_cast<uint8_t>(result);
+    registers.status2.negative = result < 0;
 
     if (get_argument(0))
     {
@@ -58,7 +61,11 @@ void MXA::operator()(Registers& registers) const
 
 void MXS::operator()(Registers& registers) const
 {
-    registers.val -= *registers.preload;
+    auto result = (registers.status2.negative ? -registers.val : registers.val) - *registers.preload;
+
+    registers.status2.carry = checkcarry(result);
+    registers.val = static_cast<uint8_t>(result);
+    registers.status2.negative = result < 0;
 
     if (get_argument(0))
     {
@@ -146,7 +153,7 @@ void CAD::operator()(Registers& registers) const
 {
     auto result = (registers.status2.negative ? static_cast<int8_t>(registers.val) : registers.val) + get_argument(0);
 
-    registers.status2.carry = result > std::numeric_limits<decltype(registers.val)>().max();
+    registers.status2.carry = checkcarry(result);
     registers.val = static_cast<uint8_t>(result);
     registers.status2.negative = result < 0;
 
@@ -158,10 +165,10 @@ void CAD::operator()(Registers& registers) const
 
 void CSU::operator()(Registers& registers) const
 {
-    // TODO: Reuse code
     auto result = (registers.status2.negative ? -registers.val : registers.val) - get_argument(0);
 
-    registers.status2.carry = result > std::numeric_limits<decltype(registers.val)>().max();
+    registers.status2.carry = checkcarry(result);
+    // TODO: Undefined behaviour, value cannot be represented in the destination type
     registers.val = static_cast<uint8_t>(result);
 
     if (get_argument(1))

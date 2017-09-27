@@ -80,6 +80,12 @@ TEST_CASE("MXL")
         REQUIRE(registers.preload == 5);
         REQUIRE(registers.val == registers.preload);
         REQUIRE(!registers.status1.sync);
+
+        instruction(registers);
+
+        REQUIRE(registers.preload == 5);
+        REQUIRE(registers.val == registers.preload);
+        REQUIRE(!registers.status1.sync);
     }
 
     SECTION("With sync")
@@ -93,6 +99,406 @@ TEST_CASE("MXL")
     }
 }
 
+TEST_CASE("MXA")
+{
+    Registers registers;
+
+    SECTION("No sync")
+    {
+        SECTION("No carry, initially zero")
+        {
+            registers.preload = 2;
+            MXA instruction({0});
+            instruction(registers);
+
+            REQUIRE(registers.val == 2);
+            REQUIRE(!registers.status2.carry);
+            REQUIRE(!registers.status2.negative);
+            REQUIRE(registers.preload == 2);
+        }
+
+        SECTION("Carry, initially positive")
+        {
+            registers.val = 250;
+            registers.preload = 15;
+
+            MXA instruction({0});
+            instruction(registers);
+
+            REQUIRE(static_cast<int>(registers.val) == static_cast<int>(static_cast<uint8_t>(250 + 15)));
+            REQUIRE(registers.status2.carry);
+            REQUIRE(!registers.status2.negative);
+            REQUIRE(registers.preload == 15);
+        }
+
+        SECTION("Initially negative")
+        {
+            registers.val = static_cast<uint8_t>(-5);
+            registers.status2.negative = true;
+            REQUIRE(registers.val == static_cast<uint8_t>(-5));
+
+            SECTION("Still negative")
+            {
+                registers.preload = 3;
+
+                MXA instruction({0});
+                instruction(registers);
+
+                REQUIRE(static_cast<int>(registers.val) == static_cast<uint8_t>(-2));
+                REQUIRE(!registers.status2.carry);
+                REQUIRE(registers.status2.negative);
+                REQUIRE(registers.preload == 3);
+            }
+
+            SECTION("Then zero")
+            {
+                registers.preload = 5;
+
+                MXA instruction({0});
+                instruction(registers);
+
+                REQUIRE(registers.val == 0);
+                REQUIRE(!registers.status2.carry);
+                REQUIRE(!registers.status2.negative);
+                REQUIRE(registers.preload == 5);
+            }
+
+            SECTION("Then positive")
+            {
+                registers.preload = 6;
+
+                MXA instruction({0});
+                instruction(registers);
+
+                REQUIRE(registers.val == 1);
+                REQUIRE(!registers.status2.carry);
+                REQUIRE(!registers.status2.negative);
+                REQUIRE(registers.preload == 6);
+            }
+        }
+
+        REQUIRE(!registers.status1.sync);
+    }
+
+    SECTION("Sync")
+    {
+        registers.preload = 2;
+        MXA instruction({1});
+        instruction(registers);
+
+        REQUIRE(registers.val == 2);
+        REQUIRE(!registers.status2.carry);
+        REQUIRE(!registers.status2.negative);
+        REQUIRE(registers.preload == 2);
+        REQUIRE(registers.status1.sync);
+    }
+}
+
+TEST_CASE("MXS")
+{
+//    Registers registers;
+//
+//    SECTION("No sync")
+//    {
+//        SECTION("No carry, initially zero")
+//        {
+//            registers.preload = 2;
+//            MXS instruction({0});
+//            instruction(registers);
+//
+//            REQUIRE(registers.val == static_cast<uint8_t>(int8_t{-2}));
+//            REQUIRE(!registers.status2.carry);
+//            REQUIRE(registers.status2.negative);
+//            REQUIRE(registers.preload == 2);
+//        }
+//
+//        SECTION("Carry, initially negative")
+//        {
+//            registers.val = static_cast<uint8_t>(int8_t{-250});
+//            registers.preload = -15;
+//
+//            MXS instruction({0});
+//            instruction(registers);
+//
+//            REQUIRE(static_cast<int>(registers.val) == static_cast<int>(static_cast<uint8_t>(-250 - 15)));
+//            REQUIRE(registers.status2.carry);
+//            REQUIRE(!registers.status2.negative);
+//            REQUIRE(registers.preload == 15);
+//        }
+//
+//        SECTION("Initially positive")
+//        {
+//            registers.val = static_cast<uint8_t>(-5);
+//            registers.status2.negative = true;
+//            REQUIRE(registers.val == static_cast<uint8_t>(-5));
+//
+//            SECTION("Still negative")
+//            {
+//                registers.preload = 3;
+//
+//                MXS instruction({0});
+//                instruction(registers);
+//
+//                REQUIRE(static_cast<int>(registers.val) == static_cast<uint8_t>(-2));
+//                REQUIRE(!registers.status2.carry);
+//                REQUIRE(registers.status2.negative);
+//                REQUIRE(registers.preload == 3);
+//            }
+//
+//            SECTION("Then zero")
+//            {
+//                registers.preload = 5;
+//
+//                MXS instruction({0});
+//                instruction(registers);
+//
+//                REQUIRE(registers.val == 0);
+//                REQUIRE(!registers.status2.carry);
+//                REQUIRE(!registers.status2.negative);
+//                REQUIRE(registers.preload == 5);
+//            }
+//
+//            SECTION("Then positive")
+//            {
+//                registers.preload = 6;
+//
+//                MXS instruction({0});
+//                instruction(registers);
+//
+//                REQUIRE(registers.val == 1);
+//                REQUIRE(!registers.status2.carry);
+//                REQUIRE(!registers.status2.negative);
+//                REQUIRE(registers.preload == 6);
+//            }
+//        }
+//
+//        REQUIRE(!registers.status1.sync);
+//    }
+//
+//    SECTION("Sync")
+//    {
+//        registers.preload = 2;
+//        MXS instruction({1});
+//        instruction(registers);
+//
+//        REQUIRE(registers.val == 2);
+//        REQUIRE(!registers.status2.carry);
+//        REQUIRE(!registers.status2.negative);
+//        REQUIRE(registers.preload == 2);
+//        REQUIRE(registers.status1.sync);
+//    }
+}
+
+TEST_CASE("MUX")
+{
+    Registers registers;
+
+    SECTION("Correctly set mux value")
+    {
+        MUX instruction{3};
+
+        instruction(registers);
+
+        REQUIRE(registers.status1.mux == 3);
+    }
+}
+
+TEST_CASE("LCL")
+{
+    Registers registers;
+
+    SECTION("Initially zero")
+    {
+        LCL instruction({0x05});
+        instruction(registers);
+
+        REQUIRE(registers.val == 0x05);
+    }
+
+    SECTION("Initially have some random value")
+    {
+        registers.val = 0xaa;
+
+        LCL instruction({0x05});
+        instruction(registers);
+
+        REQUIRE(registers.val == 0xa5);
+    }
+}
+
+TEST_CASE("LCH")
+{
+    Registers registers;
+
+    SECTION("Initially zero")
+    {
+        LCH instruction({0x05});
+        instruction(registers);
+
+        REQUIRE(registers.val == 0x50);
+    }
+
+    SECTION("Initially have some random value")
+    {
+        registers.val = 0xaa;
+
+        LCH instruction({0x05});
+        instruction(registers);
+
+        REQUIRE(registers.val == 0x5a);
+    }
+}
+
+TEST_CASE("JLV")
+{
+    Registers registers;
+    registers.pc = 1;
+
+    SECTION("No effect if zero")
+    {
+        JLV instruction({4});
+        instruction(registers);
+
+        REQUIRE(registers.pc == 1);
+        REQUIRE(registers.status2.membank == 0);
+    }
+
+    SECTION("No effect if greater than zero")
+    {
+        JLV instruction({4});
+        registers.val = 2;
+        instruction(registers);
+
+        REQUIRE(registers.pc == 1);
+        REQUIRE(registers.status2.membank == 0);
+    }
+
+    SECTION("Jump if negative")
+    {
+        JLV instruction({4});
+        registers.val = 1;
+        registers.status2.negative = true;
+        instruction(registers);
+
+        REQUIRE(registers.pc == 0);
+        REQUIRE(registers.status2.membank == 4);
+    }
+}
+
+TEST_CASE("JEV")
+{
+    Registers registers;
+    registers.pc = 1;
+
+    SECTION("Jump if zero")
+    {
+        JEV instruction({4});
+        instruction(registers);
+
+        REQUIRE(registers.pc == 0);
+        REQUIRE(registers.status2.membank == 4);
+    }
+
+    SECTION("No effect if greater than zero")
+    {
+        JEV instruction({4});
+        registers.val = 2;
+        instruction(registers);
+
+        REQUIRE(registers.pc == 1);
+        REQUIRE(registers.status2.membank == 0);
+    }
+
+    SECTION("No effect if negative")
+    {
+        JEV instruction({4});
+        registers.val = 1;
+        registers.status2.negative = true;
+        instruction(registers);
+
+        REQUIRE(registers.pc == 1);
+        REQUIRE(registers.status2.membank == 0);
+    }
+}
+
+TEST_CASE("JGV")
+{
+    Registers registers;
+    registers.pc = 1;
+
+    SECTION("No effect if zero")
+    {
+        JGV instruction({4});
+        instruction(registers);
+
+        REQUIRE(registers.pc == 1);
+        REQUIRE(registers.status2.membank == 0);
+    }
+
+    SECTION("Jump if greater than zero")
+    {
+        JGV instruction({4});
+        registers.val = 2;
+        instruction(registers);
+
+        REQUIRE(registers.pc == 0);
+        REQUIRE(registers.status2.membank == 4);
+    }
+
+    SECTION("No effect if negative")
+    {
+        JGV instruction({4});
+        registers.val = 1;
+        registers.status2.negative = true;
+        instruction(registers);
+
+        REQUIRE(registers.pc == 1);
+        REQUIRE(registers.status2.membank == 0);
+    }
+}
+
+TEST_CASE("JMP")
+{
+    Registers registers;
+
+    SECTION("Jump if zero")
+    {
+        JMP instruction({4});
+        instruction(registers);
+
+        REQUIRE(registers.pc == 0);
+    }
+
+    SECTION("Jump if greater than zero")
+    {
+        JMP instruction({4});
+        registers.val = 2;
+        instruction(registers);
+
+        REQUIRE(registers.pc == 0);
+    }
+
+    SECTION("Jump if negative")
+    {
+        JMP instruction({4});
+        registers.val = 1;
+        registers.status2.negative = true;
+        instruction(registers);
+
+        REQUIRE(registers.pc == 0);
+    }
+}
+
+TEST_CASE("LSH")
+{
+
+}
+
+TEST_CASE("RSH")
+{
+
+}
+
 TEST_CASE("CAD")
 {
     Registers registers;
@@ -101,7 +507,7 @@ TEST_CASE("CAD")
     {
         SECTION("No carry, initially zero")
         {
-            CAD instruction(2);
+            CAD instruction({2, 0});
             instruction(registers);
 
             REQUIRE(registers.val == 2);
@@ -163,6 +569,17 @@ TEST_CASE("CAD")
 
     SECTION("Sync")
     {
+        CAD instruction({2, 1});
+        instruction(registers);
 
+        REQUIRE(registers.val == 2);
+        REQUIRE(!registers.status2.carry);
+        REQUIRE(!registers.status2.negative);
+        REQUIRE(registers.status1.sync);
     }
+}
+
+TEST_CASE("CSU")
+{
+
 }

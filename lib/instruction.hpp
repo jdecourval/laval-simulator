@@ -73,9 +73,16 @@ void Instruction<ArgSizes...>::set_arg(uint8_t args_raw, uint8_t i)
 #include <climits>
 
 template<uint8_t... ArgSizes>
-template<typename R>
-constexpr R Instruction<ArgSizes...>::bitmask(unsigned int const onecount)
+template<typename T>
+constexpr T Instruction<ArgSizes...>::bitmask(unsigned int const onecount)
 {
-    return static_cast<R>(-(onecount != 0))
-           & (static_cast<R>(-1) >> ((sizeof(R) * CHAR_BIT) - onecount));
+    return static_cast<T>(-(onecount != 0))
+           & (static_cast<T>(-1) >> ((sizeof(T) * CHAR_BIT) - onecount));
+}
+
+template<uint8_t... ArgSizes>
+template <typename T>
+constexpr bool Instruction<ArgSizes...>::checkcarry(T val)
+{
+    return val > std::numeric_limits<decltype(Registers::val)>().max();
 }
