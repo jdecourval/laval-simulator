@@ -1,6 +1,8 @@
 #include "direction.h"
 
+
 Direction::Direction(uint8_t raw)
+        : std::array<detail::Direction1D, Settings::DIMENSION_N>()
 {
     for (auto i = 0u; i < size(); i++)
     {
@@ -22,7 +24,7 @@ uint8_t Direction::dump()
 }
 
 DirectionComplex::DirectionComplex(uint8_t raw)
-: std::variant<Direction, SpecialDirection>(Direction(raw))
+        : std::variant<Direction, SpecialDirection>(Direction(raw))
 {
     if (raw >= Settings::CORES)
     {

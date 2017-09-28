@@ -9,3 +9,6 @@ set(SOURCE_FILES
         )
 
 add_executable(simulator ${SOURCE_FILES})
+
+target_link_libraries(simulator
+        LavalLib)

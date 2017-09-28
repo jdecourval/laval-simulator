@@ -1,5 +1,7 @@
 #include <iostream>
+
 #include "opcodes.h"
+
 
 void NOP::operator()(Registers&) const
 {
@@ -23,11 +25,21 @@ void CTV::operator()(Registers& registers) const
 
 void DBG::operator()(Registers& registers) const
 {
-//    std::cout << "id: " << id << std::endl;
-    std::cout << "pc: " << (registers.pc & 0xf) << std::endl;
-    std::cout << "membank: " << static_cast<int>(registers.status2.membank) << std::endl;
-    std::cout << "val: " << static_cast<int>(registers.val) << std::endl;
-    std::cout << "mux: " << static_cast<int>(registers.status1.mux) << " -> " << static_cast<int>(*registers.preload) << std::endl;
+    std::cout << "pc: " << std::hex << (registers.pc & 0xf) << std::endl;
+    std::cout << "membank: " << std::hex << registers.status2.membank << std::endl;
+    std::cout << "val: " << std::hex << registers.val << std::endl;
+    if (registers.preload)
+    {
+        std::cout << "mux: " << std::hex << registers.status1.mux << " -> " << *registers.preload << std::endl;
+    }
+    else
+    {
+        std::cout << "mux: " << std::hex << registers.status1.mux << std::endl;
+    }
+    std::cout << "sync: " << std::hex << registers.status1.sync << std::endl;
+    std::cout << "ctc: " << std::hex << registers.status1.ctc << std::endl;
+    std::cout << "negative: " << std::hex << registers.status2.negative << std::endl;
+    std::cout << "carry: " << std::hex << registers.status2.carry << std::endl;
 }
 
 void HCF::operator()(Registers&) const
@@ -47,7 +59,8 @@ void MXL::operator()(Registers& registers) const
 
 void MXA::operator()(Registers& registers) const
 {
-    auto result = (registers.status2.negative ? static_cast<int8_t>(registers.val) : registers.val) + *registers.preload;
+    auto result =
+            (registers.status2.negative ? static_cast<int8_t>(registers.val) : registers.val) + *registers.preload;
 
     registers.status2.carry = checkcarry(result);
     registers.val = static_cast<uint8_t>(result);

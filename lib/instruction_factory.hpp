@@ -16,21 +16,23 @@ void InstructionFactory::register_helper(std::index_sequence<I...>)
 
     if constexpr (sizeof...(I) > 0)
     {
-        end = ((1 << I) + ...) + counter;
+        end = ((1 << I) + ...) +counter;
     }
 
     assert(end <= 256);
 
     auto begin = counter;
 
-    for (; counter<end; counter++)
+    for (; counter < end; counter++)
     {
-        map.at(counter) = [begin](uint8_t val) {
+        map.at(counter) = [begin](uint8_t val)
+        {
             if constexpr (sizeof...(I) > 0)
             {
                 assert(val > begin);
                 return std::make_unique<T>(val - begin);
-            } else if (sizeof...(I) == 0)
+            }
+            else
             {
                 assert(val == begin);
                 return std::make_unique<T>();

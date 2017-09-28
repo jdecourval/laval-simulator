@@ -1,21 +1,22 @@
 #ifndef SIMULATOR_MULTIDIMENSIONALARRAY_H
 #define SIMULATOR_MULTIDIMENSIONALARRAY_H
 
+#include <cassert>
 #include <memory>
 #include <numeric>
-#include <cassert>
 
-#include "settings.h"
 #include "core.h"
 #include "direction.h"
+#include "settings.h"
 
 
 class CoreArray
 {
 public:
-    CoreArray(std::vector<size_t> dimensions)
+    // TODO: Use an std::initializer_list
+    explicit CoreArray(std::vector<size_t> dimensions)
     {
-        size = std::accumulate(dimensions.begin(), dimensions.end(), 0ull, std::multiplies<size_t>());
+        size = std::accumulate(dimensions.begin(), dimensions.end(), 0ull, std::multiplies<>());
         assert(size <= Tools::umaxof<size_t>() >> 1);
 
         cores = std::make_unique<Core[]>(size);
@@ -35,6 +36,9 @@ public:
         index_operands.push_back(1);
     }
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "OCSimplifyInspection"
+
     Core& operator[](const std::vector<size_t>& index_array)
     {
         assert(index_array.size() == index_operands.size());
@@ -47,13 +51,16 @@ public:
     Core& offset(size_t id, const Direction& offsets)
     {
         assert(offsets.size() == index_operands.size());
+        auto long_size = static_cast<long>(size);
         auto index = std::inner_product(offsets.begin(), offsets.end(), index_operands.begin(), static_cast<long>(id));
-        index = Settings::WRAP && index >= static_cast<long>(size) ? index - size : index;
-        index = Settings::WRAP && index < 0 ? index + size : index;
-        assert(index < static_cast<long>(size));
+        index = Settings::WRAP && index >= long_size ? index - long_size : index;
+        index = Settings::WRAP && index < 0 ? index + long_size : index;
+        assert(index < long_size);
         assert(index >= 0);
         return cores[index];
     }
+
+#pragma clang diagnostic pop
 
     Core& operator[](const size_t& index)
     {

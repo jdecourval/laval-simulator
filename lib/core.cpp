@@ -5,6 +5,7 @@
 
 #include "multidimensional_array.h"
 
+
 inline uint8_t operator "" _8(unsigned long long value)
 {
     return static_cast<uint8_t>(value);
@@ -15,12 +16,7 @@ Core::Core()
           , id(0)
           , cores(nullptr)
 {
-//    for(size_t i=0; i <= sizeof...(RestD); i++)
-//    {
-//        status1.mux += std::pow(1 * 3, i);
-//    }
 
-//    mem.fill(Instruction{Op::NOP, 0});
 }
 
 
@@ -37,7 +33,7 @@ void Core::link(CoreArray *cores, size_t id, Memory_t *mem)
 
 }
 
-void Core::step1()
+void Core::fetch()
 {
     auto direction_complex = DirectionComplex(registers.status1.mux);
 
@@ -49,13 +45,15 @@ void Core::step1()
 
         if (pointed_core.registers.status1.sync)
         {
-            registers.preload = registers.status1.ctc ? pointed_core.registers.status2.carry : pointed_core.registers.val;
+            registers.preload = registers.status1.ctc ? pointed_core.registers.status2.carry
+                                                      : pointed_core.registers.val;
         }
         else
         {
             registers.preload = {};
         }
-    } catch(const std::bad_variant_access&)
+    }
+    catch (const std::bad_variant_access&)
     {
         auto direction = std::get<SpecialDirection>(direction_complex);
 
@@ -88,8 +86,6 @@ void Core::step2()
     auto raw_instruction = (*mem)[registers.status2.membank][registers.pc & 0xf];
     // Let it wrap around
     registers.pc++;
-//    Op op = (*mem)[registers.status2.membank][registers.pc & 0xf].opcode;
-//    uint8_t arg = (*mem)[registers.status2.membank][registers.pc & 0xf].arg;
 
     auto instruction = factory.create(raw_instruction);
     (*instruction)(registers);

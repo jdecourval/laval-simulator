@@ -2,11 +2,12 @@
 #define SIMULATOR_DIRECTION_H
 
 #include <cstdint>
-#include <tuple>
 #include <cmath>
+#include <tuple>
 #include <variant>
 
 #include "settings.h"
+
 
 namespace detail
 {
@@ -18,13 +19,15 @@ namespace detail
     };
 }
 
+// TODO: Should instead store an array
 class Direction : public std::array<detail::Direction1D, Settings::DIMENSION_N>
 {
 public:
-    Direction(uint8_t raw);
+    explicit Direction(uint8_t raw);
 
     uint8_t dump();
 };
+
 
 enum class SpecialDirection
 {
@@ -32,12 +35,14 @@ enum class SpecialDirection
     MEMBANK
 };
 
+
 class DirectionComplex : public std::variant<Direction, SpecialDirection>
 {
 public:
-    DirectionComplex(uint8_t raw);
+    explicit DirectionComplex(uint8_t raw);
 
     uint8_t dump();
 };
+
 
 #endif //SIMULATOR_DIRECTION_H

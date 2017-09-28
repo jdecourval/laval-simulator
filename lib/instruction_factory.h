@@ -1,8 +1,8 @@
 #ifndef PROJECT_INSTRUCTION_FACTORY_H
 #define PROJECT_INSTRUCTION_FACTORY_H
 
-#include <functional>
 #include <fstream>
+#include <functional>
 #include <memory>
 
 #include "instruction.h"
@@ -20,7 +20,7 @@ public:
     std::unique_ptr<InstructionBase> create(uint8_t val);
 
 private:
-    template <typename T, size_t... I>
+    template<typename T, size_t... I>
     void register_helper(std::index_sequence<I...>);
 
 private:

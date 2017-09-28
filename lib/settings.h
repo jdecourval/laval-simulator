@@ -1,22 +1,25 @@
 #ifndef SIMULATOR_SETTINGS_H
 #define SIMULATOR_SETTINGS_H
 
-#include <vector>
 #include <numeric>
+#include <vector>
+
 #include "tools.h"
+
 
 namespace User
 {
     constexpr std::initializer_list<size_t> DIMENSIONS = {10, 10, 10};
 };
 
+// TODO: Change to a class to avoid static variable that may throw an exception that cannot be caught
 namespace Settings
 {
     using PC_t = uint8_t;
 
     constexpr auto DIMENSION_N = User::DIMENSIONS.size();
     inline const std::vector<size_t> DIMENSIONS = User::DIMENSIONS;
-    const auto CORES = std::accumulate(User::DIMENSIONS.begin(), User::DIMENSIONS.end(), 1, std::multiplies<size_t>());
+    const auto CORES = std::accumulate(User::DIMENSIONS.begin(), User::DIMENSIONS.end(), 1, std::multiplies<>());
 
     constexpr auto WRAP = true;
 

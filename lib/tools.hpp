@@ -1,5 +1,6 @@
-#include <bitset>
 #include <algorithm>
+#include <bitset>
+
 
 template<class T>
 T Tools::umaxof()

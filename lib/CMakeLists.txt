@@ -21,11 +21,18 @@ set(SOURCE_FILES
         opcodes.h
         opcodes.cpp
         registers.h
+        registers.cpp
         settings.h
         tools.h
         tools.hpp
         )
 
 add_library(LavalLib ${SOURCE_FILES})
+
+target_include_directories(LavalLib
+        PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
+target_compile_options(LavalLib
+        PUBLIC "-Wno-unknown-pragmas")
 
 add_subdirectory(tests)

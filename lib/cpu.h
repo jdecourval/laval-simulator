@@ -1,10 +1,9 @@
 #ifndef SIMULATOR_CPU_H
 #define SIMULATOR_CPU_H
 
-
-#include "multidimensional_array.h"
 #include "core.h"
 #include "memory.h"
+#include "multidimensional_array.h"
 #include "settings.h"
 
 

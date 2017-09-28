@@ -5,7 +5,6 @@
 #include "registers.h"
 
 
-
 // 1 bits instructions
 
 // Do nothing for one cycle
@@ -17,49 +16,54 @@ struct NOP : public Instruction<>
     void operator()(Registers& registers) const override;
 };
 
+
 // Sync current VAL with connected mux
 // arg: none
 struct SYN : public Instruction<>
 {
-	using Instruction<>::Instruction;
+    using Instruction<>::Instruction;
 
-	void operator()(Registers& registers) const override;
+    void operator()(Registers& registers) const override;
 };
+
 
 // Connect to carry
 // arg: none
 struct CTC : public Instruction<>
 {
-	using Instruction<>::Instruction;
+    using Instruction<>::Instruction;
 
-	void operator()(Registers& registers) const override;
+    void operator()(Registers& registers) const override;
 };
+
 
 // Connect to val
 // arg: none
 struct CTV : public Instruction<>
 {
-	using Instruction<>::Instruction;
+    using Instruction<>::Instruction;
 
-	void operator()(Registers& registers) const override;
+    void operator()(Registers& registers) const override;
 };
+
 
 // Output some debug values to debugger
 // arg: none
 struct DBG : public Instruction<>
 {
-	using Instruction<>::Instruction;
+    using Instruction<>::Instruction;
 
-	void operator()(Registers& registers) const override;
+    void operator()(Registers& registers) const override;
 };
+
 
 // Should have a really weird but maybe useful behaviour. Setup phase ? Switch to 16 bits? Use mux as another register?
 // arg: none
 struct HCF : public Instruction<>
 {
-	using Instruction<>::Instruction;
+    using Instruction<>::Instruction;
 
-	void operator()(Registers& registers) const override;
+    void operator()(Registers& registers) const override;
 };
 
 
@@ -70,27 +74,29 @@ struct HCF : public Instruction<>
 // Arg 1:1: Sync after
 struct MXL : public Instruction<1>
 {
-	using Instruction<1>::Instruction;
+    using Instruction<1>::Instruction;
 
-	void operator()(Registers& registers) const override;
+    void operator()(Registers& registers) const override;
 };
+
 
 // Add from mux
 // Arg 1:1: Sync after
 struct MXA : public Instruction<1>
 {
-	using Instruction<1>::Instruction;
+    using Instruction<1>::Instruction;
 
-	void operator()(Registers& registers) const override;
+    void operator()(Registers& registers) const override;
 };
+
 
 // Subtract from mux
 // Arg 1:1: Sync after
 struct MXS : public Instruction<1>
 {
-	using Instruction<1>::Instruction;
+    using Instruction<1>::Instruction;
 
-	void operator()(Registers& registers) const override;
+    void operator()(Registers& registers) const override;
 };
 
 
@@ -100,72 +106,69 @@ struct MXS : public Instruction<1>
 // arg 1:3: address
 struct MUX : public Instruction<3>
 {
-	using Instruction<3>::Instruction;
+    using Instruction<3>::Instruction;
 
-	void operator()(Registers& registers) const override;
+    void operator()(Registers& registers) const override;
 };
 
-//// Change mux address
-//// arg 1:4: address
-//struct HMX : public Instruction<4>
-//{
-//	using Instruction<4>::Instruction;
-//
-//	void operator()(Registers& registers) const override;
-//};
 
 // Load constant into low part
 // arg 1:4: constant
 struct LCL : public Instruction<4>
 {
-	using Instruction<4>::Instruction;
+    using Instruction<4>::Instruction;
 
-	void operator()(Registers& registers) const override;
+    void operator()(Registers& registers) const override;
 };
+
 
 // Load constant into high part
 // arg 1:4: constant
 struct LCH : public Instruction<4>
 {
-	using Instruction<4>::Instruction;
+    using Instruction<4>::Instruction;
 
-	void operator()(Registers& registers) const override;
+    void operator()(Registers& registers) const override;
 };
+
 
 // Jump if value less than 0. Change memory bank
 // arg 1:4: memory bank address
 struct JLV : public Instruction<4>
 {
-	using Instruction<4>::Instruction;
+    using Instruction<4>::Instruction;
 
-	void operator()(Registers& registers) const override;
+    void operator()(Registers& registers) const override;
 };
+
 
 // Jump if value equals 0
 // arg 1:4: memory bank address
 struct JEV : public Instruction<4>
 {
-	using Instruction<4>::Instruction;
+    using Instruction<4>::Instruction;
 
-	void operator()(Registers& registers) const override;
+    void operator()(Registers& registers) const override;
 };
+
 
 // Jump if value greater than 0
 // arg 1:4: memory bank address
 struct JGV : public Instruction<4>
 {
-	using Instruction<4>::Instruction;
+    using Instruction<4>::Instruction;
 
-	void operator()(Registers& registers) const override;
+    void operator()(Registers& registers) const override;
 };
+
 
 // Jump unconditionally
 // arg 1:4: memory bank address
 struct JMP : public Instruction<4>
 {
-	using Instruction<4>::Instruction;
+    using Instruction<4>::Instruction;
 
-	void operator()(Registers& registers) const override;
+    void operator()(Registers& registers) const override;
 };
 
 
@@ -176,39 +179,42 @@ struct JMP : public Instruction<4>
 // Arg 2:1: Sync after
 struct LSH : public Instruction<4, 1>
 {
-	using Instruction<4, 1>::Instruction;
+    using Instruction<4, 1>::Instruction;
 
-	void operator()(Registers& registers) const override;
+    void operator()(Registers& registers) const override;
 };
+
 
 // Right circular shift
 // arg 1:4: shift amount
 // Arg 2:1: Sync after
 struct RSH : public Instruction<4, 1>
 {
-	using Instruction<4, 1>::Instruction;
+    using Instruction<4, 1>::Instruction;
 
-	void operator()(Registers& registers) const override;
+    void operator()(Registers& registers) const override;
 };
+
 
 // Add a constant
 // arg 1:4: constant
 // Arg 2:1: Sync after
 struct CAD : public Instruction<4, 1>
 {
-	using Instruction<4, 1>::Instruction;
+    using Instruction<4, 1>::Instruction;
 
-	void operator()(Registers& registers) const override;
+    void operator()(Registers& registers) const override;
 };
+
 
 // Subtract a constant
 // arg 1:4: constant
 // Arg 2:1: Sync after
 struct CSU : public Instruction<4, 1>
 {
-	using Instruction<4, 1>::Instruction;
+    using Instruction<4, 1>::Instruction;
 
-	void operator()(Registers& registers) const override;
+    void operator()(Registers& registers) const override;
 };
 
 

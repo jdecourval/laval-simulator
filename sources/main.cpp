@@ -1,6 +1,4 @@
-
-
-#include "../lib/cpu.h"
+#include "cpu.h"
 
 int main()
 {

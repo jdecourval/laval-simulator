@@ -5,11 +5,12 @@
 #include <vector>
 #include <cstdint>
 #include <functional>
-#include "settings.h"
+
+#include "instruction_factory.h"
 #include "memory.h"
 #include "opcodes.h"
 #include "registers.h"
-#include "instruction_factory.h"
+#include "settings.h"
 
 
 class CoreArray;
@@ -24,7 +25,7 @@ public:
 
     void link(CoreArray *cores, size_t id, Memory_t *mem);
 
-    void step1();
+    void fetch();
 
     void step2();
 

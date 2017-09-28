@@ -12,7 +12,7 @@ Instruction<ArgSizes...>::Instruction(const std::initializer_list<uint8_t> args)
     auto i = 0u;
 
     // TODO: There must be a way to statically initialize the array
-    for(auto& arg: args)
+    for (auto& arg: args)
     {
         this->args.at(i) = arg;
         i++;
@@ -22,7 +22,7 @@ Instruction<ArgSizes...>::Instruction(const std::initializer_list<uint8_t> args)
 template<uint8_t... ArgSizes>
 Instruction<ArgSizes...>::Instruction(uint8_t args_raw)
 {
-    assert((ArgSizes+...) <= 8);
+    assert((ArgSizes +...) <= 8);
 
     set_arg(args_raw);
 }
@@ -46,7 +46,7 @@ void Instruction<ArgSizes...>::set_arg(uint8_t args_raw)
     // Assert argument size
     assert(args_raw <= bitmask<uint8_t>((ArgSizes + ...)));
 
-    set_arg<ArgSizes...>(args_raw, 0);
+    set_arg < ArgSizes...>(args_raw, 0);
 }
 
 template<uint8_t... ArgSizes>
@@ -55,9 +55,9 @@ void Instruction<ArgSizes...>::set_arg(uint8_t args_raw, uint8_t i)
 {
     assert(FirstArgSize > 0);
 
-    args.at(i) = args_raw & bitmask<uint8_t>(FirstArgSize) << (SecondArgSize + (OtherArgSizes + ... + 0));
+    args.at(i) = args_raw & bitmask<uint8_t>(FirstArgSize) << (SecondArgSize + (OtherArgSizes + ... +0));
 
-    set_arg<SecondArgSize, OtherArgSizes...>(args_raw, static_cast<uint8_t>(i + 1));
+    set_arg < SecondArgSize, OtherArgSizes...>(args_raw, static_cast<uint8_t>(i + 1));
 }
 
 template<uint8_t... ArgSizes>
@@ -81,7 +81,7 @@ constexpr T Instruction<ArgSizes...>::bitmask(unsigned int const onecount)
 }
 
 template<uint8_t... ArgSizes>
-template <typename T>
+template<typename T>
 constexpr bool Instruction<ArgSizes...>::checkcarry(T val)
 {
     return val > std::numeric_limits<decltype(Registers::val)>().max();
