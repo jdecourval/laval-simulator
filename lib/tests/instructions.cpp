@@ -105,16 +105,32 @@ TEST_CASE("MXA")
 
     SECTION("No sync")
     {
-        SECTION("No carry, initially zero")
+        SECTION("No carry")
         {
-            registers.preload = 2;
-            MXA instruction({0});
-            instruction(registers);
+            SECTION("Initially zero, add positive")
+            {
+                registers.preload = 2;
+                MXA instruction({0});
+                instruction(registers);
 
-            REQUIRE(registers.val == 2);
+                REQUIRE(registers.val == 2);
+                REQUIRE(!registers.status2.negative);
+                REQUIRE(registers.preload == 2);
+            }
+
+            SECTION("Initially zero, add negative")
+            {
+                registers.preload = -2;
+                registers.preload_negative = true;
+                MXA instruction({0});
+                instruction(registers);
+
+                REQUIRE(registers.val == static_cast<uint8_t>(-2));
+                REQUIRE(registers.status2.negative);
+                REQUIRE(registers.preload == static_cast<uint8_t>(-2));
+            }
+
             REQUIRE(!registers.status2.carry);
-            REQUIRE(!registers.status2.negative);
-            REQUIRE(registers.preload == 2);
         }
 
         SECTION("Carry, initially positive")
@@ -129,6 +145,21 @@ TEST_CASE("MXA")
             REQUIRE(registers.status2.carry);
             REQUIRE(!registers.status2.negative);
             REQUIRE(registers.preload == 15);
+        }
+
+        SECTION("Negative carry, initially negative")
+        {
+            registers.val = static_cast<uint8_t>(-127);
+            registers.preload = static_cast<uint8_t>(-15);
+            registers.preload_negative = true;
+
+            MXA instruction({0});
+            instruction(registers);
+
+            REQUIRE(static_cast<int>(registers.val) == static_cast<int>(static_cast<uint8_t>(-127 - 15)));
+            REQUIRE(registers.status2.carry);
+            REQUIRE(!registers.status2.negative);
+            REQUIRE(registers.preload == static_cast<uint8_t>(-15));
         }
 
         SECTION("Initially negative")
@@ -196,97 +227,131 @@ TEST_CASE("MXA")
 
 TEST_CASE("MXS")
 {
-//    Registers registers;
-//
-//    SECTION("No sync")
-//    {
-//        SECTION("No carry, initially zero")
-//        {
-//            registers.preload = 2;
-//            MXS instruction({0});
-//            instruction(registers);
-//
-//            REQUIRE(registers.val == static_cast<uint8_t>(int8_t{-2}));
-//            REQUIRE(!registers.status2.carry);
-//            REQUIRE(registers.status2.negative);
-//            REQUIRE(registers.preload == 2);
-//        }
-//
-//        SECTION("Carry, initially negative")
-//        {
-//            registers.val = static_cast<uint8_t>(int8_t{-250});
-//            registers.preload = -15;
-//
-//            MXS instruction({0});
-//            instruction(registers);
-//
-//            REQUIRE(static_cast<int>(registers.val) == static_cast<int>(static_cast<uint8_t>(-250 - 15)));
-//            REQUIRE(registers.status2.carry);
-//            REQUIRE(!registers.status2.negative);
-//            REQUIRE(registers.preload == 15);
-//        }
-//
-//        SECTION("Initially positive")
-//        {
-//            registers.val = static_cast<uint8_t>(-5);
-//            registers.status2.negative = true;
-//            REQUIRE(registers.val == static_cast<uint8_t>(-5));
-//
-//            SECTION("Still negative")
-//            {
-//                registers.preload = 3;
-//
-//                MXS instruction({0});
-//                instruction(registers);
-//
-//                REQUIRE(static_cast<int>(registers.val) == static_cast<uint8_t>(-2));
-//                REQUIRE(!registers.status2.carry);
-//                REQUIRE(registers.status2.negative);
-//                REQUIRE(registers.preload == 3);
-//            }
-//
-//            SECTION("Then zero")
-//            {
-//                registers.preload = 5;
-//
-//                MXS instruction({0});
-//                instruction(registers);
-//
-//                REQUIRE(registers.val == 0);
-//                REQUIRE(!registers.status2.carry);
-//                REQUIRE(!registers.status2.negative);
-//                REQUIRE(registers.preload == 5);
-//            }
-//
-//            SECTION("Then positive")
-//            {
-//                registers.preload = 6;
-//
-//                MXS instruction({0});
-//                instruction(registers);
-//
-//                REQUIRE(registers.val == 1);
-//                REQUIRE(!registers.status2.carry);
-//                REQUIRE(!registers.status2.negative);
-//                REQUIRE(registers.preload == 6);
-//            }
-//        }
-//
-//        REQUIRE(!registers.status1.sync);
-//    }
-//
-//    SECTION("Sync")
-//    {
-//        registers.preload = 2;
-//        MXS instruction({1});
-//        instruction(registers);
-//
-//        REQUIRE(registers.val == 2);
-//        REQUIRE(!registers.status2.carry);
-//        REQUIRE(!registers.status2.negative);
-//        REQUIRE(registers.preload == 2);
-//        REQUIRE(registers.status1.sync);
-//    }
+    Registers registers;
+
+    SECTION("No sync")
+    {
+        SECTION("No carry")
+        {
+            SECTION("Initially zero, subtract positive")
+            {
+                registers.preload = 2;
+                MXS instruction({0});
+                instruction(registers);
+
+                REQUIRE(registers.val == static_cast<uint8_t>(-2));
+                REQUIRE(registers.status2.negative);
+                REQUIRE(registers.preload == 2);
+            }
+
+            SECTION("Initially zero, subtract negative")
+            {
+                registers.preload = -2;
+                registers.preload_negative = true;
+                MXS instruction({0});
+                instruction(registers);
+
+                REQUIRE(registers.val == 2);
+                REQUIRE(!registers.status2.negative);
+                REQUIRE(registers.preload == static_cast<uint8_t>(-2));
+            }
+
+            REQUIRE(!registers.status2.carry);
+        }
+
+        SECTION("Carry, initially positive")
+        {
+            registers.val = 250;
+            registers.preload = static_cast<uint8_t>(-15);
+            registers.preload_negative = true;
+
+            MXS instruction({0});
+            instruction(registers);
+
+            REQUIRE(static_cast<int>(registers.val) == static_cast<int>(static_cast<uint8_t>(250 + 15)));
+            REQUIRE(registers.status2.carry);
+            REQUIRE(!registers.status2.negative);
+            REQUIRE(registers.preload == static_cast<uint8_t>(-15));
+        }
+
+        SECTION("Negative carry, initially negative")
+        {
+            registers.val = static_cast<uint8_t>(-127);
+            registers.preload = 15;
+
+            MXS instruction({0});
+            instruction(registers);
+
+            REQUIRE(static_cast<int>(registers.val) == static_cast<int>(static_cast<uint8_t>(-127 - 15)));
+            REQUIRE(registers.status2.carry);
+            REQUIRE(!registers.status2.negative);
+            REQUIRE(registers.preload == static_cast<uint8_t>(-15));
+        }
+
+        SECTION("Initially negative")
+        {
+            registers.val = static_cast<uint8_t>(-5);
+            registers.status2.negative = true;
+            REQUIRE(registers.val == static_cast<uint8_t>(-5));
+
+            SECTION("Still negative")
+            {
+                registers.preload = static_cast<uint8_t>(-3);
+                registers.preload_negative = true;
+
+                MXS instruction({0});
+                instruction(registers);
+
+                REQUIRE(static_cast<int>(registers.val) == static_cast<uint8_t>(-2));
+                REQUIRE(!registers.status2.carry);
+                REQUIRE(registers.status2.negative);
+                REQUIRE(registers.preload == static_cast<uint8_t>(-3));
+            }
+
+            SECTION("Then zero")
+            {
+                registers.preload = static_cast<uint8_t>(-5);
+                registers.preload_negative = true;
+
+                MXS instruction({0});
+                instruction(registers);
+
+                REQUIRE(registers.val == 0);
+                REQUIRE(!registers.status2.carry);
+                REQUIRE(!registers.status2.negative);
+                REQUIRE(registers.preload == static_cast<uint8_t>(-5));
+            }
+
+            SECTION("Then positive")
+            {
+                registers.preload = static_cast<uint8_t>(-6);
+                registers.preload_negative = true;
+
+                MXS instruction({0});
+                instruction(registers);
+
+                REQUIRE(registers.val == 1);
+                REQUIRE(!registers.status2.carry);
+                REQUIRE(!registers.status2.negative);
+                REQUIRE(registers.preload == static_cast<uint8_t>(-6));
+            }
+        }
+
+        REQUIRE(!registers.status1.sync);
+    }
+
+    SECTION("Sync")
+    {
+        registers.preload = 2;
+        MXS instruction({1});
+        instruction(registers);
+
+        REQUIRE(registers.val == static_cast<uint8_t>(-2));
+        REQUIRE(!registers.status2.carry);
+        REQUIRE(registers.status2.negative);
+        REQUIRE(registers.preload == 2);
+        REQUIRE(registers.status1.sync);
+    }
 }
 
 TEST_CASE("MUX")

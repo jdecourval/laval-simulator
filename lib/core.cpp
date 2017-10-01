@@ -16,7 +16,8 @@ Core::Core()
           , id(0)
           , cores(nullptr)
 {
-
+    // This simulator rely on the fact that the simulating CPU uses two's complement notation
+    static_assert(-1 == ~0, "Your CPU architecture is too weird to use this simulator");
 }
 
 
@@ -47,6 +48,7 @@ void Core::fetch()
         {
             registers.preload = registers.status1.ctc ? pointed_core.registers.status2.carry
                                                       : pointed_core.registers.val;
+            registers.preload_negative = pointed_core.registers.status2.negative;
         }
         else
         {

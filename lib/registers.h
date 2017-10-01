@@ -36,8 +36,10 @@ struct Registers
 
 
     // Registers
+    // TODO: Use std::byte
     uint8_t val{};
     std::optional<uint8_t> preload;
+    bool preload_negative{false};
     uint8_t pc{};
     Status1 status1{};
     Status2 status2{};

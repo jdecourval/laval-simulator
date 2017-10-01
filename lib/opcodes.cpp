@@ -59,9 +59,13 @@ void MXL::operator()(Registers& registers) const
 
 void MXA::operator()(Registers& registers) const
 {
-    auto result =
-            (registers.status2.negative ? static_cast<int8_t>(registers.val) : registers.val) + *registers.preload;
+    // TODO: Do not rely on negative flag
+    // TODO: Reuse code in CAD, MXS and CSU
+    auto first_term = registers.status2.negative ? static_cast<int16_t>(static_cast<int8_t>(registers.val)) : registers.val;
+    auto second_term = registers.preload_negative ? static_cast<int16_t>(static_cast<int8_t>(*registers.preload)) : *registers.preload;
+    auto result = first_term + second_term;
 
+    // TODO: Should negative signed integer overflow set carry flag ?
     registers.status2.carry = checkcarry(result);
     registers.val = static_cast<uint8_t>(result);
     registers.status2.negative = result < 0;
@@ -74,7 +78,9 @@ void MXA::operator()(Registers& registers) const
 
 void MXS::operator()(Registers& registers) const
 {
-    auto result = (registers.status2.negative ? -registers.val : registers.val) - *registers.preload;
+    auto first_term = registers.status2.negative ? static_cast<int16_t>(static_cast<int8_t>(registers.val)) : registers.val;
+    auto second_term = registers.preload_negative ? static_cast<int16_t>(static_cast<int8_t>(*registers.preload)) : *registers.preload;
+    auto result = first_term - second_term;
 
     registers.status2.carry = checkcarry(result);
     registers.val = static_cast<uint8_t>(result);
@@ -164,7 +170,9 @@ void RSH::operator()(Registers& registers) const
 
 void CAD::operator()(Registers& registers) const
 {
-    auto result = (registers.status2.negative ? static_cast<int8_t>(registers.val) : registers.val) + get_argument(0);
+    auto first_term = registers.status2.negative ? static_cast<int16_t>(static_cast<int8_t>(registers.val)) : registers.val;
+    auto second_term = get_argument(0);
+    auto result = first_term + second_term;
 
     registers.status2.carry = checkcarry(result);
     registers.val = static_cast<uint8_t>(result);
@@ -178,7 +186,9 @@ void CAD::operator()(Registers& registers) const
 
 void CSU::operator()(Registers& registers) const
 {
-    auto result = (registers.status2.negative ? -registers.val : registers.val) - get_argument(0);
+    auto first_term = registers.status2.negative ? static_cast<int16_t>(static_cast<int8_t>(registers.val)) : registers.val;
+    auto second_term = get_argument(0);
+    auto result = first_term - second_term;
 
     registers.status2.carry = checkcarry(result);
     // TODO: Undefined behaviour, value cannot be represented in the destination type

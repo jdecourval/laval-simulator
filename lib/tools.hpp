@@ -11,12 +11,6 @@ T Tools::umaxof()
     return t;
 }
 
-template<class T>
-size_t Tools::bitsof(const T& umax)
-{
-    return std::bitset<sizeof(T) * 8>(umax).count();
-}
-
 constexpr unsigned long Tools::upper_power_of_two(unsigned long v)
 {
     v--;
