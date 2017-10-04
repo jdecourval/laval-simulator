@@ -2,11 +2,11 @@
 
 
 Direction::Direction(uint8_t raw)
-        : std::array<detail::Direction1D, Settings::DIMENSION_N>()
+: directions()
 {
-    for (auto i = 0u; i < size(); i++)
+    for (auto& direction : directions)
     {
-        this->at(i) = static_cast<detail::Direction1D>(raw % 3 - 1);
+        direction = static_cast<detail::Direction1D>(raw % 3 - 1);
         raw /= 3;
     }
 }
@@ -15,18 +15,24 @@ uint8_t Direction::dump()
 {
     uint8_t value = 0;
 
-    for (auto i = 0u; i < size(); i++)
+    for (auto i = 0u; i < directions.size(); i++)
     {
-        value += (this->at(i) + 1) * std::pow(i + 1, 3);
+        value += (directions.at(i) + 1) * std::pow(3, i);
     }
 
     return value;
 }
 
+constexpr size_t Direction::total()
+{
+    // 3 come from the number of possible direction: CURRENT, BEFORE, AFTER
+    return static_cast<size_t>(std::pow(3, Settings::DIMENSION_N));
+}
+
 DirectionComplex::DirectionComplex(uint8_t raw)
         : std::variant<Direction, SpecialDirection>(Direction(raw))
 {
-    if (raw >= Settings::CORES)
+    if (raw >= Direction::total())
     {
         std::variant<Direction, SpecialDirection>(SpecialDirection(raw - Settings::CORES));
     }

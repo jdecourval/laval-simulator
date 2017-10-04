@@ -50,9 +50,9 @@ public:
 
     Core& offset(size_t id, const Direction& offsets)
     {
-        assert(offsets.size() == index_operands.size());
+        assert(Settings::DIMENSION_N == index_operands.size());
         auto long_size = static_cast<long>(size);
-        auto index = std::inner_product(offsets.begin(), offsets.end(), index_operands.begin(), static_cast<long>(id));
+        auto index = std::inner_product(offsets.cbegin(), offsets.cend(), index_operands.begin(), static_cast<long>(id));
         index = Settings::WRAP && index >= long_size ? index - long_size : index;
         index = Settings::WRAP && index < 0 ? index + long_size : index;
         assert(index < long_size);

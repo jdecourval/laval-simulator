@@ -13,19 +13,32 @@ namespace detail
 {
     enum Direction1D
     {
-        CURRENT = -1,
-        BEFORE = 0,
+        BEFORE = -1,
+        CURRENT = 0,
         AFTER = 1
     };
 }
 
-// TODO: Should instead store an array
-class Direction : public std::array<detail::Direction1D, Settings::DIMENSION_N>
+class Direction
 {
 public:
     explicit Direction(uint8_t raw);
 
     uint8_t dump();
+
+    constexpr decltype(auto) cbegin() const noexcept;
+
+    constexpr decltype(auto) begin() noexcept;
+
+    constexpr decltype(auto) cend() const noexcept;
+
+    constexpr decltype(auto) end() noexcept;
+
+    static constexpr size_t total();
+
+private:
+    // raw value is ordered LSB to MSB
+    std::array<detail::Direction1D, Settings::DIMENSION_N> directions;
 };
 
 
@@ -44,5 +57,7 @@ public:
     uint8_t dump();
 };
 
+
+#include "direction.hpp"
 
 #endif //SIMULATOR_DIRECTION_H

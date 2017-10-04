@@ -11,6 +11,7 @@ set(SOURCE_FILES
         cpu.cpp
         direction.h
         direction.cpp
+        direction.hpp
         instruction.h
         instruction.hpp
         instruction_factory.cpp
