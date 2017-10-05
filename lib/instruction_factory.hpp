@@ -30,7 +30,7 @@ void InstructionFactory::register_helper(std::index_sequence<I...>)
             if constexpr (sizeof...(I) > 0)
             {
                 assert(val > begin);
-                return std::make_unique<T>(val - begin);
+                return std::make_unique<T>(static_cast<std::byte>(val - begin));
             }
             else
             {

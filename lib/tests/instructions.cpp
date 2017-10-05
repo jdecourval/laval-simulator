@@ -360,7 +360,7 @@ TEST_CASE("MUX")
 
     SECTION("Correctly set mux value")
     {
-        MUX instruction{3};
+        MUX instruction({3});
 
         instruction(registers);
 
