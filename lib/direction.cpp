@@ -34,7 +34,7 @@ DirectionComplex::DirectionComplex(uint8_t raw)
 {
     if (raw >= Direction::total())
     {
-        std::variant<Direction, SpecialDirection>(SpecialDirection(raw - Settings::CORES));
+        emplace<SpecialDirection>(static_cast<SpecialDirection>(raw - Settings::CORES));
     }
 }
 
