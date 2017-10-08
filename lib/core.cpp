@@ -1,48 +1,41 @@
-#include "core.h"
-
 #include <iostream>
-#include <cmath>
+#include "core.h"
 
 #include "multidimensional_array.h"
 
 
-inline uint8_t operator "" _8(unsigned long long value)
-{
-    return static_cast<uint8_t>(value);
-}
-
 Core::Core()
-        : mem()
-          , id(0)
+        : registers()
+          , mem()
           , cores(nullptr)
 {
     // This simulator rely on the fact that the simulating CPU uses two's complement notation
     static_assert(-1 == ~0, "Your CPU architecture is too weird to use this simulator");
 }
 
-
-void Core::check()
+Core::Core(const CoreArray& cores, size_t id, const Memory_t& mem)
+    : registers()
+      , mem(&mem)
+      , cores(&cores)
 {
+    // This simulator rely on the fact that the simulating CPU uses two's complement notation
+    static_assert(-1 == ~0, "Your CPU architecture is too weird to use this simulator");
 
+    registers.id = id;
 }
 
-void Core::link(CoreArray *cores, size_t id, Memory_t *mem)
-{
-    this->cores = cores;
-    this->id = id;
-    this->mem = mem;
 
-}
-
-void Core::fetch()
+void Core::preload()
 {
     auto direction_complex = DirectionComplex(registers.status1.mux);
 
     try
     {
+        assert(cores);
+
         auto direction = std::get<Direction>(direction_complex);
 
-        auto& pointed_core = cores->offset(id, direction);
+        auto& pointed_core = cores->offset(registers.id, direction);
 
         if (pointed_core.registers.status1.sync)
         {
@@ -69,39 +62,46 @@ void Core::fetch()
                 registers.preload = registers.status2.membank;
                 break;
 
+            case SpecialDirection::VAL:
+                registers.preload = registers.val;
+                break;
+
             default:
-                throw 1;
+                throw std::logic_error("Invalid direction");
         }
     }
 }
 
-
-void Core::step2()
+void Core::fetch()
 {
-    if (!registers.preload)
+#ifndef NDEBUG
+    if (!mem)
     {
-        return;
+        throw std::logic_error{"Memory is not linked"};
     }
+#endif
 
     registers.status1.sync = false;
 
     auto raw_instruction = (*mem)[registers.status2.membank][registers.pc & 0xf];
-    // Let it wrap around
-    registers.pc++;
 
     auto instruction = factory.create(raw_instruction);
-    (*instruction)(registers);
-}
 
+    // Increment PC only if the instruction does not needs to stall the pipeline
+    if ((*instruction)(registers))
+    {
+        // Let it wrap around
+        registers.pc++;
+    }
+}
 
 void Core::sync()
 {
     registers.status1.sync = true;
 }
 
-void Core::execute(const InstructionBase& raw_instruction)
+bool Core::execute(const InstructionBase& raw_instruction)
 {
-    raw_instruction(registers);
+    return raw_instruction(registers);
 }
-
 

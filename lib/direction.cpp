@@ -2,11 +2,19 @@
 
 
 Direction::Direction(uint8_t raw)
-: directions()
+    : directions()
 {
+#ifndef NDEBUG
+    if (raw >= total())
+    {
+        throw std::out_of_range{"Out of range"};
+    }
+#endif
+
     for (auto& direction : directions)
     {
-        direction = static_cast<detail::Direction1D>(raw % 3 - 1);
+        // 3 corresponds to the number of possible Direction1D
+        direction = static_cast<Direction1D>(raw % 3 - 1);
         raw /= 3;
     }
 }
@@ -17,25 +25,25 @@ uint8_t Direction::dump()
 
     for (auto i = 0u; i < directions.size(); i++)
     {
+        // 3 corresponds to the number of possible Direction1D
         value += (directions.at(i) + 1) * std::pow(3, i);
     }
 
     return value;
 }
 
-constexpr size_t Direction::total()
-{
-    // 3 come from the number of possible direction: CURRENT, BEFORE, AFTER
-    return static_cast<size_t>(std::pow(3, Settings::DIMENSION_N));
-}
-
 DirectionComplex::DirectionComplex(uint8_t raw)
-        : std::variant<Direction, SpecialDirection>(Direction(raw))
+    : Variant(raw >= Direction::total()
+              ? Variant(static_cast<SpecialDirection>(raw - Direction::total()))
+              : Variant(Direction(raw))
+)
 {
-    if (raw >= Direction::total())
+#ifndef NDEBUG
+    if (raw >= (Direction::total() + static_cast<int>(SpecialDirection::LAST_DO_NOT_USE)))
     {
-        emplace<SpecialDirection>(static_cast<SpecialDirection>(raw - Settings::CORES));
+        throw std::out_of_range{"Out of range"};
     }
+#endif
 }
 
 uint8_t DirectionComplex::dump()
@@ -46,6 +54,23 @@ uint8_t DirectionComplex::dump()
     }
     else
     {
-        return static_cast<uint8_t>(std::get<SpecialDirection>(*this)) + Settings::CORES;
+        return static_cast<uint8_t>(std::get<SpecialDirection>(*this)) + Direction::total();
     }
+}
+
+DirectionComplex::DirectionComplex(const Direction& direction)
+    : Variant(direction)
+{
+
+}
+
+DirectionComplex::DirectionComplex(SpecialDirection direction)
+    : Variant(direction)
+{
+#ifndef NDEBUG
+    if (static_cast<int>(direction) >= static_cast<int>(SpecialDirection::LAST_DO_NOT_USE))
+    {
+        throw std::out_of_range{"Out of range"};
+    }
+#endif
 }

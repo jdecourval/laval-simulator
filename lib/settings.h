@@ -7,21 +7,22 @@
 #include "tools.h"
 
 
-namespace User
+namespace UserSettings
 {
     constexpr std::initializer_list<size_t> DIMENSIONS = {10, 10, 10};
+    constexpr auto WRAP = true;
 };
 
 // TODO: Change to a class to avoid static variable that may throw an exception that cannot be caught
-namespace Settings
+// TODO: Move variable from ComputedSettings to UserSettings
+namespace ComputedSettings
 {
     using PC_t = uint8_t;
 
-    constexpr auto DIMENSION_N = User::DIMENSIONS.size();
-    inline const std::vector<size_t> DIMENSIONS = User::DIMENSIONS;
-    const auto CORES = std::accumulate(User::DIMENSIONS.begin(), User::DIMENSIONS.end(), 1, std::multiplies<>());
-
-    constexpr auto WRAP = true;
+    constexpr auto DIMENSION_N = UserSettings::DIMENSIONS.size();
+    inline const auto DIMENSIONS = UserSettings::DIMENSIONS;
+    const auto CORES = std::accumulate(UserSettings::DIMENSIONS.begin(), UserSettings::DIMENSIONS.end(), 1, std::multiplies<>());
+    constexpr auto WRAP = UserSettings::WRAP;
 
     constexpr auto BANK_NUMBER = 16;
     constexpr auto BANK_NUMBER_BITS = Tools::log2(Tools::upper_power_of_two(BANK_NUMBER));

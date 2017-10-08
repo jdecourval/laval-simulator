@@ -13,7 +13,7 @@ struct NOP : public Instruction<>
 {
     using Instruction<>::Instruction;
 
-    void operator()(Registers& registers) const override;
+    bool operator()(Registers& registers) const override;
 };
 
 
@@ -23,7 +23,7 @@ struct SYN : public Instruction<>
 {
     using Instruction<>::Instruction;
 
-    void operator()(Registers& registers) const override;
+    bool operator()(Registers& registers) const override;
 };
 
 
@@ -33,7 +33,7 @@ struct CTC : public Instruction<>
 {
     using Instruction<>::Instruction;
 
-    void operator()(Registers& registers) const override;
+    bool operator()(Registers& registers) const override;
 };
 
 
@@ -43,7 +43,7 @@ struct CTV : public Instruction<>
 {
     using Instruction<>::Instruction;
 
-    void operator()(Registers& registers) const override;
+    bool operator()(Registers& registers) const override;
 };
 
 
@@ -53,7 +53,12 @@ struct DBG : public Instruction<>
 {
     using Instruction<>::Instruction;
 
-    void operator()(Registers& registers) const override;
+    explicit DBG(Registers* output);
+
+    bool operator()(Registers& registers) const override;
+
+private:
+    Registers* output = nullptr;
 };
 
 
@@ -63,7 +68,7 @@ struct HCF : public Instruction<>
 {
     using Instruction<>::Instruction;
 
-    void operator()(Registers& registers) const override;
+    bool operator()(Registers& registers) const override;
 };
 
 
@@ -76,7 +81,7 @@ struct MXL : public Instruction<1>
 {
     using Instruction<1>::Instruction;
 
-    void operator()(Registers& registers) const override;
+    bool operator()(Registers& registers) const override;
 };
 
 
@@ -86,7 +91,7 @@ struct MXA : public Instruction<1>
 {
     using Instruction<1>::Instruction;
 
-    void operator()(Registers& registers) const override;
+    bool operator()(Registers& registers) const override;
 };
 
 
@@ -96,7 +101,7 @@ struct MXS : public Instruction<1>
 {
     using Instruction<1>::Instruction;
 
-    void operator()(Registers& registers) const override;
+    bool operator()(Registers& registers) const override;
 };
 
 
@@ -108,7 +113,7 @@ struct MUX : public Instruction<3>
 {
     using Instruction<3>::Instruction;
 
-    void operator()(Registers& registers) const override;
+    bool operator()(Registers& registers) const override;
 };
 
 
@@ -118,7 +123,7 @@ struct LCL : public Instruction<4>
 {
     using Instruction<4>::Instruction;
 
-    void operator()(Registers& registers) const override;
+    bool operator()(Registers& registers) const override;
 };
 
 
@@ -128,7 +133,7 @@ struct LCH : public Instruction<4>
 {
     using Instruction<4>::Instruction;
 
-    void operator()(Registers& registers) const override;
+    bool operator()(Registers& registers) const override;
 };
 
 
@@ -138,7 +143,7 @@ struct JLV : public Instruction<4>
 {
     using Instruction<4>::Instruction;
 
-    void operator()(Registers& registers) const override;
+    bool operator()(Registers& registers) const override;
 };
 
 
@@ -148,7 +153,7 @@ struct JEV : public Instruction<4>
 {
     using Instruction<4>::Instruction;
 
-    void operator()(Registers& registers) const override;
+    bool operator()(Registers& registers) const override;
 };
 
 
@@ -158,7 +163,7 @@ struct JGV : public Instruction<4>
 {
     using Instruction<4>::Instruction;
 
-    void operator()(Registers& registers) const override;
+    bool operator()(Registers& registers) const override;
 };
 
 
@@ -168,7 +173,7 @@ struct JMP : public Instruction<4>
 {
     using Instruction<4>::Instruction;
 
-    void operator()(Registers& registers) const override;
+    bool operator()(Registers& registers) const override;
 };
 
 
@@ -181,7 +186,7 @@ struct LSH : public Instruction<4, 1>
 {
     using Instruction<4, 1>::Instruction;
 
-    void operator()(Registers& registers) const override;
+    bool operator()(Registers& registers) const override;
 };
 
 
@@ -192,7 +197,7 @@ struct RSH : public Instruction<4, 1>
 {
     using Instruction<4, 1>::Instruction;
 
-    void operator()(Registers& registers) const override;
+    bool operator()(Registers& registers) const override;
 };
 
 
@@ -203,7 +208,7 @@ struct CAD : public Instruction<4, 1>
 {
     using Instruction<4, 1>::Instruction;
 
-    void operator()(Registers& registers) const override;
+    bool operator()(Registers& registers) const override;
 };
 
 
@@ -214,7 +219,7 @@ struct CSU : public Instruction<4, 1>
 {
     using Instruction<4, 1>::Instruction;
 
-    void operator()(Registers& registers) const override;
+    bool operator()(Registers& registers) const override;
 };
 
 

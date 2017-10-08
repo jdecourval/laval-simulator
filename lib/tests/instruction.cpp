@@ -1,16 +1,14 @@
 #include "catch.hpp"
 #include "instruction.h"
 
-// Test argument settings
-
 template<uint8_t... ArgSizes>
 struct TestInstruction : Instruction<ArgSizes...>
 {
     using Instruction<ArgSizes...>::Instruction;
 
-    void operator()(Registers&) const override
+    bool operator()(Registers&) const override
     {
-
+        return true;
     }
 };
 

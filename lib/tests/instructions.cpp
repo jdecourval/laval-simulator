@@ -1,3 +1,4 @@
+#include <opcodes.h>
 #include "core.h"
 #include "catch.hpp"
 

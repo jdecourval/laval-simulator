@@ -12,8 +12,8 @@ struct Registers
 
     struct Status1
     {
-        // 3 bits are needed for 3D or 5 bits for 4D if we ignore diagonals
-        uint8_t mux: 3;
+        // TODO: 4 bits (+ special directions) are needed for 3D if we ignore diagonals
+        uint8_t mux: 6;
         bool ctc: 1;
         bool sync: 1;
 
@@ -36,6 +36,7 @@ struct Registers
 
 
     // Registers
+    size_t id;
     // TODO: Use std::byte
     uint8_t val{};
     std::optional<uint8_t> preload;

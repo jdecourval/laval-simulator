@@ -9,7 +9,8 @@
 
 struct InstructionBase
 {
-    virtual void operator()(Registers& registers) const = 0;
+    /// @return false if the instruction have to stall the pipeline
+    virtual bool operator()(Registers& registers) const = 0;
 };
 
 
