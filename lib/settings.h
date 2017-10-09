@@ -7,10 +7,11 @@
 #include "tools.h"
 
 
+// TODO: Reduce classes reliance on settings
 namespace UserSettings
 {
     constexpr std::initializer_list<size_t> DIMENSIONS = {10, 10, 10};
-    constexpr auto WRAP = true;
+    constexpr auto WRAP = false;
 };
 
 // TODO: Change to a class to avoid static variable that may throw an exception that cannot be caught

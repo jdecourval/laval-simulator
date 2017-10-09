@@ -7,7 +7,8 @@
 using namespace std::chrono_literals;
 
 Cpu::Cpu()
-        : cores(ComputedSettings::DIMENSIONS)
+    : mem{}
+      , cores(ComputedSettings::DIMENSIONS, mem)
 {
     running = false;
     linkCores();

@@ -2,7 +2,7 @@
 #define SIMULATOR_CPU_H
 
 #include "memory.h"
-#include "multidimensional_array.h"
+#include "core_array.h"
 
 
 class Cpu
@@ -20,8 +20,8 @@ private:
     void linkCores();
 
     bool running;
-    CoreArray cores;
     Memory_t mem;
+    CoreArray cores;
 };
 
 

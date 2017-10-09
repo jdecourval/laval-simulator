@@ -23,6 +23,8 @@ public:
 
     explicit Direction(uint8_t raw);
 
+    explicit Direction(std::array<Direction1D, ComputedSettings::DIMENSION_N> directions);
+
     uint8_t dump();
 
     constexpr decltype(auto) cbegin() const noexcept;

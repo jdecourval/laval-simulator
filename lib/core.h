@@ -16,8 +16,6 @@ public:
 
     Core(const CoreArray& cores, size_t id, const Memory_t& mem);
 
-    constexpr void link(CoreArray* cores, size_t id, Memory_t* mem);
-
     void preload();
 
     void fetch();
@@ -25,6 +23,8 @@ public:
     bool execute(const InstructionBase& raw_instruction);
 
     void sync();
+
+    bool operator==(const Core&) const;
 
     Core(Core&& core) = default;
 
@@ -38,7 +38,12 @@ private:
 
     const CoreArray* cores;
     InstructionFactory factory;
+
+    friend std::ostream& operator<<(std::ostream& os, const Core& core);
 };
+
+
+std::ostream& operator<<(std::ostream& os, const Core& core);
 
 
 #include "core.hpp"

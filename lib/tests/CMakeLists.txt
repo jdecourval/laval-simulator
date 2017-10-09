@@ -1,6 +1,7 @@
 add_executable(LavalTests
         catch.hpp
         core.cpp
+        core_array.cpp
         direction.cpp
         instruction.cpp
         instructions.cpp

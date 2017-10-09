@@ -19,6 +19,12 @@ Direction::Direction(uint8_t raw)
     }
 }
 
+Direction::Direction(std::array<Direction1D, ComputedSettings::DIMENSION_N> directions)
+: directions(directions)
+{
+
+}
+
 uint8_t Direction::dump()
 {
     uint8_t value = 0;

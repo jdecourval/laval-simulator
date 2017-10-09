@@ -1,7 +1,7 @@
 #include <iostream>
 #include "core.h"
 
-#include "multidimensional_array.h"
+#include "core_array.h"
 
 
 Core::Core()
@@ -105,3 +105,13 @@ bool Core::execute(const InstructionBase& raw_instruction)
     return raw_instruction(registers);
 }
 
+bool Core::operator==(const Core& core) const
+{
+    return registers.id == core.registers.id;
+}
+
+std::ostream& operator<<(std::ostream& os, const Core& core)
+{
+    os << core.registers.id;
+    return os;
+}

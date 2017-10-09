@@ -19,6 +19,16 @@ TEST_CASE("Load and dump")
     }
 }
 
+TEST_CASE("Direction constructor")
+{
+    Direction direction({Direction::AFTER, Direction::CURRENT, Direction::BEFORE});
+    auto iter = std::cbegin(direction);
+
+    REQUIRE(*iter == Direction::AFTER);
+    REQUIRE(*(++iter) == Direction::CURRENT);
+    REQUIRE(*(++iter) == Direction::BEFORE);
+}
+
 TEST_CASE("Special directions")
 {
     auto size = Direction::total();
