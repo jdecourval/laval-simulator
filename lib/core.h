@@ -46,6 +46,4 @@ private:
 std::ostream& operator<<(std::ostream& os, const Core& core);
 
 
-#include "core.hpp"
-
 #endif //SIMULATOR_CORE_H
