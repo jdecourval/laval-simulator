@@ -19,14 +19,18 @@ public:
 
     std::unique_ptr<InstructionBase> create(uint8_t val);
 
+    template<typename T>
+    uint8_t dump(const T& instruction) const;
+
 private:
     template<typename T, size_t... I>
     void register_helper(std::index_sequence<I...>);
 
 private:
     std::array<std::function<std::unique_ptr<InstructionBase>(uint8_t)>, 256> map;
+    std::unordered_map<size_t, uint8_t> instruction_to_offset;
     uint8_t counter = 0;
-    std::ofstream dump;
+    std::ofstream dump_file;
 
 };
 

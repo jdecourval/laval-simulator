@@ -17,6 +17,7 @@ struct Registers
         bool ctc: 1;
         bool sync: 1;
 
+        Status1();
         bool operator==(const Status1& other) const;
     };
 
@@ -36,7 +37,7 @@ struct Registers
 
 
     // Registers
-    size_t id;
+    size_t id{};
     // TODO: Use std::byte
     uint8_t val{};
     std::optional<uint8_t> preload;
@@ -46,5 +47,6 @@ struct Registers
     Status2 status2{};
 };
 
+std::ostream& operator<<(std::ostream& os, const Registers& registers);
 
 #endif //SIMULATOR_REGISTERS_H

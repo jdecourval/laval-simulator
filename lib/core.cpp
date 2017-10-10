@@ -2,6 +2,7 @@
 #include "core.h"
 
 #include "core_array.h"
+#include "opcodes.h"
 
 
 Core::Core()
@@ -11,6 +12,8 @@ Core::Core()
 {
     // This simulator rely on the fact that the simulating CPU uses two's complement notation
     static_assert(-1 == ~0, "Your CPU architecture is too weird to use this simulator");
+
+    initialize();
 }
 
 Core::Core(const CoreArray& cores, size_t id, const Memory_t& mem)
@@ -22,8 +25,33 @@ Core::Core(const CoreArray& cores, size_t id, const Memory_t& mem)
     static_assert(-1 == ~0, "Your CPU architecture is too weird to use this simulator");
 
     registers.id = id;
+
+    initialize();
 }
 
+void Core::initialize()
+{
+    factory.register_instruction<NOP>();
+    factory.register_instruction<SYN>();
+    factory.register_instruction<CTC>();
+    factory.register_instruction<CTV>();
+    factory.register_instruction<DBG>();
+    factory.register_instruction<HCF>();
+    factory.register_instruction<MXL>();
+    factory.register_instruction<MXA>();
+    factory.register_instruction<MXS>();
+    factory.register_instruction<MUX>();
+    factory.register_instruction<LCL>();
+    factory.register_instruction<LCH>();
+    factory.register_instruction<JLV>();
+    factory.register_instruction<JEV>();
+    factory.register_instruction<JGV>();
+    factory.register_instruction<JMP>();
+    factory.register_instruction<LSH>();
+    factory.register_instruction<RSH>();
+    factory.register_instruction<CAD>();
+    factory.register_instruction<CSU>();
+}
 
 void Core::preload()
 {
@@ -62,10 +90,6 @@ void Core::preload()
                 registers.preload = registers.status2.membank;
                 break;
 
-            case SpecialDirection::VAL:
-                registers.preload = registers.val;
-                break;
-
             default:
                 throw std::logic_error("Invalid direction");
         }
@@ -83,7 +107,7 @@ void Core::fetch()
 
     registers.status1.sync = false;
 
-    auto raw_instruction = (*mem)[registers.status2.membank][registers.pc & 0xf];
+    auto raw_instruction = (*mem)[registers.status2.membank][registers.pc];
 
     auto instruction = factory.create(raw_instruction);
 
@@ -114,4 +138,15 @@ std::ostream& operator<<(std::ostream& os, const Core& core)
 {
     os << core.registers.id;
     return os;
+}
+
+InstructionFactory& Core::get_factory()
+{
+    return factory;
+}
+
+void Core::step()
+{
+    preload();
+    fetch();
 }

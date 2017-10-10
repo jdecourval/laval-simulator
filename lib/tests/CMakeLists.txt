@@ -5,6 +5,7 @@ add_executable(LavalTests
         direction.cpp
         instruction.cpp
         instructions.cpp
+        instruction_factory.cpp
         main.cpp
         )
 

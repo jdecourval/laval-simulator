@@ -28,7 +28,7 @@ namespace ComputedSettings
     constexpr auto BANK_NUMBER = 16;
     constexpr auto BANK_NUMBER_BITS = Tools::log2(Tools::upper_power_of_two(BANK_NUMBER));
 
-    constexpr auto BANK_SIZE = 1u << sizeof(PC_t);
+    constexpr auto BANK_SIZE = 1u << (8 * sizeof(PC_t));
 
 
     constexpr auto MUX_BITS = Tools::upper_power_of_two(DIMENSION_N);

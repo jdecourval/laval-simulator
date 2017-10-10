@@ -21,6 +21,8 @@ public:
         AFTER = 1
     };
 
+    Direction();
+
     explicit Direction(uint8_t raw);
 
     explicit Direction(std::array<Direction1D, ComputedSettings::DIMENSION_N> directions);
@@ -45,7 +47,6 @@ private:
 
 enum class SpecialDirection
 {
-    VAL,
     PC,
     MEMBANK,
     LAST_DO_NOT_USE

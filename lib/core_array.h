@@ -41,6 +41,11 @@ public:
         return std::end(cores);
     }
 
+    decltype(auto) size() noexcept
+    {
+        return cores.size();
+    }
+
     CoreArray(CoreArray&) = delete;
 
     CoreArray& operator=(CoreArray&) = delete;

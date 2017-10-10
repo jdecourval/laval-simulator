@@ -38,28 +38,14 @@ DBG::DBG(Registers* output)
 
 bool DBG::operator()(Registers& registers) const
 {
+    // TODO: Move this functionality from the instruction to a new test-only instruction
     if (output)
     {
         *output = registers;
     }
     else
     {
-        std::cout << "id: " << std::hex << (registers.id) << std::endl;
-        std::cout << "pc: " << std::hex << (registers.pc & 0xf) << std::endl;
-        std::cout << "membank: " << std::hex << registers.status2.membank << std::endl;
-        std::cout << "val: " << std::hex << registers.val << std::endl;
-        if (registers.preload)
-        {
-            std::cout << "mux: " << std::hex << registers.status1.mux << " -> " << *registers.preload << std::endl;
-        }
-        else
-        {
-            std::cout << "mux: " << std::hex << registers.status1.mux << std::endl;
-        }
-        std::cout << "sync: " << std::hex << registers.status1.sync << std::endl;
-        std::cout << "ctc: " << std::hex << registers.status1.ctc << std::endl;
-        std::cout << "negative: " << std::hex << registers.status2.negative << std::endl;
-        std::cout << "carry: " << std::hex << registers.status2.carry << std::endl;
+        std::cout << registers << std::endl;
     }
 
     return true;

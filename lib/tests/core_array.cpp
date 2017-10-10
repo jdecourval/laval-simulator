@@ -12,8 +12,10 @@ TEST_CASE("ID are correctly set and operator[](size_t) return them in the correc
 
     CoreArray cores({4, 4, 4}, mem);
 
+    REQUIRE(cores.size() == 4 * 4 * 4);
+
     auto id = 0u;
-    for(auto& core: cores)
+    for (auto& core: cores)
     {
         core.execute(DBG{&test_registers});
         REQUIRE(test_registers.id == id);
@@ -55,18 +57,21 @@ TEST_CASE("Offsets")
     core.execute(DBG{&test_registers});
 
     {
-        auto& offsetted = cores.offset(test_registers.id, Direction({Direction::CURRENT, Direction::CURRENT, Direction::CURRENT}));
+        auto& offsetted = cores.offset(test_registers.id,
+            Direction({Direction::CURRENT, Direction::CURRENT, Direction::CURRENT}));
         REQUIRE(core == offsetted);
     }
 
     {
-        auto& offsetted = cores.offset(test_registers.id, Direction({Direction::BEFORE, Direction::CURRENT, Direction::CURRENT}));
+        auto& offsetted = cores.offset(test_registers.id,
+            Direction({Direction::BEFORE, Direction::CURRENT, Direction::CURRENT}));
         auto& compare = cores[{0, 1, 1}];
         REQUIRE(compare == offsetted);
     }
 
     {
-        auto& offsetted = cores.offset(test_registers.id, Direction({Direction::AFTER, Direction::AFTER, Direction::AFTER}));
+        auto& offsetted = cores.offset(test_registers.id,
+            Direction({Direction::AFTER, Direction::AFTER, Direction::AFTER}));
         auto& compare = cores[{2, 2, 2}];
         REQUIRE(compare == offsetted);
     }

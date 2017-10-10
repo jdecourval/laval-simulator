@@ -78,3 +78,30 @@ constexpr bool Instruction<ArgSizes...>::checkcarry(T val)
 {
     return val > std::numeric_limits<decltype(Registers::val)>().max();
 }
+
+template<uint8_t... ArgSizes>
+uint8_t Instruction<ArgSizes...>::dump() const
+{
+    if constexpr (sizeof...(ArgSizes) != 0)
+    {
+        return dump<ArgSizes...>(0, 0);
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+template<uint8_t... ArgSizes>
+template<uint8_t FirstArgSize, uint8_t SecondArgSize, uint8_t... OtherArgSizes>
+uint8_t Instruction<ArgSizes...>::dump(uint8_t i, uint8_t shift) const
+{
+    return (args.at(i) << shift) + dump<SecondArgSize, OtherArgSizes...>(i + 1, shift + FirstArgSize);
+}
+
+template<uint8_t... ArgSizes>
+template<uint8_t LastArgSize>
+uint8_t Instruction<ArgSizes...>::dump(uint8_t i, uint8_t shift) const
+{
+    return args.at(i) << shift;
+}

@@ -16,6 +16,8 @@ public:
 
     Core(const CoreArray& cores, size_t id, const Memory_t& mem);
 
+    void initialize();
+
     void preload();
 
     void fetch();
@@ -23,6 +25,10 @@ public:
     bool execute(const InstructionBase& raw_instruction);
 
     void sync();
+
+    void step();
+
+    InstructionFactory& get_factory();
 
     bool operator==(const Core&) const;
 

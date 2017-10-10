@@ -29,6 +29,8 @@ struct Instruction : public InstructionBase
 
     constexpr uint8_t get_argument(uint8_t arg_index) const;
 
+    uint8_t dump() const;
+
 
 protected:
     static constexpr void sync(Registers& registers);
@@ -48,6 +50,12 @@ private:
     constexpr void set_arg(std::byte args_raw, uint8_t i);
 
     constexpr void set_arg(std::byte args_raw);
+
+    template<uint8_t LastArgSize>
+    uint8_t dump(uint8_t i, uint8_t shift) const;
+
+    template<uint8_t FirstArgSize, uint8_t SecondArgSize, uint8_t... OtherArgSizes>
+    uint8_t dump(uint8_t i, uint8_t shift) const;
 
 
 private:

@@ -1,6 +1,12 @@
 #include "direction.h"
 
 
+Direction::Direction()
+: Direction(std::array<Direction1D, ComputedSettings::DIMENSION_N>{})
+{
+
+}
+
 Direction::Direction(uint8_t raw)
     : directions()
 {

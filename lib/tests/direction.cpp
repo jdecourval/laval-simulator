@@ -33,46 +33,32 @@ TEST_CASE("Special directions")
 {
     auto size = Direction::total();
 
-    SECTION("VAL")
-    {
-        DirectionComplex direction{SpecialDirection::VAL};
-        REQUIRE(std::holds_alternative<SpecialDirection>(direction));
-        REQUIRE(static_cast<int>(direction.dump()) == size);
-    }
-
     SECTION("PC")
     {
         DirectionComplex direction{SpecialDirection::PC};
         REQUIRE(std::holds_alternative<SpecialDirection>(direction));
-        REQUIRE(direction.dump() == size + 1);
+        REQUIRE(direction.dump() == size);
     }
 
     SECTION("MEMBANK")
     {
         DirectionComplex direction{SpecialDirection::MEMBANK};
         REQUIRE(std::holds_alternative<SpecialDirection>(direction));
-        REQUIRE(direction.dump() == size + 2);
+        REQUIRE(direction.dump() == size + 1);
     }
 
-    SECTION("VAL from raw")
+    SECTION("PC from raw")
     {
         DirectionComplex direction{static_cast<uint8_t>(size)};
         REQUIRE(std::holds_alternative<SpecialDirection>(direction));
         REQUIRE(direction.dump() == size);
     }
 
-    SECTION("PC from raw")
+    SECTION("MEMBANK from raw")
     {
         DirectionComplex direction{static_cast<uint8_t>(size + 1)};
         REQUIRE(std::holds_alternative<SpecialDirection>(direction));
         REQUIRE(direction.dump() == size + 1);
-    }
-
-    SECTION("MEMBANK from raw")
-    {
-        DirectionComplex direction{static_cast<uint8_t>(size + 2)};
-        REQUIRE(std::holds_alternative<SpecialDirection>(direction));
-        REQUIRE(direction.dump() == size + 2);
     }
 
     SECTION("Invalid directions")
