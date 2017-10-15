@@ -19,20 +19,18 @@ struct Instruction : public InstructionBase
 {
     using Args = std::index_sequence<ArgSizes...>;
 
-
     constexpr Instruction();
 
     constexpr Instruction(std::array<uint8_t, sizeof...(ArgSizes)> args);
 
-    // TODO: This function wrongly allows to accidentally pass a single argument to a multiple arguments instruction
     constexpr explicit Instruction(std::byte args_raw);
-
-    constexpr uint8_t get_argument(uint8_t arg_index) const;
 
     uint8_t dump() const;
 
 
 protected:
+    constexpr uint8_t get_argument(uint8_t arg_index) const;
+
     static constexpr void sync(Registers& registers);
 
     template<typename T>
@@ -44,12 +42,12 @@ protected:
 
 private:
     template<uint8_t LastArgSize>
-    constexpr void set_arg(std::byte args_raw, uint8_t i);
+    constexpr void set_arg(uint8_t args_raw, uint8_t i);
 
     template<uint8_t FirstArgSize, uint8_t SecondArgSize, uint8_t... OtherArgSizes>
-    constexpr void set_arg(std::byte args_raw, uint8_t i);
+    constexpr void set_arg(uint8_t args_raw, uint8_t i);
 
-    constexpr void set_arg(std::byte args_raw);
+    constexpr void set_arg(uint8_t args_raw);
 
     template<uint8_t LastArgSize>
     uint8_t dump(uint8_t i, uint8_t shift) const;

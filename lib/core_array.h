@@ -1,19 +1,16 @@
 #ifndef SIMULATOR_MULTIDIMENSIONALARRAY_H
 #define SIMULATOR_MULTIDIMENSIONALARRAY_H
 
-#include <cassert>
-#include <memory>
-#include <numeric>
-
 #include "core.h"
-#include "direction.h"
 #include "settings.h"
 
+
+class Direction;
 
 class CoreArray
 {
 public:
-    explicit CoreArray(std::vector<size_t> dimensions, const Memory_t& mem);
+    explicit CoreArray(const std::vector<size_t>& dimensions, const Memory_t& mem);
 
     Core& operator[](const size_t& index);
 

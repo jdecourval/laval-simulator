@@ -187,9 +187,7 @@ bool JMP::operator()(Registers& registers) const
 
 bool LSH::operator()(Registers& registers) const
 {
-    uint8_t amount = get_argument(0) >> 1;
-
-    registers.val <<= amount;
+    registers.val = safe_left_shift(registers.val, get_argument(0));
 
     if (get_argument(1))
     {
@@ -201,9 +199,7 @@ bool LSH::operator()(Registers& registers) const
 
 bool RSH::operator()(Registers& registers) const
 {
-    uint8_t amount = get_argument(0) >> 1;
-
-    registers.val >>= amount;
+    registers.val = safe_right_shift(registers.val, get_argument(0));
 
     if (get_argument(1))
     {

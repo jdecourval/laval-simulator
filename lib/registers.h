@@ -13,9 +13,9 @@ struct Registers
     struct Status1
     {
         // TODO: 4 bits (+ special directions) are needed for 3D if we ignore diagonals
-        uint8_t mux: 6;
-        bool ctc: 1;
-        bool sync: 1;
+        uint8_t mux; //: 6;
+        bool ctc; //: 1;
+        bool sync; //: 1;
 
         Status1();
         bool operator==(const Status1& other) const;

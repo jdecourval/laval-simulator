@@ -1,7 +1,9 @@
 #include "core_array.h"
 
+#include "direction.h"
 
-CoreArray::CoreArray(std::vector<size_t> dimensions, const Memory_t& mem)
+
+CoreArray::CoreArray(const std::vector<size_t>& dimensions, const Memory_t& mem)
 {
     auto size = std::accumulate(dimensions.begin(), dimensions.end(), 1ull, std::multiplies<>());
     assert(size <= Tools::umaxof<size_t>() >> 1);
@@ -13,7 +15,7 @@ CoreArray::CoreArray(std::vector<size_t> dimensions, const Memory_t& mem)
 
     for (auto i = 1u; i < dimensions.size(); i++)
     {
-        auto product = 1u;
+        auto product = 1ul;
 
         for (auto j = i; j < dimensions.size(); j++)
         {

@@ -1,7 +1,5 @@
 #include "instruction_factory.h"
 
-#include "opcodes.h"
-
 
 InstructionFactory::InstructionFactory()
         : dump_file("dump")

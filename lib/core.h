@@ -24,8 +24,6 @@ public:
 
     bool execute(const InstructionBase& raw_instruction);
 
-    void sync();
-
     void step();
 
     InstructionFactory& get_factory();
@@ -40,16 +38,13 @@ public:
 
 private:
     Registers registers;
-    const Memory_t* mem;
-
-    const CoreArray* cores;
     InstructionFactory factory;
+
+    const Memory_t* mem;
+    const CoreArray* cores;
 
     friend std::ostream& operator<<(std::ostream& os, const Core& core);
 };
-
-
-std::ostream& operator<<(std::ostream& os, const Core& core);
 
 
 #endif //SIMULATOR_CORE_H

@@ -5,6 +5,7 @@ template<uint8_t... ArgSizes>
 struct TestInstruction : Instruction<ArgSizes...>
 {
     using Instruction<ArgSizes...>::Instruction;
+    using Instruction<ArgSizes...>::get_argument;
 
     bool operator()(Registers&) const override
     {

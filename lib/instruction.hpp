@@ -1,3 +1,6 @@
+#include <climits>
+#include "tools.h"
+
 template<uint8_t... ArgSizes>
 constexpr Instruction<ArgSizes...>::Instruction()
 {
@@ -16,7 +19,7 @@ constexpr Instruction<ArgSizes...>::Instruction(std::byte args_raw)
 {
     static_assert((ArgSizes + ...) <= 8);
 
-    set_arg(args_raw);
+    set_arg(std::to_integer<uint8_t>(args_raw));
 }
 
 template<uint8_t... ArgSizes>
@@ -32,14 +35,14 @@ constexpr void Instruction<ArgSizes...>::sync(Registers& registers)
 }
 
 template<uint8_t... ArgSizes>
-constexpr void Instruction<ArgSizes...>::set_arg(const std::byte args_raw)
+constexpr void Instruction<ArgSizes...>::set_arg(uint8_t args_raw)
 {
     // Assert argument size
 #ifndef NDEBUG
-        if ((args_raw & ~bitmask<std::byte>((ArgSizes + ...))) != std::byte{0})
-        {
-            throw std::out_of_range("Argument out of range");
-        }
+    if ((args_raw & ~bitmask<uint8_t>((ArgSizes + ...))) != 0u)
+    {
+        throw std::out_of_range("Argument out of range");
+    }
 #endif
 
     set_arg<ArgSizes...>(args_raw, 0);
@@ -47,23 +50,21 @@ constexpr void Instruction<ArgSizes...>::set_arg(const std::byte args_raw)
 
 template<uint8_t... ArgSizes>
 template<uint8_t FirstArgSize, uint8_t SecondArgSize, uint8_t... OtherArgSizes>
-constexpr void Instruction<ArgSizes...>::set_arg(std::byte args_raw, uint8_t i)
+constexpr void Instruction<ArgSizes...>::set_arg(uint8_t args_raw, uint8_t i)
 {
-    args.at(i) = static_cast<uint8_t>(args_raw & bitmask<std::byte>(FirstArgSize));
+    args.at(i) = args_raw & bitmask<uint8_t>(FirstArgSize);
 
-    set_arg<SecondArgSize, OtherArgSizes...>(args_raw >> FirstArgSize, static_cast<uint8_t>(i + 1));
+    set_arg<SecondArgSize, OtherArgSizes...>(safe_right_shift(args_raw, FirstArgSize), static_cast<uint8_t>(i + 1));
 }
 
 template<uint8_t... ArgSizes>
 template<uint8_t FirstArgSize>
-constexpr void Instruction<ArgSizes...>::set_arg(std::byte args_raw, uint8_t i)
+constexpr void Instruction<ArgSizes...>::set_arg(uint8_t args_raw, uint8_t i)
 {
     assert(i == args.size() - 1);
 
-    args.at(i) = static_cast<uint8_t>(args_raw & bitmask<std::byte>(FirstArgSize));
+    args.at(i) = args_raw & bitmask<uint8_t>(FirstArgSize);
 }
-
-#include <climits>
 
 template<uint8_t... ArgSizes>
 template<typename T>
@@ -96,12 +97,13 @@ template<uint8_t... ArgSizes>
 template<uint8_t FirstArgSize, uint8_t SecondArgSize, uint8_t... OtherArgSizes>
 uint8_t Instruction<ArgSizes...>::dump(uint8_t i, uint8_t shift) const
 {
-    return (args.at(i) << shift) + dump<SecondArgSize, OtherArgSizes...>(i + 1, shift + FirstArgSize);
+    return dump<FirstArgSize>(i, shift) + dump<SecondArgSize, OtherArgSizes...>(i + 1_u8, shift + FirstArgSize);
 }
 
+// TODO: Natural size integers may be faster where having an uint8_t is not meaningful. Benchmark first.
 template<uint8_t... ArgSizes>
 template<uint8_t LastArgSize>
 uint8_t Instruction<ArgSizes...>::dump(uint8_t i, uint8_t shift) const
 {
-    return args.at(i) << shift;
+    return safe_left_shift(args.at(i), shift);
 }

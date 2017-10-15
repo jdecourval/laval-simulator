@@ -3,6 +3,7 @@
 
 #include "core_array.h"
 #include "opcodes.h"
+#include "direction.h"
 
 
 Core::Core()
@@ -117,11 +118,6 @@ void Core::fetch()
         // Let it wrap around
         registers.pc++;
     }
-}
-
-void Core::sync()
-{
-    registers.status1.sync = true;
 }
 
 bool Core::execute(const InstructionBase& raw_instruction)

@@ -22,7 +22,7 @@ TEST_CASE("Load and dump")
 TEST_CASE("Direction constructor")
 {
     Direction direction({Direction::AFTER, Direction::CURRENT, Direction::BEFORE});
-    auto iter = std::cbegin(direction);
+    auto iter = std::begin(direction);
 
     REQUIRE(*iter == Direction::AFTER);
     REQUIRE(*(++iter) == Direction::CURRENT);
@@ -70,7 +70,6 @@ TEST_CASE("Special directions")
         REQUIRE_THROWS_AS(DirectionComplex {Direction::total() + static_cast<int>(SpecialDirection::LAST_DO_NOT_USE)},
                 const std::out_of_range&);
 
-        REQUIRE_THROWS_AS(DirectionComplex {SpecialDirection{SpecialDirection::LAST_DO_NOT_USE}},
-                const std::out_of_range&);
+        REQUIRE_THROWS_AS(DirectionComplex {SpecialDirection::LAST_DO_NOT_USE}, const std::out_of_range&);
     }
 }

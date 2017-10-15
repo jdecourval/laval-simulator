@@ -4,6 +4,7 @@
 #include <core_array.h>
 #include <opcodes.h>
 #include <iostream>
+#include <direction.h>
 
 
 // TODO: Those are the names that appear in the console. Should choose them to include tested class. Or use tag ?
@@ -34,7 +35,7 @@ TEST_CASE("Single core tests")
     {
         REQUIRE_FALSE(test_registers.status1.sync);
 
-        core.sync();
+        core.execute(SYN{});
         core.execute(DBG{&test_registers});
         REQUIRE(test_registers.status1.sync);
     }

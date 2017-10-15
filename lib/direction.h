@@ -25,27 +25,29 @@ public:
 
     explicit Direction(uint8_t raw);
 
-    explicit Direction(std::array<Direction1D, ComputedSettings::DIMENSION_N> directions);
+    explicit Direction(const std::array<Direction1D, ComputedSettings::DIMENSION_N>& directions);
 
     uint8_t dump();
 
     constexpr decltype(auto) cbegin() const noexcept;
 
-    constexpr decltype(auto) begin() const noexcept;
+    constexpr decltype(auto) begin() noexcept;
 
     constexpr decltype(auto) cend() const noexcept;
 
-    constexpr decltype(auto) end() const noexcept;
+    constexpr decltype(auto) end() noexcept;
 
     static constexpr size_t total();
 
 private:
+    static constexpr uint8_t three_pow(unsigned long n);
+
     // raw value is ordered LSB to MSB
     std::array<Direction1D, ComputedSettings::DIMENSION_N> directions;
 };
 
 
-enum class SpecialDirection
+enum class SpecialDirection: uint8_t
 {
     PC,
     MEMBANK,

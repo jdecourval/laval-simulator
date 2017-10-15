@@ -1,6 +1,7 @@
 #include <memory.h>
 #include <core_array.h>
 #include <opcodes.h>
+#include <direction.h>
 #include "catch.hpp"
 
 
