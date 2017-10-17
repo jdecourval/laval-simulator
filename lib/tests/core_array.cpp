@@ -5,12 +5,12 @@
 #include "catch.hpp"
 
 
-using Memory_t = Memory<1, 1>;
+using Memory_t = Memory;
 
 // TODO: Use operator== to compare cores
 TEST_CASE("ID are correctly set and operator[](size_t) return them in the correct order")
 {
-    Memory_t mem{};
+    Memory_t mem{1, 1};
     Registers test_registers;
 
     CoreArray cores({4, 4, 4}, mem);
@@ -28,7 +28,7 @@ TEST_CASE("ID are correctly set and operator[](size_t) return them in the correc
 
 TEST_CASE("Operator[](std::vector)")
 {
-    Memory_t mem{};
+    Memory_t mem{1, 1};
     Registers test_registers;
 
     CoreArray cores({4, 4, 4}, mem);
@@ -52,7 +52,7 @@ TEST_CASE("Operator[](std::vector)")
 
 TEST_CASE("Offsets")
 {
-    Memory_t mem{};
+    Memory_t mem{1, 1};
     Registers test_registers;
 
     CoreArray cores({4, 4, 4}, mem);

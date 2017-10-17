@@ -21,23 +21,22 @@ public:
 };
 
 
-template<unsigned BankNumber, unsigned BankSize>
 class Memory final : public MemoryInterface
 {
 public:
-    constexpr size_type banks_size() const override final;
+    Memory(unsigned BankNumber, unsigned BankSize);
 
-    constexpr size_type banks_number() const override final;
+    size_type banks_size() const override final;
+
+    size_type banks_number() const override final;
 
     gsl::span<uint8_t> at(size_type i) override final;
 
     gsl::span<const uint8_t> at(size_type i) const override final;
 
 private:
-    std::array<std::array<uint8_t, BankSize>, BankNumber> banks;
+    std::vector<std::vector<uint8_t>> banks;
 };
 
-
-#include "memory.hpp"
 
 #endif //SIMULATOR_MEMORY_H

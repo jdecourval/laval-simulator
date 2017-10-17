@@ -3,14 +3,20 @@
 
 #include "memory.h"
 #include "core_array.h"
-#include "settings.h"
 
 
 /// Class responsible of initializing and running the system
 class Cpu
 {
 public:
-    Cpu();
+    struct Settings
+    {
+        constexpr static std::initializer_list<size_t> dimensions = {10, 10, 10};
+        constexpr static auto bank_number = 16;
+        constexpr static auto bank_size  = 256;
+    };
+
+    explicit Cpu(const Settings&);
 
     void Start();
 
@@ -22,7 +28,7 @@ private:
     void linkCores();
 
     bool running;
-    Memory<UserSettings::BANK_NUMBER, UserSettings::BANK_SIZE> mem;
+    Memory mem;
     CoreArray cores;
 };
 

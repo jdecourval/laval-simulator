@@ -1,7 +1,9 @@
 #include "cpu.h"
+#include "settings.h"
+
 
 int main()
 {
-    Cpu cpu;
+    Cpu cpu(settings);
     cpu.Start();
 }

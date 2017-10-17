@@ -20,12 +20,11 @@ set(SOURCE_FILES
         instruction_factory.h
         instruction_factory.hpp
         memory.h
-        memory.hpp
+        memory.cpp
         opcodes.h
         opcodes.cpp
         registers.h
         registers.cpp
-        settings.h
         tools.h
         tools.hpp
         )

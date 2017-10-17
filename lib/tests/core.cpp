@@ -60,7 +60,7 @@ TEST_CASE("Single core tests")
 
 TEST_CASE("Tests that need a linked core")
 {
-    Memory<1, 10> memory{};
+    Memory memory{1, 10};
     CoreArray core_array({1, 1, 1}, memory);
     Core& core = core_array[0];
     Registers test_registers;
@@ -117,7 +117,7 @@ TEST_CASE("Tests with memory")
 {
     SECTION("Execute from linked memory")
     {
-        Memory<1, 50> memory{};
+        Memory memory{1, 50};
         CoreArray core_array({1, 1, 1}, memory);
         Core& core = core_array[{0, 0, 0}];
         Registers test_registers;
