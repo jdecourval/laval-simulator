@@ -2,15 +2,16 @@
 #define SIMULATOR_MULTIDIMENSIONALARRAY_H
 
 #include "core.h"
-#include "settings.h"
 
 
 class Direction;
 
 class CoreArray
 {
+    static constexpr auto Wrap = false;
+
 public:
-    explicit CoreArray(const std::vector<size_t>& dimensions, const Memory_t& mem);
+    explicit CoreArray(const std::vector<size_t>& dimensions, const MemoryInterface& mem);
 
     Core& operator[](const size_t& index);
 

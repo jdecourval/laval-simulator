@@ -5,6 +5,8 @@
 #include "catch.hpp"
 
 
+using Memory_t = Memory<1, 1>;
+
 // TODO: Use operator== to compare cores
 TEST_CASE("ID are correctly set and operator[](size_t) return them in the correct order")
 {

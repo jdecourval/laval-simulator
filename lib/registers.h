@@ -36,9 +36,9 @@ struct Registers
     };
 
 
+    size_t id{};    // Implementation helper, would not be needed in a real ASIC
+
     // Registers
-    size_t id{};
-    // TODO: Use std::byte
     uint8_t val{};
     std::optional<uint8_t> preload;
     bool preload_negative{false};

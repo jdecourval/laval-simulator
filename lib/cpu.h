@@ -3,8 +3,10 @@
 
 #include "memory.h"
 #include "core_array.h"
+#include "settings.h"
 
 
+/// Class responsible of initializing and running the system
 class Cpu
 {
 public:
@@ -20,7 +22,7 @@ private:
     void linkCores();
 
     bool running;
-    Memory_t mem;
+    Memory<UserSettings::BANK_NUMBER, UserSettings::BANK_SIZE> mem;
     CoreArray cores;
 };
 

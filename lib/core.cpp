@@ -17,7 +17,7 @@ Core::Core()
     initialize();
 }
 
-Core::Core(const CoreArray& cores, size_t id, const Memory_t& mem)
+Core::Core(const CoreArray& cores, size_t id, const MemoryInterface& mem)
     : registers()
       , mem(&mem)
       , cores(&cores)
@@ -32,6 +32,8 @@ Core::Core(const CoreArray& cores, size_t id, const Memory_t& mem)
 
 void Core::initialize()
 {
+    assert(mem == nullptr || mem->banks_size() <= std::numeric_limits<decltype(registers.pc)>::max() + 1);
+
     factory.register_instruction<NOP>();
     factory.register_instruction<SYN>();
     factory.register_instruction<CTC>();
@@ -108,15 +110,15 @@ void Core::fetch()
 
     registers.status1.sync = false;
 
-    auto raw_instruction = (*mem)[registers.status2.membank][registers.pc];
+    auto raw_instruction = mem->at(registers.status2.membank).at(registers.pc);
 
     auto instruction = factory.create(raw_instruction);
 
     // Increment PC only if the instruction does not needs to stall the pipeline
     if ((*instruction)(registers))
     {
-        // Let it wrap around
-        registers.pc++;
+        // Safe to cast since the modulo limits the value and a check about that is done in initialize.
+        registers.pc = static_cast<uint8_t>((registers.pc + 1) % mem->banks_size());
     }
 }
 

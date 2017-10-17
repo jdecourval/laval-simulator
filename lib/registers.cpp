@@ -32,18 +32,18 @@ bool Registers::Status2::operator==(const Registers::Status2& other) const
 
 std::ostream& operator<<(std::ostream& os, const Registers& registers)
 {
-    os << "id: " << std::hex << (registers.id) << std::endl;
-    os << "pc: " << std::hex << (registers.pc & 0xf) << std::endl;
-    os << "membank: " << std::hex << registers.status2.membank << std::endl;
-    os << "val: " << std::hex << registers.val << std::endl;
+    os << "id: " << std::hex << registers.id << std::endl;
+    os << "pc: " << std::hex << static_cast<int>(registers.pc) << std::endl;
+    os << "membank: " << std::hex << static_cast<int>(registers.status2.membank) << std::endl;
+    os << "val: " << std::hex << static_cast<int>(registers.val) << std::endl;
 
     if (registers.preload)
     {
-        os << "mux: " << std::hex << registers.status1.mux << " -> " << *registers.preload << std::endl;
+        os << "mux: " << std::hex << static_cast<int>(registers.status1.mux) << " -> " << *registers.preload << std::endl;
     }
     else
     {
-        os << "mux: " << std::hex << registers.status1.mux << std::endl;
+        os << "mux: " << std::hex << static_cast<int>(registers.status1.mux) << std::endl;
     }
 
     os << "sync: " << std::hex << registers.status1.sync << std::endl;

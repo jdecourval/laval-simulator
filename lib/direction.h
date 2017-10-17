@@ -6,13 +6,13 @@
 #include <tuple>
 #include <variant>
 
-#include "settings.h"
-
 
 class DirectionComplex;
 
 class Direction
 {
+    static constexpr auto Dimensions = 3u;
+
 public:
     enum Direction1D
     {
@@ -25,7 +25,7 @@ public:
 
     explicit Direction(uint8_t raw);
 
-    explicit Direction(const std::array<Direction1D, ComputedSettings::DIMENSION_N>& directions);
+    explicit Direction(const std::array<Direction1D, Dimensions>& directions);
 
     uint8_t dump();
 
@@ -37,13 +37,15 @@ public:
 
     constexpr decltype(auto) end() noexcept;
 
+    static constexpr size_t size();
+
     static constexpr size_t total();
 
 private:
     static constexpr uint8_t three_pow(unsigned long n);
 
     // raw value is ordered LSB to MSB
-    std::array<Direction1D, ComputedSettings::DIMENSION_N> directions;
+    std::array<Direction1D, Dimensions> directions;
 };
 
 

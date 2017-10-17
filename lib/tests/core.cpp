@@ -3,7 +3,6 @@
 #include <core.h>
 #include <core_array.h>
 #include <opcodes.h>
-#include <iostream>
 #include <direction.h>
 
 
@@ -61,7 +60,7 @@ TEST_CASE("Single core tests")
 
 TEST_CASE("Tests that need a linked core")
 {
-    Memory_t memory{};
+    Memory<1, 10> memory{};
     CoreArray core_array({1, 1, 1}, memory);
     Core& core = core_array[0];
     Registers test_registers;
@@ -80,7 +79,7 @@ TEST_CASE("Tests that need a linked core")
     {
         REQUIRE(test_registers.pc == 0);
 
-        for (auto i = 1u; i < 256; i++)
+        for (auto i = 1u; i < memory.banks_size(); i++)
         {
             core.fetch();
             core.execute(DBG{&test_registers});
@@ -118,7 +117,7 @@ TEST_CASE("Tests with memory")
 {
     SECTION("Execute from linked memory")
     {
-        Memory_t memory{};
+        Memory<1, 50> memory{};
         CoreArray core_array({1, 1, 1}, memory);
         Core& core = core_array[{0, 0, 0}];
         Registers test_registers;
@@ -129,8 +128,8 @@ TEST_CASE("Tests with memory")
         REQUIRE(test_registers.status2.membank == 0);
         REQUIRE(test_registers.val == 0);
 
-        memory[0][0] = core.get_factory().dump(CAD({1}));
-        memory[0][1] = core.get_factory().dump(NOP());
+        memory.at(0)[0] = core.get_factory().dump(CAD({1}));
+        memory.at(0)[1] = core.get_factory().dump(NOP());
 
         core.step();
         core.step();
@@ -146,7 +145,7 @@ TEST_CASE("Tests with memory")
             Registers test_registers_after_nop = test_registers;
             test_registers_after_nop.pc++;
 
-            for (; test_registers_after_nop.pc != 0; ++test_registers_after_nop.pc)
+            for (; test_registers.pc < memory.banks_size() - 1; ++test_registers_after_nop.pc)
             {
                 core.step();
                 core.execute(DBG{&test_registers});
@@ -154,8 +153,10 @@ TEST_CASE("Tests with memory")
                 REQUIRE(test_registers == test_registers_after_nop);
             }
 
+            // pc should now wrap back to zero
             core.step();
             core.execute(DBG{&test_registers});
+            test_registers_after_nop.pc = 0;
             REQUIRE(test_registers == test_registers_after_nop);
 
             // PC should have wrap, first instruction supposed to execute again

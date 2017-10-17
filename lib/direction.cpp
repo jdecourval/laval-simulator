@@ -2,7 +2,7 @@
 
 
 Direction::Direction()
-: Direction(std::array<Direction1D, ComputedSettings::DIMENSION_N>{})
+: Direction(std::array<Direction1D, Dimensions>{})
 {
 
 }
@@ -25,7 +25,7 @@ Direction::Direction(uint8_t raw)
     }
 }
 
-Direction::Direction(const std::array<Direction1D, ComputedSettings::DIMENSION_N>& directions)
+Direction::Direction(const std::array<Direction1D, Dimensions>& directions)
 : directions(directions)
 {
 

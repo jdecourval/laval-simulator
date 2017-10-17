@@ -3,6 +3,7 @@ project(LavalLib)
 
 set(CMAKE_CXX_STANDARD 17)
 
+# TODO: Split sources and API headers
 set(SOURCE_FILES
         core.h
         core.cpp
@@ -19,6 +20,7 @@ set(SOURCE_FILES
         instruction_factory.h
         instruction_factory.hpp
         memory.h
+        memory.hpp
         opcodes.h
         opcodes.cpp
         registers.h
@@ -37,6 +39,8 @@ target_include_directories(LavalLib
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 
     target_compile_options(LavalLib
+        PUBLIC "-pipe"                      # Use pipe instead of temporary files. This slightly speed up compilation.
+
         PUBLIC "-Wall"                      # Activate most warnings.
         PUBLIC "-Wextra"                    # Activate more warnings.
         PUBLIC "-Wnull-dereference"         # Warn of undefined behaviors due to dereferencing a null pointer.

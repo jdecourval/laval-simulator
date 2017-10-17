@@ -8,7 +8,7 @@ using namespace std::chrono_literals;
 
 Cpu::Cpu()
     : mem{}
-      , cores(ComputedSettings::DIMENSIONS, mem)
+      , cores(UserSettings::DIMENSIONS, mem)
 {
     running = false;
     linkCores();
@@ -29,15 +29,6 @@ void Cpu::Start()
     {
         std::cout << "loop" << std::endl;
 
-        for (auto i = 0; i < ComputedSettings::CORES; i++)
-        {
-            cores[i].preload();
-        }
-
-        for (auto i = 0; i < ComputedSettings::CORES; i++)
-        {
-            cores[i].fetch();
-        }
 
         std::this_thread::sleep_for(1s);
     }

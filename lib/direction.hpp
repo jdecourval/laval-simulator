@@ -1,3 +1,5 @@
+#include "tools.h"
+
 constexpr decltype(auto) Direction::cbegin() const noexcept
 {
     return directions.cbegin();
@@ -18,10 +20,15 @@ constexpr decltype(auto) Direction::end() noexcept
     return directions.end();
 }
 
+constexpr size_t Direction::size()
+{
+    return Dimensions;
+}
+
 constexpr size_t Direction::total()
 {
     // 3 come from the number of possible direction: CURRENT, BEFORE, AFTER
-    return three_pow(ComputedSettings::DIMENSION_N);
+    return three_pow(Dimensions);
 }
 
 constexpr uint8_t Direction::three_pow(unsigned long n)
