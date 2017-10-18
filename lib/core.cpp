@@ -50,8 +50,8 @@ void Core::initialize()
     factory.register_instruction<JEV>();
     factory.register_instruction<JGV>();
     factory.register_instruction<JMP>();
-    factory.register_instruction<LSH>();
-    factory.register_instruction<RSH>();
+    factory.register_instruction<LLS>();
+    factory.register_instruction<RLS>();
     factory.register_instruction<CAD>();
     factory.register_instruction<CSU>();
 }

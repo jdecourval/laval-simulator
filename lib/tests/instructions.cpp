@@ -555,16 +555,6 @@ TEST_CASE("JMP")
     }
 }
 
-TEST_CASE("LSH")
-{
-
-}
-
-TEST_CASE("RSH")
-{
-
-}
-
 TEST_CASE("CAD")
 {
     Registers registers;
@@ -648,4 +638,156 @@ TEST_CASE("CAD")
 TEST_CASE("CSU")
 {
 
+}
+
+TEST_CASE("LCS")
+{
+    Registers registers;
+    Registers registers_expected;
+
+    SECTION("No sync")
+    {
+        SECTION("No overflow 1")
+        {
+            LLS instruction({1, 0});
+            registers.val = 0b0101'0101;
+            instruction(registers);
+
+            registers_expected.val = 0b1010'1010;
+            REQUIRE(registers == registers_expected);
+        }
+
+        SECTION("No overflow 2")
+        {
+            LLS instruction({3, 0});
+            registers.val = 0b0001'1101;
+            instruction(registers);
+
+            registers_expected.val = 0b1110'1000;
+            REQUIRE(registers == registers_expected);
+        }
+
+        SECTION("Overflow by 1")
+        {
+            // The carry flag is updated to the last bit shifted out, bit[n-1], of the register Rm.
+            LLS instruction({2, 0});
+            registers.val = 0b0101'0101;
+            instruction(registers);
+
+            registers_expected.val = 0b0101'0100;
+            registers_expected.status2.carry = true;
+            REQUIRE(registers == registers_expected);
+        }
+
+        SECTION("Overflow by 2")
+        {
+            LLS instruction({3, 0});
+            registers.val = 0b0101'0101;
+            instruction(registers);
+
+            registers_expected.val = 0b1010'1000;
+            registers_expected.status2.carry = false;
+            REQUIRE(registers == registers_expected);
+        }
+
+        SECTION("Shift by 8")
+        {
+            LLS instruction({8, 0});
+            registers.val = 0b1111'1111;
+            instruction(registers);
+
+            registers_expected.val = 0b0000'0000;
+            registers_expected.status2.carry = true;
+            REQUIRE(registers == registers_expected);
+        }
+
+        REQUIRE(!registers.status1.sync);
+    }
+
+    SECTION("Sync")
+    {
+        LLS instruction({1, 1});
+        registers.val = 0b0101'0101;
+        instruction(registers);
+
+        registers_expected.val = 0b1010'1010;
+        registers_expected.status1.sync = true;
+        REQUIRE(registers == registers_expected);
+    }
+}
+
+TEST_CASE("RLS")
+{
+    Registers registers;
+    Registers registers_expected;
+
+    SECTION("No sync")
+    {
+        SECTION("No overflow 1")
+        {
+            RLS instruction({1, 0});
+            registers.val = 0b1010'1010;
+            instruction(registers);
+
+            registers_expected.val = 0b0101'0101;
+            REQUIRE(registers == registers_expected);
+        }
+
+        SECTION("No overflow 2")
+        {
+            RLS instruction({3, 0});
+            registers.val = 0b0101'0000;
+            instruction(registers);
+
+            registers_expected.val = 0b0000'1010;
+            REQUIRE(registers == registers_expected);
+        }
+
+        SECTION("Overflow by 1")
+        {
+            // The carry flag is updated to the last bit shifted out
+            RLS instruction({2, 0});
+            registers.val = 0b1010'1010;
+            instruction(registers);
+
+            registers_expected.val = 0b0010'1010;
+            registers_expected.status2.carry = true;
+            REQUIRE(registers == registers_expected);
+        }
+
+        SECTION("Overflow by 2")
+        {
+            RLS instruction({3, 0});
+            registers.val = 0b1010'1010;
+            instruction(registers);
+
+            registers_expected.val = 0b0001'0101;
+            registers_expected.status2.carry = false;
+            REQUIRE(registers == registers_expected);
+        }
+
+        SECTION("Shift by 8")
+        {
+            RLS instruction({8, 0});
+            registers.val = 0b1111'1111;
+            instruction(registers);
+
+            registers_expected.val = 0b0000'0000;
+            registers_expected.status2.carry = true;
+            REQUIRE(registers == registers_expected);
+        }
+
+        REQUIRE(!registers.status1.sync);
+    }
+
+    SECTION("Sync")
+    {
+        RLS instruction({1, 1});
+        registers.val = 0b1010'1010;
+        instruction(registers);
+
+        registers_expected.val = 0b0101'0101;
+        registers_expected.status1.sync = true;
+        REQUIRE(registers == registers_expected);
+    }
 }

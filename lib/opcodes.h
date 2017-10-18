@@ -179,10 +179,10 @@ struct JMP : public Instruction<4>
 
 // 5 bits instructions
 
-// Left circular shift
+// Left logical shift
 // arg 1:4: shift amount
 // Arg 2:1: Sync after
-struct LSH : public Instruction<4, 1>
+struct LLS : public Instruction<4, 1>
 {
     using Instruction<4, 1>::Instruction;
 
@@ -190,10 +190,10 @@ struct LSH : public Instruction<4, 1>
 };
 
 
-// Right circular shift
+// Right logical shift
 // arg 1:4: shift amount
 // Arg 2:1: Sync after
-struct RSH : public Instruction<4, 1>
+struct RLS : public Instruction<4, 1>
 {
     using Instruction<4, 1>::Instruction;
 

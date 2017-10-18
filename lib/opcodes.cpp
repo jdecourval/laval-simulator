@@ -185,9 +185,14 @@ bool JMP::operator()(Registers& registers) const
     return true;
 }
 
-bool LSH::operator()(Registers& registers) const
+bool LLS::operator()(Registers& registers) const
 {
-    registers.val = safe_left_shift(registers.val, get_argument(0));
+    auto result = registers.val << get_argument(0);
+    registers.val = static_cast<uint8_t>(result);
+
+    // Using our powerful 32/64 bits computer we can easily check for overflow
+    // Carry is true if the bit next to the MSB of the register is true
+    registers.status2.carry = (result & (std::numeric_limits<decltype(registers.val)>::max() + 1)) > 0;
 
     if (get_argument(1))
     {
@@ -197,9 +202,13 @@ bool LSH::operator()(Registers& registers) const
     return true;
 }
 
-bool RSH::operator()(Registers& registers) const
+bool RLS::operator()(Registers& registers) const
 {
-    registers.val = safe_right_shift(registers.val, get_argument(0));
+    // There is no way in C++ to check right overflow, it needs to be computed
+    // Shift by one less and check if there is a bit at LSB
+    registers.status2.carry = get_argument(0) > 0 && (registers.val >> (get_argument(0) - 1)) & 1;
+
+    registers.val = static_cast<uint8_t>(registers.val >> get_argument(0));
 
     if (get_argument(1))
     {
