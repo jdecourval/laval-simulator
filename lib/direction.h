@@ -70,6 +70,6 @@ public:
 };
 
 
-#include "direction.hpp"
+#include "impl/direction.hpp"
 
 #endif //SIMULATOR_DIRECTION_H

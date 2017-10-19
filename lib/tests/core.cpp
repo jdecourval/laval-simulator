@@ -1,9 +1,12 @@
 #include "catch.hpp"
 
 #include <core.h>
-#include <core_array.h>
-#include <opcodes.h>
-#include <direction.h>
+
+#include "test_instructions.h"
+
+#include "direction.h"
+#include "opcodes.h"
+#include "impl/core_array.h"
 
 
 // TODO: Those are the names that appear in the console. Should choose them to include tested class. Or use tag ?
@@ -12,7 +15,7 @@ TEST_CASE("Single core tests")
     Core core;
     Registers test_registers;
 
-    core.execute(DBG{&test_registers});
+    core.execute(Debug{test_registers});
 
     SECTION("Initialization")
     {
@@ -35,7 +38,7 @@ TEST_CASE("Single core tests")
         REQUIRE_FALSE(test_registers.status1.sync);
 
         core.execute(SYN{});
-        core.execute(DBG{&test_registers});
+        core.execute(Debug{test_registers});
         REQUIRE(test_registers.status1.sync);
     }
 
@@ -44,7 +47,7 @@ TEST_CASE("Single core tests")
         REQUIRE(test_registers.status2.membank == 0);
 
         core.execute(JMP({1}));
-        core.execute(DBG{&test_registers});
+        core.execute(Debug{test_registers});
         REQUIRE(test_registers.status2.membank == 1);
     }
 
@@ -53,7 +56,7 @@ TEST_CASE("Single core tests")
         REQUIRE(test_registers.val == 0);
 
         core.execute(LCL({4}));
-        core.execute(DBG{&test_registers});
+        core.execute(Debug{test_registers});
         REQUIRE(test_registers.val == 4);
     }
 }
@@ -65,9 +68,9 @@ TEST_CASE("Tests that need a linked core")
     Core& core = core_array[0];
     Registers test_registers;
 
-    core.execute(DBG{&test_registers});
+    core.execute(Debug{test_registers});
 
-    core.execute(DBG{&test_registers});
+    core.execute(Debug{test_registers});
     REQUIRE(test_registers.id == 0);
 
     SECTION("Test ids")
@@ -82,12 +85,12 @@ TEST_CASE("Tests that need a linked core")
         for (auto i = 1u; i < memory.banks_size(); i++)
         {
             core.fetch();
-            core.execute(DBG{&test_registers});
+            core.execute(Debug{test_registers});
             REQUIRE(test_registers.pc == i);
         }
 
         core.fetch();
-        core.execute(DBG{&test_registers});
+        core.execute(Debug{test_registers});
         REQUIRE(test_registers.pc == 0);
     }
 
@@ -100,7 +103,7 @@ TEST_CASE("Tests that need a linked core")
         core.execute(instruction);
         core.preload();
 
-        core.execute(DBG{&test_registers});
+        core.execute(Debug{test_registers});
         REQUIRE(test_registers.preload.value() == 0);
 
         // To increment PC
@@ -108,7 +111,7 @@ TEST_CASE("Tests that need a linked core")
 
         core.preload();
 
-        core.execute(DBG{&test_registers});
+        core.execute(Debug{test_registers});
         REQUIRE(test_registers.preload.value() == 1);
     }
 }
@@ -122,7 +125,7 @@ TEST_CASE("Tests with memory")
         Core& core = core_array[{0, 0, 0}];
         Registers test_registers;
 
-        core.execute(DBG{&test_registers});
+        core.execute(Debug{test_registers});
 
         REQUIRE(test_registers.pc == 0);
         REQUIRE(test_registers.status2.membank == 0);
@@ -134,7 +137,7 @@ TEST_CASE("Tests with memory")
         core.step();
         core.step();
 
-        core.execute(DBG{&test_registers});
+        core.execute(Debug{test_registers});
 
         REQUIRE(test_registers.pc == 2);
         REQUIRE(test_registers.status2.membank == 0);
@@ -148,21 +151,21 @@ TEST_CASE("Tests with memory")
             for (; test_registers.pc < memory.banks_size() - 1; ++test_registers_after_nop.pc)
             {
                 core.step();
-                core.execute(DBG{&test_registers});
+                core.execute(Debug{test_registers});
 
                 REQUIRE(test_registers == test_registers_after_nop);
             }
 
             // pc should now wrap back to zero
             core.step();
-            core.execute(DBG{&test_registers});
+            core.execute(Debug{test_registers});
             test_registers_after_nop.pc = 0;
             REQUIRE(test_registers == test_registers_after_nop);
 
             // PC should have wrap, first instruction supposed to execute again
             REQUIRE(test_registers.pc == 0);
             core.step();
-            core.execute(DBG{&test_registers});
+            core.execute(Debug{test_registers});
             REQUIRE(test_registers.val == 2);
 
         }

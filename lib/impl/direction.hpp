@@ -1,5 +1,6 @@
 #include "tools.h"
 
+
 constexpr decltype(auto) Direction::cbegin() const noexcept
 {
     return directions.cbegin();

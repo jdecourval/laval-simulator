@@ -1,6 +1,8 @@
-#include <opcodes.h>
-#include "core.h"
 #include "catch.hpp"
+
+#include "opcodes.h"
+#include "core.h"
+
 
 TEST_CASE("NOP")
 {

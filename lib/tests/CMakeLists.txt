@@ -7,6 +7,8 @@ add_executable(LavalTests
         instructions.cpp
         instruction_factory.cpp
         main.cpp
+        test_instructions.h
+        test_instructions.cpp
         )
 
 target_include_directories(LavalTests

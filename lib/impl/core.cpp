@@ -1,9 +1,10 @@
-#include <iostream>
 #include "core.h"
 
+#include <iostream>
+
 #include "core_array.h"
-#include "opcodes.h"
 #include "direction.h"
+#include "opcodes.h"
 
 
 Core::Core()

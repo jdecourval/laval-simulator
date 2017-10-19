@@ -1,9 +1,10 @@
 #ifndef SIMULATOR_CORE_H
 #define SIMULATOR_CORE_H
 
-#include "instruction_factory.h"
-#include "registers.h"
 #include "memory.h"
+#include "registers.h"
+
+#include "impl/instruction_factory.h"
 
 
 class CoreArray;

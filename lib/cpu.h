@@ -1,9 +1,13 @@
 #ifndef SIMULATOR_CPU_H
 #define SIMULATOR_CPU_H
 
-#include "memory.h"
-#include "core_array.h"
+#include <memory>
 
+#include "memory.h"
+#include "impl/core_array.h"
+
+
+class CoreArray;
 
 /// Class responsible of initializing and running the system
 class Cpu
@@ -12,8 +16,8 @@ public:
     struct Settings
     {
         constexpr static std::initializer_list<size_t> dimensions = {10, 10, 10};
-        constexpr static auto bank_number = 16;
-        constexpr static auto bank_size  = 256;
+        constexpr static auto bank_number = 16u;
+        constexpr static auto bank_size  = 256u;
     };
 
     explicit Cpu(const Settings&);

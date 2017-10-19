@@ -1,5 +1,7 @@
 #include "catch.hpp"
+
 #include "instruction.h"
+
 
 template<uint8_t... ArgSizes>
 struct TestInstruction : Instruction<ArgSizes...>

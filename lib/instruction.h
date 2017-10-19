@@ -61,6 +61,6 @@ private:
 };
 
 
-#include "instruction.hpp"
+#include "impl/instruction.hpp"
 
 #endif //PROJECT_INSTRUCTION_H

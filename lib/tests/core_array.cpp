@@ -1,8 +1,9 @@
-#include <memory.h>
-#include <core_array.h>
-#include <opcodes.h>
-#include <direction.h>
 #include "catch.hpp"
+
+#include "impl/core_array.h"
+
+#include "direction.h"
+#include "test_instructions.h"
 
 
 using Memory_t = Memory;
@@ -20,7 +21,7 @@ TEST_CASE("ID are correctly set and operator[](size_t) return them in the correc
     auto id = 0u;
     for (auto& core: cores)
     {
-        core.execute(DBG{&test_registers});
+        core.execute(Debug{test_registers});
         REQUIRE(test_registers.id == id);
         id++;
     }
@@ -41,7 +42,7 @@ TEST_CASE("Operator[](std::vector)")
             for (auto k = 0ul; k < 4; ++k)
             {
                 auto& core = cores[{i, j, k}];
-                core.execute(DBG{&test_registers});
+                core.execute(Debug{test_registers});
                 REQUIRE(test_registers.id == id);
                 REQUIRE(&core == &cores[id]);
                 id++;
@@ -57,7 +58,7 @@ TEST_CASE("Offsets")
 
     CoreArray cores({4, 4, 4}, mem);
     auto& core = cores[{1, 1, 1}];
-    core.execute(DBG{&test_registers});
+    core.execute(Debug{test_registers});
 
     {
         auto& offsetted = cores.offset(test_registers.id,

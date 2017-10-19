@@ -53,12 +53,7 @@ struct DBG : public Instruction<>
 {
     using Instruction<>::Instruction;
 
-    explicit DBG(Registers* output);
-
     bool operator()(Registers& registers) const override;
-
-private:
-    Registers* output = nullptr;
 };
 
 

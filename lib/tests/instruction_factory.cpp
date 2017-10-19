@@ -1,6 +1,6 @@
 #include "catch.hpp"
 
-#include <instruction_factory.h>
+#include "impl/instruction_factory.h"
 
 
 template<uint8_t... ArgSizes>

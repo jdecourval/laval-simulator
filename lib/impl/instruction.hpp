@@ -1,5 +1,7 @@
 #include <climits>
+
 #include "tools.h"
+
 
 template<uint8_t... ArgSizes>
 constexpr Instruction<ArgSizes...>::Instruction()

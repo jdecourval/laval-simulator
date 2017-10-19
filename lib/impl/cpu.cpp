@@ -1,14 +1,13 @@
 #include "cpu.h"
 
 #include <thread>
-#include <iostream>
 
 
 using namespace std::chrono_literals;
 
 Cpu::Cpu(const Settings& settings)
     : mem{settings.bank_number, settings.bank_size}
-      , cores(settings.dimensions, mem)
+      , cores{settings.dimensions, mem}
 {
     running = false;
     linkCores();

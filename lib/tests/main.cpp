@@ -2,6 +2,7 @@
 
 #include "catch.hpp"
 
+
 TEST_CASE("Unit test are functional")
 {
     REQUIRE(2 + 2 == 4);

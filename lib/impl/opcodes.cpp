@@ -1,7 +1,7 @@
+#include "opcodes.h"
+
 #include <iostream>
 #include <functional>
-
-#include "opcodes.h"
 
 
 bool NOP::operator()(Registers&) const
@@ -30,23 +30,9 @@ bool CTV::operator()(Registers& registers) const
     return true;
 }
 
-DBG::DBG(Registers* output)
-: output(output)
-{
-
-}
-
 bool DBG::operator()(Registers& registers) const
 {
-    // TODO: Move this functionality from the instruction to a new test-only instruction
-    if (output)
-    {
-        *output = registers;
-    }
-    else
-    {
-        std::cout << registers << std::endl;
-    }
+    std::cout << registers << std::endl;
 
     return true;
 }

@@ -3,36 +3,39 @@ project(LavalLib)
 
 set(CMAKE_CXX_STANDARD 17)
 
-# TODO: Split sources and API headers
 set(SOURCE_FILES
         core.h
-        core.cpp
-        core_array.h
-        core_array.cpp
         cpu.h
-        cpu.cpp
         direction.h
-        direction.cpp
-        direction.hpp
         instruction.h
-        instruction.hpp
-        instruction_factory.cpp
-        instruction_factory.h
-        instruction_factory.hpp
         memory.h
-        memory.cpp
         opcodes.h
-        opcodes.cpp
         registers.h
-        registers.cpp
-        tools.h
-        tools.hpp
+
+        impl/core.cpp
+        impl/core_array.h
+        impl/core_array.cpp
+        impl/cpu.cpp
+        impl/direction.cpp
+        impl/direction.hpp
+        impl/instruction.hpp
+        impl/instruction_factory.cpp
+        impl/instruction_factory.h
+        impl/instruction_factory.hpp
+        impl/memory.cpp
+        impl/opcodes.cpp
+        impl/registers.cpp
+        impl/tools.h
+        impl/tools.hpp
         )
 
 add_library(LavalLib ${SOURCE_FILES})
 
 target_include_directories(LavalLib
-        PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+        PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
+        PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/impl
+        PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/externals
+        )
 
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
