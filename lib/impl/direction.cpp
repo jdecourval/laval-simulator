@@ -38,7 +38,6 @@ uint8_t Direction::dump()
     for (auto i = 0u; i < directions.size(); i++)
     {
         // 3 corresponds to the number of possible Direction1D
-        // TODO: Check for overflow
         value += (directions.at(i) + 1u) * three_pow(i);
     }
 

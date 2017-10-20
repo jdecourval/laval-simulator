@@ -2,6 +2,7 @@
 #define SIMULATOR_CPU_H
 
 #include <memory>
+#include <chrono>
 
 #include "memory.h"
 #include "impl/core_array.h"
@@ -12,6 +13,8 @@ class CoreArray;
 /// Class responsible of initializing and running the system
 class Cpu
 {
+    using BenchmarkClock = std::chrono::high_resolution_clock;
+
 public:
     struct Settings
     {
@@ -22,15 +25,13 @@ public:
 
     explicit Cpu(const Settings&);
 
-    void Start();
+    [[noreturn]] void Start(const std::chrono::milliseconds& period);
 
     Cpu(Cpu&) = delete;
 
     Cpu& operator=(Cpu&) = delete;
 
 private:
-    void linkCores();
-
     bool running;
     Memory mem;
     CoreArray cores;
