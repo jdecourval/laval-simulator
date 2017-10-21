@@ -11,6 +11,7 @@ set(SOURCE_FILES
         memory.h
         opcodes.h
         registers.h
+        thread_pool.h
 
         impl/core.cpp
         impl/core_array.h
@@ -25,11 +26,18 @@ set(SOURCE_FILES
         impl/memory.cpp
         impl/opcodes.cpp
         impl/registers.cpp
+        impl/thread_pool.cpp
+        impl/thread_pool.hpp
         impl/tools.h
         impl/tools.hpp
         )
 
 add_library(LavalLib ${SOURCE_FILES})
+
+find_package(Threads)
+
+target_link_libraries(LavalLib
+        ${CMAKE_THREAD_LIBS_INIT})
 
 target_include_directories(LavalLib
         PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}

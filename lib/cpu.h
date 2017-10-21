@@ -24,6 +24,7 @@ public:
     };
 
     explicit Cpu(const Settings&);
+    explicit Cpu(const Settings&, Memory&& memory);
 
     [[noreturn]] void Start(const std::chrono::milliseconds& period);
 
@@ -32,7 +33,6 @@ public:
     Cpu& operator=(Cpu&) = delete;
 
 private:
-    bool running;
     Memory mem;
     CoreArray cores;
 };

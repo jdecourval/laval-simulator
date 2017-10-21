@@ -1,15 +1,21 @@
 #include "cpu.h"
 
-#include <thread>
+#include "thread_pool.h"
 
 
 using namespace std::chrono_literals;
 
 Cpu::Cpu(const Settings& settings)
-    : mem{settings.bank_number, settings.bank_size}
+    : Cpu(settings, Memory{settings.bank_number, settings.bank_size})
+{
+
+}
+
+Cpu::Cpu(const Cpu::Settings& settings, Memory&& memory)
+    : mem(memory)
       , cores{settings.dimensions, mem}
 {
-    running = false;
+
 }
 
 #pragma clang diagnostic push
@@ -23,10 +29,15 @@ void Cpu::Start(const std::chrono::milliseconds& period)
     {
         std::cout << "starting cpu at " << 1000 / period.count() << " Hz" << std::endl;
     }
+    else
+    {
+        std::cout << "starting cpu at max speed" << std::endl;
+    }
 
     auto time_before_execution = BenchmarkClock::now();
     auto last_report_time = BenchmarkClock::now();
     auto loops = 0ull;
+    ThreadPool<16> pool;
 
     while (true)
     {
@@ -40,15 +51,8 @@ void Cpu::Start(const std::chrono::milliseconds& period)
             loops = 0;
         }
 
-        for (auto& core: cores)
-        {
-            core.preload();
-        }
-
-        for (auto& core: cores)
-        {
-            core.fetch();
-        }
+        pool.apply(std::begin(cores), std::end(cores), [](auto& core){ core.preload(); });
+        pool.apply(std::begin(cores), std::end(cores), [](auto& core){ core.fetch(); });
 
         if (period > 0s)
         {
