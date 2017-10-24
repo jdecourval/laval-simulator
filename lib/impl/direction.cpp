@@ -31,7 +31,7 @@ Direction::Direction(const std::array<Direction1D, Dimensions>& directions)
 
 }
 
-uint8_t Direction::dump()
+std::byte Direction::dump()
 {
     unsigned value = 0;
 
@@ -42,7 +42,7 @@ uint8_t Direction::dump()
     }
 
     assert(value <= std::numeric_limits<uint8_t>::max());
-    return static_cast<uint8_t>(value);
+    return static_cast<std::byte>(value);
 }
 
 DirectionComplex::DirectionComplex(uint8_t raw)
@@ -59,16 +59,14 @@ DirectionComplex::DirectionComplex(uint8_t raw)
 #endif
 }
 
-uint8_t DirectionComplex::dump()
+std::byte DirectionComplex::dump()
 {
     if (std::holds_alternative<Direction>(*this))
     {
         return std::get<Direction>(*this).dump();
     }
-    else
-    {
-        return static_cast<uint8_t>(std::get<SpecialDirection>(*this)) + Direction::total();
-    }
+
+    return static_cast<std::byte>(static_cast<unsigned>(std::get<SpecialDirection>(*this)) + Direction::total());
 }
 
 DirectionComplex::DirectionComplex(const Direction& direction)

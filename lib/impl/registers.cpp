@@ -18,7 +18,7 @@ bool Registers::Status1::operator==(const Registers::Status1& other) const
 
 Registers::Status1::Status1()
 {
-    mux = DirectionComplex{Direction{}}.dump();
+    mux = std::to_integer<uint8_t>(DirectionComplex{Direction{}}.dump());
     ctc = false;
     sync = false;
 }

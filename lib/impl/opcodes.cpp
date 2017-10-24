@@ -4,6 +4,9 @@
 #include <functional>
 
 
+using namespace OpCodes;
+
+
 bool NOP::operator()(Registers&) const
 {
     return true;

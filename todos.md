@@ -3,7 +3,6 @@
 - Test with clang
 - As most older 8 bits CPU, consider if using some 16 bits registers could prove useful
 - I/O
-- Cpu class
 
 # Tests/challenges idea
 - Multiply test:

@@ -35,26 +35,26 @@ void Core::initialize()
 {
     assert(mem == nullptr || mem->banks_size() <= std::numeric_limits<decltype(registers.pc)>::max() + 1);
 
-    factory.register_instruction<NOP>();
-    factory.register_instruction<SYN>();
-    factory.register_instruction<CTC>();
-    factory.register_instruction<CTV>();
-    factory.register_instruction<DBG>();
-    factory.register_instruction<HCF>();
-    factory.register_instruction<MXL>();
-    factory.register_instruction<MXA>();
-    factory.register_instruction<MXS>();
-    factory.register_instruction<MUX>();
-    factory.register_instruction<LCL>();
-    factory.register_instruction<LCH>();
-    factory.register_instruction<JLV>();
-    factory.register_instruction<JEV>();
-    factory.register_instruction<JGV>();
-    factory.register_instruction<JMP>();
-    factory.register_instruction<LLS>();
-    factory.register_instruction<RLS>();
-    factory.register_instruction<CAD>();
-    factory.register_instruction<CSU>();
+    factory.register_instruction<OpCodes::NOP>();
+    factory.register_instruction<OpCodes::SYN>();
+    factory.register_instruction<OpCodes::CTC>();
+    factory.register_instruction<OpCodes::CTV>();
+    factory.register_instruction<OpCodes::DBG>();
+    factory.register_instruction<OpCodes::HCF>();
+    factory.register_instruction<OpCodes::MXL>();
+    factory.register_instruction<OpCodes::MXA>();
+    factory.register_instruction<OpCodes::MXS>();
+    factory.register_instruction<OpCodes::MUX>();
+    factory.register_instruction<OpCodes::LCL>();
+    factory.register_instruction<OpCodes::LCH>();
+    factory.register_instruction<OpCodes::JLV>();
+    factory.register_instruction<OpCodes::JEV>();
+    factory.register_instruction<OpCodes::JGV>();
+    factory.register_instruction<OpCodes::JMP>();
+    factory.register_instruction<OpCodes::LLS>();
+    factory.register_instruction<OpCodes::RLS>();
+    factory.register_instruction<OpCodes::CAD>();
+    factory.register_instruction<OpCodes::CSU>();
 }
 
 void Core::preload()

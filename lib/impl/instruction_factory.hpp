@@ -7,7 +7,7 @@ void InstructionFactory::register_instruction()
 template<typename T, size_t... I>
 void InstructionFactory::register_helper(std::index_sequence<I...>)
 {
-    auto end = counter + 1L;
+    auto end = counter + 1uL;
 
     if constexpr (sizeof...(I) > 0)
     {

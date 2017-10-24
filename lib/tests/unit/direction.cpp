@@ -14,8 +14,8 @@ TEST_CASE("Load and dump")
         Direction direction{i};
 
         REQUIRE(std::holds_alternative<Direction>(direction_complex));
-        REQUIRE(direction.dump() == i);
-        REQUIRE(direction_complex.dump() == i);
+        REQUIRE(direction.dump() == std::byte{i});
+        REQUIRE(direction_complex.dump() == std::byte{i});
     }
 }
 
@@ -37,28 +37,28 @@ TEST_CASE("Special directions")
     {
         DirectionComplex direction{SpecialDirection::PC};
         REQUIRE(std::holds_alternative<SpecialDirection>(direction));
-        REQUIRE(direction.dump() == size);
+        REQUIRE(direction.dump() == static_cast<std::byte>(size));
     }
 
     SECTION("MEMBANK")
     {
         DirectionComplex direction{SpecialDirection::MEMBANK};
         REQUIRE(std::holds_alternative<SpecialDirection>(direction));
-        REQUIRE(direction.dump() == size + 1);
+        REQUIRE(direction.dump() == static_cast<std::byte>(size + 1));
     }
 
     SECTION("PC from raw")
     {
         DirectionComplex direction{static_cast<uint8_t>(size)};
         REQUIRE(std::holds_alternative<SpecialDirection>(direction));
-        REQUIRE(direction.dump() == size);
+        REQUIRE(direction.dump() == static_cast<std::byte>(size));
     }
 
     SECTION("MEMBANK from raw")
     {
         DirectionComplex direction{static_cast<uint8_t>(size + 1)};
         REQUIRE(std::holds_alternative<SpecialDirection>(direction));
-        REQUIRE(direction.dump() == size + 1);
+        REQUIRE(direction.dump() == static_cast<std::byte>(size + 1));
     }
 
     SECTION("Invalid directions")

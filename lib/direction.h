@@ -2,6 +2,7 @@
 #define SIMULATOR_DIRECTION_H
 
 #include <cstdint>
+#include <cstddef>
 #include <cmath>
 #include <tuple>
 #include <variant>
@@ -27,7 +28,7 @@ public:
 
     explicit Direction(const std::array<Direction1D, Dimensions>& directions);
 
-    uint8_t dump();
+    std::byte dump();
 
     constexpr decltype(auto) cbegin() const noexcept;
 
@@ -66,7 +67,7 @@ public:
     explicit DirectionComplex(const Direction&);
     explicit DirectionComplex(uint8_t raw);
 
-    uint8_t dump();
+    std::byte dump();
 };
 
 

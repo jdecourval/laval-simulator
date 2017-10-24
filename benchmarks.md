@@ -17,7 +17,7 @@ cpu MHz         : 3743.031
 
 
 21 oct
-
+e43088daa4abd0aa01836886e57ed4d7aeb16f54
 
     struct Settings
     {
@@ -36,7 +36,7 @@ cpu MHz         : 3743.031
 
 
 21 oct
-
+e43088daa4abd0aa01836886e57ed4d7aeb16f54
 
     struct Settings
     {

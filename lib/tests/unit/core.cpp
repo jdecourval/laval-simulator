@@ -37,7 +37,7 @@ TEST_CASE("Single core tests")
     {
         REQUIRE_FALSE(test_registers.status1.sync);
 
-        core.execute(SYN{});
+        core.execute(OpCodes::SYN{});
         core.execute(Debug{test_registers});
         REQUIRE(test_registers.status1.sync);
     }
@@ -46,7 +46,7 @@ TEST_CASE("Single core tests")
     {
         REQUIRE(test_registers.status2.membank == 0);
 
-        core.execute(JMP({1}));
+        core.execute(OpCodes::JMP({1}));
         core.execute(Debug{test_registers});
         REQUIRE(test_registers.status2.membank == 1);
     }
@@ -55,13 +55,13 @@ TEST_CASE("Single core tests")
     {
         REQUIRE(test_registers.val == 0);
 
-        core.execute(LCL({4}));
+        core.execute(OpCodes::LCL({4}));
         core.execute(Debug{test_registers});
         REQUIRE(test_registers.val == 4);
     }
 }
 
-TEST_CASE("Tests that need a linked core")
+TEST_CASE("Tests that need memory")
 {
     Memory memory{1, 10};
     CoreArray core_array({1, 1, 1}, memory);
@@ -99,7 +99,7 @@ TEST_CASE("Tests that need a linked core")
         REQUIRE(test_registers.pc == 0);
         REQUIRE(!test_registers.preload);
 
-        auto instruction = MUX({DirectionComplex{SpecialDirection::PC}.dump()});
+        auto instruction = OpCodes::MUX({DirectionComplex{SpecialDirection::PC}.dump()});
         core.execute(instruction);
         core.preload();
 
@@ -131,8 +131,8 @@ TEST_CASE("Tests with memory")
         REQUIRE(test_registers.status2.membank == 0);
         REQUIRE(test_registers.val == 0);
 
-        memory.at(0)[0] = core.get_factory().dump(CAD({1}));
-        memory.at(0)[1] = core.get_factory().dump(NOP());
+        memory.at(0)[0] = core.get_factory().dump(OpCodes::CAD({1}));
+        memory.at(0)[1] = core.get_factory().dump(OpCodes::NOP());
 
         core.step();
         core.step();

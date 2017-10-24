@@ -13,7 +13,7 @@ TEST_CASE("NOP")
 
         REQUIRE(registers_copy == registers);
 
-        NOP instruction;
+        OpCodes::NOP instruction;
         instruction(registers);
 
         REQUIRE(registers_copy == registers);
@@ -27,7 +27,7 @@ TEST_CASE("SYN")
         Registers registers;
         REQUIRE(!registers.status1.sync);
 
-        SYN instruction;
+        OpCodes::SYN instruction;
         instruction(registers);
 
         REQUIRE(registers.status1.sync);
@@ -41,7 +41,7 @@ TEST_CASE("CTC")
         Registers registers;
         REQUIRE(!registers.status1.ctc);
 
-        CTC instruction;
+        OpCodes::CTC instruction;
         instruction(registers);
 
         REQUIRE(registers.status1.ctc);
@@ -59,7 +59,7 @@ TEST_CASE("CTV")
         Registers registers;
         registers.status1.ctc = true;
 
-        CTV instruction;
+        OpCodes::CTV instruction;
         instruction(registers);
 
         REQUIRE(!registers.status1.ctc);
@@ -77,7 +77,7 @@ TEST_CASE("MXL")
 
     SECTION("Without sync")
     {
-        MXL instruction({0});
+        OpCodes::MXL instruction({0});
         instruction(registers);
 
         REQUIRE(registers.preload == 5);
@@ -93,7 +93,7 @@ TEST_CASE("MXL")
 
     SECTION("With sync")
     {
-        MXL instruction({1});
+        OpCodes::MXL instruction({1});
         instruction(registers);
 
         REQUIRE(registers.preload == 5);
@@ -113,7 +113,7 @@ TEST_CASE("MXA")
             SECTION("Initially zero, add positive")
             {
                 registers.preload = 2;
-                MXA instruction({0});
+                OpCodes::MXA instruction({0});
                 instruction(registers);
 
                 REQUIRE(registers.val == 2);
@@ -125,7 +125,7 @@ TEST_CASE("MXA")
             {
                 registers.preload = -2;
                 registers.preload_negative = true;
-                MXA instruction({0});
+                OpCodes::MXA instruction({0});
                 instruction(registers);
 
                 REQUIRE(registers.val == static_cast<uint8_t>(-2));
@@ -141,7 +141,7 @@ TEST_CASE("MXA")
             registers.val = 250;
             registers.preload = 15;
 
-            MXA instruction({0});
+            OpCodes::MXA instruction({0});
             instruction(registers);
 
             REQUIRE(static_cast<int>(registers.val) == static_cast<int>(static_cast<uint8_t>(250 + 15)));
@@ -156,7 +156,7 @@ TEST_CASE("MXA")
             registers.preload = static_cast<uint8_t>(-15);
             registers.preload_negative = true;
 
-            MXA instruction({0});
+            OpCodes::MXA instruction({0});
             instruction(registers);
 
             REQUIRE(static_cast<int>(registers.val) == static_cast<int>(static_cast<uint8_t>(-127 - 15)));
@@ -175,7 +175,7 @@ TEST_CASE("MXA")
             {
                 registers.preload = 3;
 
-                MXA instruction({0});
+                OpCodes::MXA instruction({0});
                 instruction(registers);
 
                 REQUIRE(static_cast<int>(registers.val) == static_cast<uint8_t>(-2));
@@ -188,7 +188,7 @@ TEST_CASE("MXA")
             {
                 registers.preload = 5;
 
-                MXA instruction({0});
+                OpCodes::MXA instruction({0});
                 instruction(registers);
 
                 REQUIRE(registers.val == 0);
@@ -201,7 +201,7 @@ TEST_CASE("MXA")
             {
                 registers.preload = 6;
 
-                MXA instruction({0});
+                OpCodes::MXA instruction({0});
                 instruction(registers);
 
                 REQUIRE(registers.val == 1);
@@ -217,7 +217,7 @@ TEST_CASE("MXA")
     SECTION("Sync")
     {
         registers.preload = 2;
-        MXA instruction({1});
+        OpCodes::MXA instruction({1});
         instruction(registers);
 
         REQUIRE(registers.val == 2);
@@ -239,7 +239,7 @@ TEST_CASE("MXS")
             SECTION("Initially zero, subtract positive")
             {
                 registers.preload = 2;
-                MXS instruction({0});
+                OpCodes::MXS instruction({0});
                 instruction(registers);
 
                 REQUIRE(registers.val == static_cast<uint8_t>(-2));
@@ -251,7 +251,7 @@ TEST_CASE("MXS")
             {
                 registers.preload = -2;
                 registers.preload_negative = true;
-                MXS instruction({0});
+                OpCodes::MXS instruction({0});
                 instruction(registers);
 
                 REQUIRE(registers.val == 2);
@@ -268,7 +268,7 @@ TEST_CASE("MXS")
             registers.preload = static_cast<uint8_t>(-15);
             registers.preload_negative = true;
 
-            MXS instruction({0});
+            OpCodes::MXS instruction({0});
             instruction(registers);
 
             REQUIRE(static_cast<int>(registers.val) == static_cast<int>(static_cast<uint8_t>(250 + 15)));
@@ -282,7 +282,7 @@ TEST_CASE("MXS")
             registers.val = static_cast<uint8_t>(-127);
             registers.preload = 15;
 
-            MXS instruction({0});
+            OpCodes::MXS instruction({0});
             instruction(registers);
 
             REQUIRE(static_cast<int>(registers.val) == static_cast<int>(static_cast<uint8_t>(-127 - 15)));
@@ -302,7 +302,7 @@ TEST_CASE("MXS")
                 registers.preload = static_cast<uint8_t>(-3);
                 registers.preload_negative = true;
 
-                MXS instruction({0});
+                OpCodes::MXS instruction({0});
                 instruction(registers);
 
                 REQUIRE(static_cast<int>(registers.val) == static_cast<uint8_t>(-2));
@@ -316,7 +316,7 @@ TEST_CASE("MXS")
                 registers.preload = static_cast<uint8_t>(-5);
                 registers.preload_negative = true;
 
-                MXS instruction({0});
+                OpCodes::MXS instruction({0});
                 instruction(registers);
 
                 REQUIRE(registers.val == 0);
@@ -330,7 +330,7 @@ TEST_CASE("MXS")
                 registers.preload = static_cast<uint8_t>(-6);
                 registers.preload_negative = true;
 
-                MXS instruction({0});
+                OpCodes::MXS instruction({0});
                 instruction(registers);
 
                 REQUIRE(registers.val == 1);
@@ -346,7 +346,7 @@ TEST_CASE("MXS")
     SECTION("Sync")
     {
         registers.preload = 2;
-        MXS instruction({1});
+        OpCodes::MXS instruction({1});
         instruction(registers);
 
         REQUIRE(registers.val == static_cast<uint8_t>(-2));
@@ -363,7 +363,7 @@ TEST_CASE("MUX")
 
     SECTION("Correctly set mux value")
     {
-        MUX instruction({3});
+        OpCodes::MUX instruction({3});
 
         instruction(registers);
 
@@ -377,7 +377,7 @@ TEST_CASE("LCL")
 
     SECTION("Initially zero")
     {
-        LCL instruction({0x05});
+        OpCodes::LCL instruction({0x05});
         instruction(registers);
 
         REQUIRE(registers.val == 0x05);
@@ -387,7 +387,7 @@ TEST_CASE("LCL")
     {
         registers.val = 0xaa;
 
-        LCL instruction({0x05});
+        OpCodes::LCL instruction({0x05});
         instruction(registers);
 
         REQUIRE(registers.val == 0xa5);
@@ -400,7 +400,7 @@ TEST_CASE("LCH")
 
     SECTION("Initially zero")
     {
-        LCH instruction({0x05});
+        OpCodes::LCH instruction({0x05});
         instruction(registers);
 
         REQUIRE(registers.val == 0x50);
@@ -410,7 +410,7 @@ TEST_CASE("LCH")
     {
         registers.val = 0xaa;
 
-        LCH instruction({0x05});
+        OpCodes::LCH instruction({0x05});
         instruction(registers);
 
         REQUIRE(registers.val == 0x5a);
@@ -424,7 +424,7 @@ TEST_CASE("JLV")
 
     SECTION("No effect if zero")
     {
-        JLV instruction({4});
+        OpCodes::JLV instruction({4});
         instruction(registers);
 
         REQUIRE(registers.pc == 1);
@@ -433,7 +433,7 @@ TEST_CASE("JLV")
 
     SECTION("No effect if greater than zero")
     {
-        JLV instruction({4});
+        OpCodes::JLV instruction({4});
         registers.val = 2;
         instruction(registers);
 
@@ -443,7 +443,7 @@ TEST_CASE("JLV")
 
     SECTION("Jump if negative")
     {
-        JLV instruction({4});
+        OpCodes::JLV instruction({4});
         registers.val = 1;
         registers.status2.negative = true;
         instruction(registers);
@@ -460,7 +460,7 @@ TEST_CASE("JEV")
 
     SECTION("Jump if zero")
     {
-        JEV instruction({4});
+        OpCodes::JEV instruction({4});
         instruction(registers);
 
         REQUIRE(registers.pc == 0);
@@ -469,7 +469,7 @@ TEST_CASE("JEV")
 
     SECTION("No effect if greater than zero")
     {
-        JEV instruction({4});
+        OpCodes::JEV instruction({4});
         registers.val = 2;
         instruction(registers);
 
@@ -479,7 +479,7 @@ TEST_CASE("JEV")
 
     SECTION("No effect if negative")
     {
-        JEV instruction({4});
+        OpCodes::JEV instruction({4});
         registers.val = 1;
         registers.status2.negative = true;
         instruction(registers);
@@ -496,7 +496,7 @@ TEST_CASE("JGV")
 
     SECTION("No effect if zero")
     {
-        JGV instruction({4});
+        OpCodes::JGV instruction({4});
         instruction(registers);
 
         REQUIRE(registers.pc == 1);
@@ -505,7 +505,7 @@ TEST_CASE("JGV")
 
     SECTION("Jump if greater than zero")
     {
-        JGV instruction({4});
+        OpCodes::JGV instruction({4});
         registers.val = 2;
         instruction(registers);
 
@@ -515,7 +515,7 @@ TEST_CASE("JGV")
 
     SECTION("No effect if negative")
     {
-        JGV instruction({4});
+        OpCodes::JGV instruction({4});
         registers.val = 1;
         registers.status2.negative = true;
         instruction(registers);
@@ -531,7 +531,7 @@ TEST_CASE("JMP")
 
     SECTION("Jump if zero")
     {
-        JMP instruction({4});
+        OpCodes::JMP instruction({4});
         instruction(registers);
 
         REQUIRE(registers.pc == 0);
@@ -539,7 +539,7 @@ TEST_CASE("JMP")
 
     SECTION("Jump if greater than zero")
     {
-        JMP instruction({4});
+        OpCodes::JMP instruction({4});
         registers.val = 2;
         instruction(registers);
 
@@ -548,7 +548,7 @@ TEST_CASE("JMP")
 
     SECTION("Jump if negative")
     {
-        JMP instruction({4});
+        OpCodes::JMP instruction({4});
         registers.val = 1;
         registers.status2.negative = true;
         instruction(registers);
@@ -565,7 +565,7 @@ TEST_CASE("CAD")
     {
         SECTION("No carry, initially zero")
         {
-            CAD instruction({2, 0});
+            OpCodes::CAD instruction({2, 0});
             instruction(registers);
 
             REQUIRE(registers.val == 2);
@@ -577,7 +577,7 @@ TEST_CASE("CAD")
         {
             registers.val = 250;
 
-            CAD instruction({15, 0});
+            OpCodes::CAD instruction({15, 0});
             instruction(registers);
 
             REQUIRE(static_cast<int>(registers.val) == static_cast<int>(static_cast<uint8_t>(250 + 15)));
@@ -593,7 +593,7 @@ TEST_CASE("CAD")
 
             SECTION("Still negative")
             {
-                CAD instruction({3, 0});
+                OpCodes::CAD instruction({3, 0});
                 instruction(registers);
 
                 REQUIRE(static_cast<int>(registers.val) == static_cast<uint8_t>(-2));
@@ -603,7 +603,7 @@ TEST_CASE("CAD")
 
             SECTION("Then zero")
             {
-                CAD instruction({5, 0});
+                OpCodes::CAD instruction({5, 0});
                 instruction(registers);
 
                 REQUIRE(registers.val == 0);
@@ -613,7 +613,7 @@ TEST_CASE("CAD")
 
             SECTION("Then positive")
             {
-                CAD instruction({6, 0});
+                OpCodes::CAD instruction({6, 0});
                 instruction(registers);
 
                 REQUIRE(registers.val == 1);
@@ -627,7 +627,7 @@ TEST_CASE("CAD")
 
     SECTION("Sync")
     {
-        CAD instruction({2, 1});
+        OpCodes::CAD instruction({2, 1});
         instruction(registers);
 
         REQUIRE(registers.val == 2);
@@ -651,7 +651,7 @@ TEST_CASE("LCS")
     {
         SECTION("No overflow 1")
         {
-            LLS instruction({1, 0});
+            OpCodes::LLS instruction({1, 0});
             registers.val = 0b0101'0101;
             instruction(registers);
 
@@ -661,7 +661,7 @@ TEST_CASE("LCS")
 
         SECTION("No overflow 2")
         {
-            LLS instruction({3, 0});
+            OpCodes::LLS instruction({3, 0});
             registers.val = 0b0001'1101;
             instruction(registers);
 
@@ -672,7 +672,7 @@ TEST_CASE("LCS")
         SECTION("Overflow by 1")
         {
             // The carry flag is updated to the last bit shifted out, bit[n-1], of the register Rm.
-            LLS instruction({2, 0});
+            OpCodes::LLS instruction({2, 0});
             registers.val = 0b0101'0101;
             instruction(registers);
 
@@ -683,7 +683,7 @@ TEST_CASE("LCS")
 
         SECTION("Overflow by 2")
         {
-            LLS instruction({3, 0});
+            OpCodes::LLS instruction({3, 0});
             registers.val = 0b0101'0101;
             instruction(registers);
 
@@ -694,7 +694,7 @@ TEST_CASE("LCS")
 
         SECTION("Shift by 8")
         {
-            LLS instruction({8, 0});
+            OpCodes::LLS instruction({8, 0});
             registers.val = 0b1111'1111;
             instruction(registers);
 
@@ -708,7 +708,7 @@ TEST_CASE("LCS")
 
     SECTION("Sync")
     {
-        LLS instruction({1, 1});
+        OpCodes::LLS instruction({1, 1});
         registers.val = 0b0101'0101;
         instruction(registers);
 
@@ -727,7 +727,7 @@ TEST_CASE("RLS")
     {
         SECTION("No overflow 1")
         {
-            RLS instruction({1, 0});
+            OpCodes::RLS instruction({1, 0});
             registers.val = 0b1010'1010;
             instruction(registers);
 
@@ -737,7 +737,7 @@ TEST_CASE("RLS")
 
         SECTION("No overflow 2")
         {
-            RLS instruction({3, 0});
+            OpCodes::RLS instruction({3, 0});
             registers.val = 0b0101'0000;
             instruction(registers);
 
@@ -748,7 +748,7 @@ TEST_CASE("RLS")
         SECTION("Overflow by 1")
         {
             // The carry flag is updated to the last bit shifted out
-            RLS instruction({2, 0});
+            OpCodes::RLS instruction({2, 0});
             registers.val = 0b1010'1010;
             instruction(registers);
 
@@ -759,7 +759,7 @@ TEST_CASE("RLS")
 
         SECTION("Overflow by 2")
         {
-            RLS instruction({3, 0});
+            OpCodes::RLS instruction({3, 0});
             registers.val = 0b1010'1010;
             instruction(registers);
 
@@ -770,7 +770,7 @@ TEST_CASE("RLS")
 
         SECTION("Shift by 8")
         {
-            RLS instruction({8, 0});
+            OpCodes::RLS instruction({8, 0});
             registers.val = 0b1111'1111;
             instruction(registers);
 
@@ -784,7 +784,7 @@ TEST_CASE("RLS")
 
     SECTION("Sync")
     {
-        RLS instruction({1, 1});
+        OpCodes::RLS instruction({1, 1});
         registers.val = 0b1010'1010;
         instruction(registers);
 

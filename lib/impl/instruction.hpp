@@ -89,10 +89,8 @@ uint8_t Instruction<ArgSizes...>::dump() const
     {
         return dump<ArgSizes...>(0, 0);
     }
-    else
-    {
-        return 0;
-    }
+
+    return 0;
 }
 
 template<uint8_t... ArgSizes>
