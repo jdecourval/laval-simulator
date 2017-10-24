@@ -180,6 +180,70 @@ TEST_CASE("Tests with memory")
 
 TEST_CASE("Fetch from linked core")
 {
-    // value + carry
+    Memory memory{1, 50};
+    CoreArray core_array({1, 1, 2}, memory);
+    Core& core1 = core_array[{0, 0, 0}];
+    Core& core2 = core_array[{0, 0, 1}];
+    Registers test_registers;
+
+    // Move one bit into carry
+    core2.execute(OpCodes::LCH({8}));
+    core2.execute(OpCodes::LLS({1, 0}));
+
+    core2.execute(Debug{test_registers});
+    REQUIRE(test_registers.status2.carry);
+
+    // Load a know value
+    core2.execute(OpCodes::LCL({2}));
+
+    // Connect core1 to core2
+    core1.execute(OpCodes::MUX(Direction({Direction::CURRENT, Direction::CURRENT, Direction::AFTER}).dump()));
+
+    SECTION("Do not spontaneously load if no sync")
+    {
+        // We have to manually preload since its not automatic from execute
+        core1.preload();
+        core1.execute(Debug{test_registers});
+        REQUIRE(test_registers.val == 0);
+    }
+
+    SECTION("Do not load if no sync")
+    {
+        core1.preload();
+        core1.execute(OpCodes::MXL({0}));
+
+        core1.execute(Debug{test_registers});
+        REQUIRE(test_registers.val == 0);
+    }
+
+
+    SECTION("Load from val")
+    {
+        core2.execute(OpCodes::SYN());
+
+        core1.preload();
+        core1.execute(OpCodes::MXL({0}));
+
+        core1.execute(Debug{test_registers});
+        REQUIRE(test_registers.val == 2);
+    }
+
+    SECTION("Load from carry")
+    {
+        core1.execute(OpCodes::CTC());
+
+        core2.execute(OpCodes::SYN());
+
+        core1.preload();
+        core1.execute(OpCodes::MXL({0}));
+
+        core1.execute(Debug{test_registers});
+        REQUIRE(test_registers.val == 1);
+    }
+
+    // Core2 should never be affected
+    core2.execute(Debug{test_registers});
+    REQUIRE(test_registers.val == 2);
+    REQUIRE(test_registers.status2.carry);
 }
 
