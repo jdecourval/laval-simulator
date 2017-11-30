@@ -69,6 +69,24 @@ namespace OpCodes
         bool operator()(Registers& registers) const override;
     };
 
+// Halt the program and return current value as solution
+// arg: none
+    struct HLT : public Instruction<>
+    {
+        using Instruction<>::Instruction;
+
+        bool operator()(Registers& registers) const override;
+    };
+
+// Fetch and discard value at mux
+// arg: none
+    struct MXD : public Instruction<>
+    {
+        using Instruction<>::Instruction;
+
+        bool operator()(Registers& registers) const override;
+    };
+
 
 // TODO ?: Change sync mode: auto, manual
 
@@ -114,7 +132,6 @@ namespace OpCodes
         bool operator()(Registers& registers) const override;
     };
 
-
 // Load constant into low part
 // arg 1:4: constant
     struct LCL : public Instruction<4>
@@ -137,7 +154,7 @@ namespace OpCodes
 
 // Jump if value less than 0. Change memory bank
 // arg 1:4: memory bank address
-    struct JLV : public Instruction<4>
+    struct JLZ : public Instruction<4>
     {
         using Instruction<4>::Instruction;
 
@@ -147,7 +164,7 @@ namespace OpCodes
 
 // Jump if value equals 0
 // arg 1:4: memory bank address
-    struct JEV : public Instruction<4>
+    struct JEZ : public Instruction<4>
     {
         using Instruction<4>::Instruction;
 
@@ -157,7 +174,7 @@ namespace OpCodes
 
 // Jump if value greater than 0
 // arg 1:4: memory bank address
-    struct JGV : public Instruction<4>
+    struct JGZ : public Instruction<4>
     {
         using Instruction<4>::Instruction;
 
@@ -220,5 +237,28 @@ namespace OpCodes
         bool operator()(Registers& registers) const override;
     };
 
-}
+
+    // Logical AND
+    // arg 1:4: constant
+    // Arg 2:1: Sync after
+    struct CAN : public Instruction<4, 1>
+    {
+        using Instruction<4, 1>::Instruction;
+
+        bool operator()(Registers& registers) const override;
+    };
+
+
+    // Logical AND
+    // arg 1:4: constant
+    // Arg 2:1: Sync after
+    struct COR : public Instruction<4, 1>
+    {
+        using Instruction<4, 1>::Instruction;
+
+        bool operator()(Registers& registers) const override;
+    };
+
+    }
+
 #endif //SIMULATOR_OPCODES_H

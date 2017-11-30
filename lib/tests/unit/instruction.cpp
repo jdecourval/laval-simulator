@@ -1,4 +1,4 @@
-#include "catch.hpp"
+#include <catch.hpp>
 
 #include "instruction.h"
 
@@ -88,20 +88,20 @@ TEST_CASE("Out of range initializer_list argument")
     REQUIRE_THROWS_AS(TestInstruction<3>({8}), const std::out_of_range&);
 }
 
-TEST_CASE("Dump")
-{
-    {
-        using WorkAroundTemplateInMacro = TestInstruction<>;
-        REQUIRE(WorkAroundTemplateInMacro().dump() == 0);
-    }
-
-    {
-        using WorkAroundTemplateInMacro = TestInstruction<1, 1, 1, 1, 1, 1>;
-        REQUIRE(WorkAroundTemplateInMacro(std::byte{13}).dump() == 13);
-    }
-
-    {
-        using WorkAroundTemplateInMacro = TestInstruction<6>;
-        REQUIRE(WorkAroundTemplateInMacro(std::byte{50}).dump() == 50);
-    }
-}
+//TEST_CASE("Dump")
+//{
+//    {
+//        using WorkAroundTemplateInMacro = TestInstruction<>;
+//        REQUIRE(WorkAroundTemplateInMacro().dump() == 0);
+//    }
+//
+//    {
+//        using WorkAroundTemplateInMacro = TestInstruction<1, 1, 1, 1, 1, 1>;
+//        REQUIRE(WorkAroundTemplateInMacro(std::byte{13}).dump() == 13);
+//    }
+//
+//    {
+//        using WorkAroundTemplateInMacro = TestInstruction<6>;
+//        REQUIRE(WorkAroundTemplateInMacro(std::byte{50}).dump() == 50);
+//    }
+//}

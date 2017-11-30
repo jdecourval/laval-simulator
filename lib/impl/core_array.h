@@ -17,7 +17,7 @@ public:
 
     Core& operator[](const std::vector<size_t>& index_array);
 
-    const Core& offset(size_t id, const Direction& offsets) const;
+    Core& offset(size_t id, const Direction& offsets);
 
     decltype(auto) cbegin() const noexcept
     {

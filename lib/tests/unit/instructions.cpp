@@ -1,4 +1,4 @@
-#include "catch.hpp"
+#include <catch.hpp>
 
 #include "opcodes.h"
 #include "core.h"
@@ -417,14 +417,14 @@ TEST_CASE("LCH")
     }
 }
 
-TEST_CASE("JLV")
+TEST_CASE("JLZ")
 {
     Registers registers;
     registers.pc = 1;
 
     SECTION("No effect if zero")
     {
-        OpCodes::JLV instruction({4});
+        OpCodes::JLZ instruction({4});
         instruction(registers);
 
         REQUIRE(registers.pc == 1);
@@ -433,7 +433,7 @@ TEST_CASE("JLV")
 
     SECTION("No effect if greater than zero")
     {
-        OpCodes::JLV instruction({4});
+        OpCodes::JLZ instruction({4});
         registers.val = 2;
         instruction(registers);
 
@@ -443,7 +443,7 @@ TEST_CASE("JLV")
 
     SECTION("Jump if negative")
     {
-        OpCodes::JLV instruction({4});
+        OpCodes::JLZ instruction({4});
         registers.val = 1;
         registers.status2.negative = true;
         instruction(registers);
@@ -453,14 +453,14 @@ TEST_CASE("JLV")
     }
 }
 
-TEST_CASE("JEV")
+TEST_CASE("JEZ")
 {
     Registers registers;
     registers.pc = 1;
 
     SECTION("Jump if zero")
     {
-        OpCodes::JEV instruction({4});
+        OpCodes::JEZ instruction({4});
         instruction(registers);
 
         REQUIRE(registers.pc == 0);
@@ -469,7 +469,7 @@ TEST_CASE("JEV")
 
     SECTION("No effect if greater than zero")
     {
-        OpCodes::JEV instruction({4});
+        OpCodes::JEZ instruction({4});
         registers.val = 2;
         instruction(registers);
 
@@ -479,7 +479,7 @@ TEST_CASE("JEV")
 
     SECTION("No effect if negative")
     {
-        OpCodes::JEV instruction({4});
+        OpCodes::JEZ instruction({4});
         registers.val = 1;
         registers.status2.negative = true;
         instruction(registers);
@@ -489,14 +489,14 @@ TEST_CASE("JEV")
     }
 }
 
-TEST_CASE("JGV")
+TEST_CASE("JGZ")
 {
     Registers registers;
     registers.pc = 1;
 
     SECTION("No effect if zero")
     {
-        OpCodes::JGV instruction({4});
+        OpCodes::JGZ instruction({4});
         instruction(registers);
 
         REQUIRE(registers.pc == 1);
@@ -505,7 +505,7 @@ TEST_CASE("JGV")
 
     SECTION("Jump if greater than zero")
     {
-        OpCodes::JGV instruction({4});
+        OpCodes::JGZ instruction({4});
         registers.val = 2;
         instruction(registers);
 
@@ -515,7 +515,7 @@ TEST_CASE("JGV")
 
     SECTION("No effect if negative")
     {
-        OpCodes::JGV instruction({4});
+        OpCodes::JGZ instruction({4});
         registers.val = 1;
         registers.status2.negative = true;
         instruction(registers);
@@ -793,3 +793,7 @@ TEST_CASE("RLS")
         REQUIRE(registers == registers_expected);
     }
 }
+
+// TODO: Test HLT
+// TODO: Test SYN block core until access
+// TODO: Test jump instructions in fetch change pc to 0

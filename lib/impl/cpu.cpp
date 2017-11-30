@@ -1,29 +1,42 @@
 #include "cpu.h"
 
+#include "opcodes.h"
 #include "thread_pool.h"
 
 
 using namespace std::chrono_literals;
 
 Cpu::Cpu(const Settings& settings)
-    : Cpu(settings, Memory{settings.bank_number, settings.bank_size})
+    : Cpu(settings, Memory{settings}, std::vector<size_t>(std::accumulate(settings.dimensions.begin(), settings.dimensions.end(), 1ul, std::multiplies<>())))
 {
-
+    assert(settings.dimensions.size() == 3);
 }
 
-Cpu::Cpu(const Cpu::Settings& settings, Memory&& memory)
-    : mem(memory)
-      , cores{settings.dimensions, mem}
+Cpu::Cpu(const Settings& settings, Memory&& memory, std::vector<MemoryInterface::size_type>&& core_to_mem_map)
+    : mem{std::move(memory)}, cores{settings.dimensions, mem}, core_to_mem_map{std::move(core_to_mem_map)}
 {
+    assert(settings.dimensions.size() == 3);
+}
 
+void Cpu::link_memory(Memory&& memory, std::vector<MemoryInterface::size_type>&& core_to_mem_map)
+{
+    mem = std::move(memory);
+    this->core_to_mem_map = std::move(core_to_mem_map);
 }
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
 
-void Cpu::Start(const std::chrono::milliseconds& period)
+void Cpu::start(const std::chrono::milliseconds& period)
 {
     assert(period.count() >= 0);
+    assert(cores.size() == core_to_mem_map.size());
+
+    for(auto i = 0ull; i < core_to_mem_map.size(); i++)
+    {
+        assert(core_to_mem_map[i] < mem.banks_number());
+        cores[i].wire(core_to_mem_map[i]);      // TODO: Not yet initialized
+    }
 
     if (period.count() != 0)
     {
@@ -56,6 +69,9 @@ void Cpu::Start(const std::chrono::milliseconds& period)
 
         if (period > 0s)
         {
+            // TODO: Replace OpCodes::DBG by a local implementation
+            std::for_each(std::begin(cores), std::end(cores), [](auto& core) { core.execute(OpCodes::DBG()); });
+
             auto time_to_sleep = period - (BenchmarkClock::now() - time_before_execution);
 
             if (time_to_sleep > 0ns)

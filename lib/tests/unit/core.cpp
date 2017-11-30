@@ -1,4 +1,4 @@
-#include "catch.hpp"
+#include <catch.hpp>
 
 #include <core.h>
 
@@ -63,7 +63,7 @@ TEST_CASE("Single core tests")
 
 TEST_CASE("Tests that need memory")
 {
-    Memory memory{1, 10};
+    Memory memory(Settings{{1, 1, 1}, 1, 10});
     CoreArray core_array({1, 1, 1}, memory);
     Core& core = core_array[0];
     Registers test_registers;
@@ -120,7 +120,7 @@ TEST_CASE("Tests with memory")
 {
     SECTION("Execute from linked memory")
     {
-        Memory memory{1, 50};
+        Memory memory(Settings{{1, 1, 1}, 1, 50});
         CoreArray core_array({1, 1, 1}, memory);
         Core& core = core_array[{0, 0, 0}];
         Registers test_registers;
@@ -180,7 +180,7 @@ TEST_CASE("Tests with memory")
 
 TEST_CASE("Fetch from linked core")
 {
-    Memory memory{1, 50};
+    Memory memory(Settings{{1, 1, 1}, 1, 50});
     CoreArray core_array({1, 1, 2}, memory);
     Core& core1 = core_array[{0, 0, 0}];
     Core& core2 = core_array[{0, 0, 1}];

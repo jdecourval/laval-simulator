@@ -1,6 +1,8 @@
 #ifndef SIMULATOR_MEMORY_H
 #define SIMULATOR_MEMORY_H
 
+#include "settings.h"
+
 #include <array>
 #include <functional>
 #include <gsl/gsl>
@@ -24,7 +26,7 @@ public:
 class Memory final : public MemoryInterface
 {
 public:
-    Memory(unsigned BankNumber, unsigned BankSize);
+    explicit Memory(const Settings& settings);
 
     size_type banks_size() const override final;
 

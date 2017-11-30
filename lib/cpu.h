@@ -16,17 +16,20 @@ class Cpu
     using BenchmarkClock = std::chrono::high_resolution_clock;
 
 public:
-    struct Settings
-    {
-        constexpr static std::initializer_list<size_t> dimensions = {10, 10, 10};
-        constexpr static auto bank_number = 16u;
-        constexpr static auto bank_size  = 256u;
-    };
-
     explicit Cpu(const Settings&);
-    explicit Cpu(const Settings&, Memory&& memory);
+    explicit Cpu(const Settings&, Memory&& memory, std::vector<MemoryInterface::size_type>&& core_to_mem_map);
 
-    [[noreturn]] void Start(const std::chrono::milliseconds& period);
+    void link_memory(Memory&& memory, std::vector<MemoryInterface::size_type>&& core_to_mem_map);
+
+    template <typename Instruction_t>
+    uint8_t dump(const Instruction_t& instruction)
+    {
+        assert(cores.size() > 0);
+
+        return cores[0].get_factory().dump(instruction);
+    }
+
+    [[noreturn]] void start(const std::chrono::milliseconds& period);
 
     Cpu(Cpu&) = delete;
 
@@ -35,6 +38,7 @@ public:
 private:
     Memory mem;
     CoreArray cores;
+    std::vector<MemoryInterface::size_type> core_to_mem_map;
 };
 
 

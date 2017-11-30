@@ -1,7 +1,5 @@
 #include "core.h"
 
-#include <iostream>
-
 #include "core_array.h"
 #include "direction.h"
 #include "opcodes.h"
@@ -18,7 +16,7 @@ Core::Core()
     initialize();
 }
 
-Core::Core(const CoreArray& cores, size_t id, const MemoryInterface& mem)
+Core::Core(CoreArray& cores, size_t id, const MemoryInterface& mem)
     : registers()
       , mem(&mem)
       , cores(&cores)
@@ -31,6 +29,11 @@ Core::Core(const CoreArray& cores, size_t id, const MemoryInterface& mem)
     initialize();
 }
 
+void Core::wire(uint8_t membank)
+{
+    registers.status2.membank = membank;
+}
+
 void Core::initialize()
 {
     assert(mem == nullptr || mem->banks_size() <= std::numeric_limits<decltype(registers.pc)>::max() + 1);
@@ -41,20 +44,24 @@ void Core::initialize()
     factory.register_instruction<OpCodes::CTV>();
     factory.register_instruction<OpCodes::DBG>();
     factory.register_instruction<OpCodes::HCF>();
+    factory.register_instruction<OpCodes::HLT>();
+    factory.register_instruction<OpCodes::MXD>();
     factory.register_instruction<OpCodes::MXL>();
     factory.register_instruction<OpCodes::MXA>();
     factory.register_instruction<OpCodes::MXS>();
     factory.register_instruction<OpCodes::MUX>();
     factory.register_instruction<OpCodes::LCL>();
     factory.register_instruction<OpCodes::LCH>();
-    factory.register_instruction<OpCodes::JLV>();
-    factory.register_instruction<OpCodes::JEV>();
-    factory.register_instruction<OpCodes::JGV>();
+    factory.register_instruction<OpCodes::JLZ>();
+    factory.register_instruction<OpCodes::JEZ>();
+    factory.register_instruction<OpCodes::JGZ>();
     factory.register_instruction<OpCodes::JMP>();
     factory.register_instruction<OpCodes::LLS>();
     factory.register_instruction<OpCodes::RLS>();
     factory.register_instruction<OpCodes::CAD>();
     factory.register_instruction<OpCodes::CSU>();
+    factory.register_instruction<OpCodes::CAN>();
+    factory.register_instruction<OpCodes::COR>();
 }
 
 void Core::preload()
@@ -78,6 +85,16 @@ void Core::preload()
         else
         {
             registers.preload = {};
+        }
+
+        // POC:
+        auto raw_instruction = mem->at(registers.status2.membank).at(registers.pc);
+        auto instruction = factory.create(raw_instruction);
+
+        if (dynamic_cast<OpCodes::MXL*>(instruction.get()) || dynamic_cast<OpCodes::MXA*>(instruction.get()) || dynamic_cast<OpCodes::MXS*>(instruction.get()) ||
+        dynamic_cast<OpCodes::MXL*>(instruction.get()))
+        {
+            cores->offset(registers.id, direction).registers.status2.unlock = true;
         }
     }
     catch (const std::bad_variant_access&)
@@ -121,6 +138,8 @@ void Core::fetch()
         // Safe to cast since the modulo limits the value and a check about that is done in initialize.
         registers.pc = static_cast<uint8_t>((registers.pc + 1) % mem->banks_size());
     }
+
+    registers.status2.unlock = false;
 }
 
 bool Core::execute(const InstructionBase& raw_instruction)

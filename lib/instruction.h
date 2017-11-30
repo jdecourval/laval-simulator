@@ -25,7 +25,7 @@ struct Instruction : public InstructionBase
 
     constexpr explicit Instruction(std::byte args_raw);
 
-    uint8_t dump() const;
+    uint8_t dump_args() const;
 
 
 protected:

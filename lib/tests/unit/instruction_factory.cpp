@@ -1,4 +1,4 @@
-#include "catch.hpp"
+#include <catch.hpp>
 
 #include "impl/instruction_factory.h"
 
@@ -41,7 +41,6 @@ TEST_CASE("Instruction factory")
         {
             auto size0_raw = factory.dump(Size0());
             REQUIRE(size0_raw == 4);
-
         }
 
         {

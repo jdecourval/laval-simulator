@@ -1,4 +1,3 @@
-#include <numeric>
 #include "core_array.h"
 
 #include "direction.h"
@@ -38,7 +37,7 @@ Core& CoreArray::operator[](const std::vector<size_t>& index_array)
     return cores[index];
 }
 
-const Core& CoreArray::offset(size_t id, const Direction& offsets) const
+Core& CoreArray::offset(size_t id, const Direction& offsets)
 {
     assert(offsets.size() == index_operands.size());
     auto long_size = static_cast<long>(cores.size());

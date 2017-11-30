@@ -83,11 +83,11 @@ constexpr bool Instruction<ArgSizes...>::checkcarry(T val)
 }
 
 template<uint8_t... ArgSizes>
-uint8_t Instruction<ArgSizes...>::dump() const
+uint8_t Instruction<ArgSizes...>::dump_args() const
 {
     if constexpr (sizeof...(ArgSizes) != 0)
     {
-        return dump<ArgSizes...>(0, 0);
+        return dump_args < ArgSizes...>(0, 0);
     }
 
     return 0;
@@ -97,7 +97,7 @@ template<uint8_t... ArgSizes>
 template<uint8_t FirstArgSize, uint8_t SecondArgSize, uint8_t... OtherArgSizes>
 uint8_t Instruction<ArgSizes...>::dump(uint8_t i, uint8_t shift) const
 {
-    return dump<FirstArgSize>(i, shift) + dump<SecondArgSize, OtherArgSizes...>(i + 1_u8, shift + FirstArgSize);
+    return dump_args < FirstArgSize> (i, shift) + dump_args<SecondArgSize, OtherArgSizes...>(i + 1_u8, shift + FirstArgSize);
 }
 
 // TODO: Natural size integers may be faster where having an uint8_t is not meaningful. Benchmark first.

@@ -16,7 +16,7 @@ bool SYN::operator()(Registers& registers) const
 {
     sync(registers);
 
-    return true;
+    return registers.status2.unlock;
 }
 
 bool CTC::operator()(Registers& registers) const
@@ -44,6 +44,17 @@ bool HCF::operator()(Registers&) const
 {
     // TODO
     return true;
+}
+
+bool HLT::operator()(Registers& registers) const
+{
+    // TODO: Wrap in something
+    throw registers.val;
+}
+
+bool MXD::operator()(Registers& registers) const
+{
+    return registers.preload.has_value();
 }
 
 bool MXL::operator()(Registers& registers) const
@@ -133,34 +144,37 @@ bool LCH::operator()(Registers& registers) const
     return true;
 }
 
-bool JLV::operator()(Registers& registers) const
+bool JLZ::operator()(Registers& registers) const
 {
     if (registers.status2.negative)
     {
         registers.status2.membank = get_argument(0);
         registers.pc = 0;
+        return false;
     }
 
     return true;
 }
 
-bool JEV::operator()(Registers& registers) const
+bool JEZ::operator()(Registers& registers) const
 {
     if (registers.val == 0)
     {
         registers.status2.membank = get_argument(0);
         registers.pc = 0;
+        return false;
     }
 
     return true;
 }
 
-bool JGV::operator()(Registers& registers) const
+bool JGZ::operator()(Registers& registers) const
 {
     if (!registers.status2.negative && registers.val != 0)
     {
         registers.status2.membank = get_argument(0);
         registers.pc = 0;
+        return false;
     }
 
     return true;
@@ -171,7 +185,7 @@ bool JMP::operator()(Registers& registers) const
     registers.status2.membank = get_argument(0);
     registers.pc = 0;
 
-    return true;
+    return false;
 }
 
 bool LLS::operator()(Registers& registers) const
@@ -234,6 +248,30 @@ bool CSU::operator()(Registers& registers) const
     registers.status2.carry = checkcarry(result);
     // TODO: Undefined behaviour, value cannot be represented in the destination type
     registers.val = static_cast<uint8_t>(result);
+
+    if (get_argument(1))
+    {
+        sync(registers);
+    }
+
+    return true;
+}
+
+bool CAN::operator()(Registers& registers) const
+{
+    registers.val &= get_argument(0);
+
+    if (get_argument(1))
+    {
+        sync(registers);
+    }
+
+    return true;
+}
+
+bool COR::operator()(Registers& registers) const
+{
+    registers.val |= get_argument(0);
 
     if (get_argument(1))
     {

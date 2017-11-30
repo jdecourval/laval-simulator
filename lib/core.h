@@ -15,7 +15,9 @@ class Core
 public:
     Core();
 
-    Core(const CoreArray& cores, size_t id, const MemoryInterface& mem);
+    Core(CoreArray& cores, size_t id, const MemoryInterface& mem);
+
+    void wire(uint8_t membank);
 
     void initialize();
 
@@ -42,7 +44,7 @@ private:
     InstructionFactory factory;
 
     const MemoryInterface* mem;
-    const CoreArray* cores;
+    CoreArray* cores;  // TODO: make const
 
     friend std::ostream& operator<<(std::ostream& os, const Core& core);
 };
