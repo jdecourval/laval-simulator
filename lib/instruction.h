@@ -50,10 +50,10 @@ private:
     constexpr void set_arg(uint8_t args_raw);
 
     template<uint8_t LastArgSize>
-    uint8_t dump(uint8_t i, uint8_t shift) const;
+    uint8_t dump_args(uint8_t i, uint8_t shift) const;
 
     template<uint8_t FirstArgSize, uint8_t SecondArgSize, uint8_t... OtherArgSizes>
-    uint8_t dump(uint8_t i, uint8_t shift) const;
+    uint8_t dump_args(uint8_t i, uint8_t shift) const;
 
 
 private:

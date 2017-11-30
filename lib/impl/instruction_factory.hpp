@@ -42,5 +42,5 @@ void InstructionFactory::register_helper(std::index_sequence<I...>)
 template<typename T>
 uint8_t InstructionFactory::dump(const T& instruction) const
 {
-    return instruction_to_offset.at(typeid(T).hash_code()) + instruction.dump();
+    return instruction_to_offset.at(typeid(T).hash_code()) + instruction.dump_args();
 }

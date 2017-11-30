@@ -95,7 +95,7 @@ uint8_t Instruction<ArgSizes...>::dump_args() const
 
 template<uint8_t... ArgSizes>
 template<uint8_t FirstArgSize, uint8_t SecondArgSize, uint8_t... OtherArgSizes>
-uint8_t Instruction<ArgSizes...>::dump(uint8_t i, uint8_t shift) const
+uint8_t Instruction<ArgSizes...>::dump_args(uint8_t i, uint8_t shift) const
 {
     return dump_args < FirstArgSize> (i, shift) + dump_args<SecondArgSize, OtherArgSizes...>(i + 1_u8, shift + FirstArgSize);
 }
@@ -103,7 +103,7 @@ uint8_t Instruction<ArgSizes...>::dump(uint8_t i, uint8_t shift) const
 // TODO: Natural size integers may be faster where having an uint8_t is not meaningful. Benchmark first.
 template<uint8_t... ArgSizes>
 template<uint8_t LastArgSize>
-uint8_t Instruction<ArgSizes...>::dump(uint8_t i, uint8_t shift) const
+uint8_t Instruction<ArgSizes...>::dump_args(uint8_t i, uint8_t shift) const
 {
     return safe_left_shift(args.at(i), shift);
 }
