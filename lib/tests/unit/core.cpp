@@ -247,3 +247,150 @@ TEST_CASE("Fetch from linked core")
     REQUIRE(test_registers.status2.carry);
 }
 
+TEST_CASE("Synchronization tests")
+{
+    Memory memory(Settings{{1, 1, 1}, 2, 50});
+    CoreArray core_array({1, 1, 2}, memory);
+    Core& core1 = core_array[{0, 0, 0}];
+    Core& core2 = core_array[{0, 0, 1}];
+
+    core2.execute(OpCodes::LCL({1}));
+
+    Registers test_registers;
+    core1.execute(Debug{test_registers});
+    REQUIRE(test_registers.val == 0);
+
+    SECTION("Sync block until mux access")
+    {
+        // TODO: Cleanup this test
+        memory.at(0).at(0) = core1.get_factory().dump(
+        OpCodes::MUX({Direction({Direction::CURRENT, Direction::CURRENT, Direction::AFTER}).dump()}));
+        memory.at(0).at(1) = core1.get_factory().dump(OpCodes::MXL({0}));
+        memory.at(0).at(2) = core1.get_factory().dump(OpCodes::MXL({0}));
+
+        memory.at(1).at(0) = core2.get_factory().dump(OpCodes::SYN());
+        memory.at(1).at(1) = core2.get_factory().dump(OpCodes::NOP());
+        memory.at(1).at(2) = core2.get_factory().dump(OpCodes::SYN());
+
+        core1.wire(0);
+        core2.wire(1);
+
+        // MUX, SYN
+        core1.preload();
+        core2.preload();
+
+        core1.execute(Debug{test_registers});
+        REQUIRE(!test_registers.status2.unlock);
+        REQUIRE(!test_registers.status1.sync);
+        core2.execute(Debug{test_registers});
+        REQUIRE(!test_registers.status2.unlock);
+        REQUIRE(!test_registers.status1.sync);
+
+        core1.fetch();
+        core2.fetch();
+
+        core1.execute(Debug{test_registers});
+        REQUIRE(!test_registers.status2.unlock);
+        REQUIRE(!test_registers.status1.sync);
+        REQUIRE(test_registers.pc == 1);
+        core2.execute(Debug{test_registers});
+        REQUIRE(!test_registers.status2.unlock);
+        REQUIRE(test_registers.status1.sync);
+        REQUIRE(test_registers.pc == 0);    // core2 is blocked until MXL in core1
+
+        // MXL (1st), SYN
+        core1.preload();
+        core2.preload();
+
+        core1.execute(Debug{test_registers});
+        REQUIRE(!test_registers.status2.unlock);
+        REQUIRE(!test_registers.status1.sync);
+        core2.execute(Debug{test_registers});
+        REQUIRE(test_registers.status2.unlock);
+        REQUIRE(test_registers.status1.sync);
+
+        core1.fetch();
+        core2.fetch();
+
+        core1.execute(Debug{test_registers});
+        REQUIRE(!test_registers.status2.unlock);
+        REQUIRE(!test_registers.status1.sync);
+        REQUIRE(test_registers.pc == 2);
+        REQUIRE(test_registers.val == 1);
+        core2.execute(Debug{test_registers});
+        REQUIRE(!test_registers.status2.unlock);
+        REQUIRE(!test_registers.status1.sync);  // Sync is deactivated so that one SYN could not unlock two successive mux op
+        REQUIRE(test_registers.pc == 1);    // core2 was unlocked
+
+        // MXL (2nd), NOP
+        core1.preload();
+        core2.preload();
+
+        core1.execute(Debug{test_registers});
+        REQUIRE(!test_registers.status2.unlock);
+        REQUIRE(!test_registers.status1.sync);
+        core2.execute(Debug{test_registers});
+        REQUIRE(!test_registers.status2.unlock);
+        REQUIRE(!test_registers.status1.sync);
+
+        core1.fetch();
+        core2.fetch();
+
+        core1.execute(Debug{test_registers});
+        REQUIRE(!test_registers.status2.unlock);
+        REQUIRE(!test_registers.status1.sync);
+        REQUIRE(test_registers.pc == 2);    // core1 is waiting for the next sync
+        core2.execute(Debug{test_registers});
+        REQUIRE(!test_registers.status2.unlock);
+        REQUIRE(!test_registers.status1.sync);
+        REQUIRE(test_registers.pc == 2);
+
+        // MXL (2nd), SYN
+        core1.preload();
+        core2.preload();
+
+        core1.execute(Debug{test_registers});
+        REQUIRE(!test_registers.status2.unlock);
+        REQUIRE(!test_registers.status1.sync);
+        core2.execute(Debug{test_registers});
+        REQUIRE(!test_registers.status2.unlock);
+        REQUIRE(!test_registers.status1.sync);
+
+        core1.fetch();
+        core2.fetch();
+
+        core1.execute(Debug{test_registers});
+        REQUIRE(!test_registers.status2.unlock);
+        REQUIRE(!test_registers.status1.sync);
+        REQUIRE(test_registers.pc == 2);
+        core2.execute(Debug{test_registers});
+        REQUIRE(!test_registers.status2.unlock);
+        REQUIRE(test_registers.status1.sync);   // Sync is set in fetch, core1 could not have preload in time and is still blocked
+        REQUIRE(test_registers.pc == 2);
+
+        // MXL (2nd), SYN
+        core1.preload();
+        core2.preload();
+
+        core1.execute(Debug{test_registers});
+        REQUIRE(!test_registers.status2.unlock);
+        REQUIRE(!test_registers.status1.sync);
+        core2.execute(Debug{test_registers});
+        REQUIRE(test_registers.status2.unlock);
+        REQUIRE(test_registers.status1.sync);
+
+        core1.fetch();
+        core2.fetch();
+
+        core1.execute(Debug{test_registers});
+        REQUIRE(!test_registers.status2.unlock);
+        REQUIRE(!test_registers.status1.sync);
+        REQUIRE(test_registers.pc == 3);
+        core2.execute(Debug{test_registers});
+        REQUIRE(!test_registers.status2.unlock);
+        REQUIRE(!test_registers.status1.sync);
+        REQUIRE(test_registers.pc == 3);
+    }
+}
+
+// TODO: Test wire

@@ -19,3 +19,4 @@
 - Check with the undefined behaviour sanitizer
 - Deadlock detector
 - Output program size
+- Fix HLT when using a thread pool

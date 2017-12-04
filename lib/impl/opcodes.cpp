@@ -1,7 +1,8 @@
 #include "opcodes.h"
 
+#include "answer.h"
+
 #include <iostream>
-#include <functional>
 
 
 using namespace OpCodes;
@@ -14,9 +15,13 @@ bool NOP::operator()(Registers&) const
 
 bool SYN::operator()(Registers& registers) const
 {
-    sync(registers);
+    if (registers.status2.unlock)
+    {
+        return true;
+    }
 
-    return registers.status2.unlock;
+    sync(registers);
+    return false;
 }
 
 bool CTC::operator()(Registers& registers) const
@@ -48,8 +53,7 @@ bool HCF::operator()(Registers&) const
 
 bool HLT::operator()(Registers& registers) const
 {
-    // TODO: Wrap in something
-    throw registers.val;
+    throw Answer{registers.val};
 }
 
 bool MXD::operator()(Registers& registers) const

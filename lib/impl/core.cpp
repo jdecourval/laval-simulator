@@ -81,20 +81,21 @@ void Core::preload()
             registers.preload = registers.status1.ctc ? pointed_core.registers.status2.carry
                                                       : pointed_core.registers.val;
             registers.preload_negative = pointed_core.registers.status2.negative;
+
+            // TODO: This is duplicated
+            auto raw_instruction = mem->at(registers.status2.membank).at(registers.pc);
+            auto instruction = factory.create(raw_instruction);
+
+            // TODO: Should be in the instructions
+            if (dynamic_cast<OpCodes::MXL*>(instruction.get()) || dynamic_cast<OpCodes::MXA*>(instruction.get()) || dynamic_cast<OpCodes::MXS*>(instruction.get()) ||
+                dynamic_cast<OpCodes::MXD*>(instruction.get()))
+            {
+                pointed_core.registers.status2.unlock = true;
+            }
         }
         else
         {
             registers.preload = {};
-        }
-
-        // POC:
-        auto raw_instruction = mem->at(registers.status2.membank).at(registers.pc);
-        auto instruction = factory.create(raw_instruction);
-
-        if (dynamic_cast<OpCodes::MXL*>(instruction.get()) || dynamic_cast<OpCodes::MXA*>(instruction.get()) || dynamic_cast<OpCodes::MXS*>(instruction.get()) ||
-        dynamic_cast<OpCodes::MXL*>(instruction.get()))
-        {
-            cores->offset(registers.id, direction).registers.status2.unlock = true;
         }
     }
     catch (const std::bad_variant_access&)

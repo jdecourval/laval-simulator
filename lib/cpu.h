@@ -29,7 +29,7 @@ public:
         return cores[0].get_factory().dump(instruction);
     }
 
-    [[noreturn]] void start(const std::chrono::milliseconds& period);
+    uint8_t start(const std::chrono::milliseconds& period = std::chrono::milliseconds(0));
 
     Cpu(Cpu&) = delete;
 

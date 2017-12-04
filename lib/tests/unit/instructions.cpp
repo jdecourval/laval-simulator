@@ -797,3 +797,4 @@ TEST_CASE("RLS")
 // TODO: Test HLT
 // TODO: Test SYN block core until access
 // TODO: Test jump instructions in fetch change pc to 0
+// TODO: Test SYN if MUX to PC (Immediate write?)

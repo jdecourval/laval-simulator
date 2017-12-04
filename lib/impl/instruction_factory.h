@@ -8,7 +8,7 @@
 #include "instruction.h"
 
 
-// TODO: Static class or members ?
+// TODO: Static class or members ? Currently there is one instance per core
 class InstructionFactory
 {
 public:
@@ -31,7 +31,6 @@ private:
     std::unordered_map<size_t, uint8_t> instruction_to_offset;
     uint8_t counter = 0;
     std::ofstream dump_file;
-
 };
 
 

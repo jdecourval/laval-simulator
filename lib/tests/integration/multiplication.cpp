@@ -5,7 +5,7 @@
 #include <opcodes.h>
 
 
-// Compute c = a * b, a > b
+// Compute c = a * b
 // From https://en.wikipedia.org/wiki/Bitwise_operation
 // Algo:
 /*
@@ -17,7 +17,7 @@ while b ≠ 0
     right shift b by 1
 return c
  */
-TEST_CASE("Multiplication")
+uint8_t multiplication(uint8_t a, uint8_t b)
 {
     using namespace OpCodes;
     using namespace std::chrono_literals;
@@ -35,7 +35,7 @@ TEST_CASE("Multiplication")
 
     // Core 0: shift a
     // Membank 0, init a
-    memory.at(0).at(0) = cpu.dump(LCL({6}));
+    memory.at(0).at(0) = cpu.dump(LCL({a}));
     memory.at(0).at(1) = cpu.dump(JMP({1}));
 
     // Membank 1, shift a
@@ -56,16 +56,16 @@ TEST_CASE("Multiplication")
     memory.at(5).at(8) = cpu.dump(JMP({5}));
 
     // Membank 6, return 0
-    memory.at(6).at(0) = cpu.dump(LCL({0}));
-    memory.at(6).at(1) = cpu.dump(LCH({0}));
-    memory.at(6).at(2) = cpu.dump(MXD());
+    memory.at(6).at(0) = cpu.dump(MXD());
+    memory.at(6).at(1) = cpu.dump(LCL({0}));
+    memory.at(6).at(2) = cpu.dump(LCH({0}));
     memory.at(6).at(3) = cpu.dump(SYN());
     memory.at(6).at(4) = cpu.dump(JMP({5}));
 
 
     // Core 2: loop on b and shift b
     // Membank 2, init b
-    memory.at(2).at(0) = cpu.dump(LCL({3}));
+    memory.at(2).at(0) = cpu.dump(LCL({b}));
     memory.at(2).at(1) = cpu.dump(MUX({Direction({Direction::CURRENT, Direction::AFTER, Direction::BEFORE}).dump()}));
     memory.at(2).at(2) = cpu.dump(JMP({3}));
 
@@ -77,21 +77,32 @@ TEST_CASE("Multiplication")
     memory.at(3).at(4) = cpu.dump(JMP({3}));
 
     // Membank 4: halt
-
-    memory.at(4).at(0) = cpu.dump(MXL({0}));
-    memory.at(4).at(1) = cpu.dump(MXL({0}));    // TODO: This is cheating
-    memory.at(4).at(2) = cpu.dump(MXL({0}));    // TODO: This is cheating
-    memory.at(4).at(3) = cpu.dump(DBG());
-    memory.at(4).at(4) = cpu.dump(HLT());
+    memory.at(4).at(0) = cpu.dump(SYN());
+    memory.at(4).at(1) = cpu.dump(MXL({0}));
+    memory.at(4).at(2) = cpu.dump(HLT());
 
 
     // Core 4: accumulate c
     // Membank 7, init c
     memory.at(7).at(0) = cpu.dump(MUX({Direction({Direction::CURRENT, Direction::BEFORE, Direction::CURRENT}).dump()}));  // TODO: Put in another memory bank
-    memory.at(7).at(1) = cpu.dump(MXA({0}));
-    memory.at(7).at(3) = cpu.dump(SYN());
-    memory.at(7).at(4) = cpu.dump(JMP({7}));
+    memory.at(7).at(2) = cpu.dump(JMP({8}));
+
+    // Membank 8, accumulate
+    memory.at(8).at(0) = cpu.dump(MXA({0}));
+    memory.at(8).at(1) = cpu.dump(SYN());
+    memory.at(8).at(2) = cpu.dump(JMP({8}));
 
     cpu.link_memory(std::move(memory), std::move(map));
-    cpu.start(100ms);
+    return cpu.start();
+}
+
+TEST_CASE("Multiplication")
+{
+    for (auto a = 0u; a <= 0b1111; a++)
+    {
+        for (auto b = 0u; b <= 0b1111; b++)
+        {
+            REQUIRE(multiplication(a, b) == a * b);
+        }
+    }
 }

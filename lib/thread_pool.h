@@ -31,6 +31,7 @@ private:
     bool ready;
     bool done;
     std::atomic<bool> running;
+    std::exception_ptr exception;
 };
 
 
@@ -42,6 +43,7 @@ public:
     void apply(InputIt first, InputIt last, UnaryFunction f);
 
 private:
+    // TODO: No need for this if only one core is used
     std::array<Thread, Cores> cores;
 };
 

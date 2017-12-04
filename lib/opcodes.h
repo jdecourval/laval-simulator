@@ -261,4 +261,6 @@ namespace OpCodes
 
     }
 
+// TODO: Load a constant 0 instruction? Then maybe replace LCL and LCH by Load 0 + CAD
+
 #endif //SIMULATOR_OPCODES_H

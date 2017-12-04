@@ -1,5 +1,6 @@
 #include "cpu.h"
 
+#include "answer.h"
 #include "opcodes.h"
 #include "thread_pool.h"
 
@@ -27,7 +28,7 @@ void Cpu::link_memory(Memory&& memory, std::vector<MemoryInterface::size_type>&&
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
 
-void Cpu::start(const std::chrono::milliseconds& period)
+uint8_t Cpu::start(const std::chrono::milliseconds& period)
 {
     assert(period.count() >= 0);
     assert(cores.size() == core_to_mem_map.size());
@@ -50,7 +51,7 @@ void Cpu::start(const std::chrono::milliseconds& period)
     auto time_before_execution = BenchmarkClock::now();
     auto last_report_time = BenchmarkClock::now();
     auto loops = 0ull;
-    ThreadPool<16> pool;
+    ThreadPool<1> pool;
 
     while (true)
     {
@@ -65,7 +66,15 @@ void Cpu::start(const std::chrono::milliseconds& period)
         }
 
         pool.apply(std::begin(cores), std::end(cores), [](auto& core){ core.preload(); });
-        pool.apply(std::begin(cores), std::end(cores), [](auto& core){ core.fetch(); });
+
+        try
+        {
+            pool.apply(std::begin(cores), std::end(cores), [](auto& core){ core.fetch(); });
+        }
+        catch (const Answer& answer)
+        {
+            return answer.content;
+        }
 
         if (period > 0s)
         {
