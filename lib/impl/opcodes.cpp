@@ -201,11 +201,6 @@ bool LLS::operator()(Registers& registers) const
     // Carry is true if the bit next to the MSB of the register is true
     registers.status2.carry = (result & (std::numeric_limits<decltype(registers.val)>::max() + 1)) > 0;
 
-    if (get_argument(1))
-    {
-        sync(registers);
-    }
-
     return true;
 }
 
@@ -216,11 +211,6 @@ bool RLS::operator()(Registers& registers) const
     registers.status2.carry = get_argument(0) > 0 && (registers.val >> (get_argument(0) - 1)) & 1;
 
     registers.val = static_cast<uint8_t>(registers.val >> get_argument(0));
-
-    if (get_argument(1))
-    {
-        sync(registers);
-    }
 
     return true;
 }
@@ -235,11 +225,6 @@ bool CAD::operator()(Registers& registers) const
     registers.val = static_cast<uint8_t>(result);
     registers.status2.negative = result < 0;
 
-    if (get_argument(1))
-    {
-        sync(registers);
-    }
-
     return true;
 }
 
@@ -253,11 +238,6 @@ bool CSU::operator()(Registers& registers) const
     // TODO: Undefined behaviour, value cannot be represented in the destination type
     registers.val = static_cast<uint8_t>(result);
 
-    if (get_argument(1))
-    {
-        sync(registers);
-    }
-
     return true;
 }
 
@@ -265,22 +245,12 @@ bool CAN::operator()(Registers& registers) const
 {
     registers.val &= get_argument(0);
 
-    if (get_argument(1))
-    {
-        sync(registers);
-    }
-
     return true;
 }
 
 bool COR::operator()(Registers& registers) const
 {
     registers.val |= get_argument(0);
-
-    if (get_argument(1))
-    {
-        sync(registers);
-    }
 
     return true;
 }

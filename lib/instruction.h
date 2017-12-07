@@ -1,10 +1,10 @@
 #ifndef PROJECT_INSTRUCTION_H
 #define PROJECT_INSTRUCTION_H
 
+#include "registers.h"
+
 #include <cassert>
 #include <cstddef>
-
-#include "registers.h"
 
 
 struct InstructionBase

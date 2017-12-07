@@ -106,126 +106,110 @@ TEST_CASE("MXA")
 {
     Registers registers;
 
-    SECTION("No sync")
+    SECTION("No carry")
     {
-        SECTION("No carry")
+        SECTION("Initially zero, add positive")
         {
-            SECTION("Initially zero, add positive")
-            {
-                registers.preload = 2;
-                OpCodes::MXA instruction({0});
-                instruction(registers);
-
-                REQUIRE(registers.val == 2);
-                REQUIRE(!registers.status2.negative);
-                REQUIRE(registers.preload == 2);
-            }
-
-            SECTION("Initially zero, add negative")
-            {
-                registers.preload = -2;
-                registers.preload_negative = true;
-                OpCodes::MXA instruction({0});
-                instruction(registers);
-
-                REQUIRE(registers.val == static_cast<uint8_t>(-2));
-                REQUIRE(registers.status2.negative);
-                REQUIRE(registers.preload == static_cast<uint8_t>(-2));
-            }
-
-            REQUIRE(!registers.status2.carry);
-        }
-
-        SECTION("Carry, initially positive")
-        {
-            registers.val = 250;
-            registers.preload = 15;
-
+            registers.preload = 2;
             OpCodes::MXA instruction({0});
             instruction(registers);
 
-            REQUIRE(static_cast<int>(registers.val) == static_cast<int>(static_cast<uint8_t>(250 + 15)));
-            REQUIRE(registers.status2.carry);
+            REQUIRE(registers.val == 2);
             REQUIRE(!registers.status2.negative);
-            REQUIRE(registers.preload == 15);
+            REQUIRE(registers.preload == 2);
         }
 
-        SECTION("Negative carry, initially negative")
+        SECTION("Initially zero, add negative")
         {
-            registers.val = static_cast<uint8_t>(-127);
-            registers.preload = static_cast<uint8_t>(-15);
+            registers.preload = -2;
             registers.preload_negative = true;
-
             OpCodes::MXA instruction({0});
             instruction(registers);
 
-            REQUIRE(static_cast<int>(registers.val) == static_cast<int>(static_cast<uint8_t>(-127 - 15)));
-            REQUIRE(registers.status2.carry);
-            REQUIRE(!registers.status2.negative);
-            REQUIRE(registers.preload == static_cast<uint8_t>(-15));
+            REQUIRE(registers.val == static_cast<uint8_t>(-2));
+            REQUIRE(registers.status2.negative);
+            REQUIRE(registers.preload == static_cast<uint8_t>(-2));
         }
 
-        SECTION("Initially negative")
-        {
-            registers.val = static_cast<uint8_t>(-5);
-            registers.status2.negative = true;
-            REQUIRE(registers.val == static_cast<uint8_t>(-5));
-
-            SECTION("Still negative")
-            {
-                registers.preload = 3;
-
-                OpCodes::MXA instruction({0});
-                instruction(registers);
-
-                REQUIRE(static_cast<int>(registers.val) == static_cast<uint8_t>(-2));
-                REQUIRE(!registers.status2.carry);
-                REQUIRE(registers.status2.negative);
-                REQUIRE(registers.preload == 3);
-            }
-
-            SECTION("Then zero")
-            {
-                registers.preload = 5;
-
-                OpCodes::MXA instruction({0});
-                instruction(registers);
-
-                REQUIRE(registers.val == 0);
-                REQUIRE(!registers.status2.carry);
-                REQUIRE(!registers.status2.negative);
-                REQUIRE(registers.preload == 5);
-            }
-
-            SECTION("Then positive")
-            {
-                registers.preload = 6;
-
-                OpCodes::MXA instruction({0});
-                instruction(registers);
-
-                REQUIRE(registers.val == 1);
-                REQUIRE(!registers.status2.carry);
-                REQUIRE(!registers.status2.negative);
-                REQUIRE(registers.preload == 6);
-            }
-        }
-
-        REQUIRE(!registers.status1.sync);
+        REQUIRE(!registers.status2.carry);
     }
 
-    SECTION("Sync")
+    SECTION("Carry, initially positive")
     {
-        registers.preload = 2;
-        OpCodes::MXA instruction({1});
+        registers.val = 250;
+        registers.preload = 15;
+
+        OpCodes::MXA instruction({0});
         instruction(registers);
 
-        REQUIRE(registers.val == 2);
-        REQUIRE(!registers.status2.carry);
+        REQUIRE(static_cast<int>(registers.val) == static_cast<int>(static_cast<uint8_t>(250 + 15)));
+        REQUIRE(registers.status2.carry);
         REQUIRE(!registers.status2.negative);
-        REQUIRE(registers.preload == 2);
-        REQUIRE(registers.status1.sync);
+        REQUIRE(registers.preload == 15);
     }
+
+    SECTION("Negative carry, initially negative")
+    {
+        registers.val = static_cast<uint8_t>(-127);
+        registers.preload = static_cast<uint8_t>(-15);
+        registers.preload_negative = true;
+
+        OpCodes::MXA instruction({0});
+        instruction(registers);
+
+        REQUIRE(static_cast<int>(registers.val) == static_cast<int>(static_cast<uint8_t>(-127 - 15)));
+        REQUIRE(registers.status2.carry);
+        REQUIRE(!registers.status2.negative);
+        REQUIRE(registers.preload == static_cast<uint8_t>(-15));
+    }
+
+    SECTION("Initially negative")
+    {
+        registers.val = static_cast<uint8_t>(-5);
+        registers.status2.negative = true;
+        REQUIRE(registers.val == static_cast<uint8_t>(-5));
+
+        SECTION("Still negative")
+        {
+            registers.preload = 3;
+
+            OpCodes::MXA instruction({0});
+            instruction(registers);
+
+            REQUIRE(static_cast<int>(registers.val) == static_cast<uint8_t>(-2));
+            REQUIRE(!registers.status2.carry);
+            REQUIRE(registers.status2.negative);
+            REQUIRE(registers.preload == 3);
+        }
+
+        SECTION("Then zero")
+        {
+            registers.preload = 5;
+
+            OpCodes::MXA instruction({0});
+            instruction(registers);
+
+            REQUIRE(registers.val == 0);
+            REQUIRE(!registers.status2.carry);
+            REQUIRE(!registers.status2.negative);
+            REQUIRE(registers.preload == 5);
+        }
+
+        SECTION("Then positive")
+        {
+            registers.preload = 6;
+
+            OpCodes::MXA instruction({0});
+            instruction(registers);
+
+            REQUIRE(registers.val == 1);
+            REQUIRE(!registers.status2.carry);
+            REQUIRE(!registers.status2.negative);
+            REQUIRE(registers.preload == 6);
+        }
+    }
+
+    REQUIRE(!registers.status1.sync);
 }
 
 TEST_CASE("MXS")
@@ -561,80 +545,66 @@ TEST_CASE("CAD")
 {
     Registers registers;
 
-    SECTION("No sync")
+    SECTION("No carry, initially zero")
     {
-        SECTION("No carry, initially zero")
-        {
-            OpCodes::CAD instruction({2, 0});
-            instruction(registers);
-
-            REQUIRE(registers.val == 2);
-            REQUIRE(!registers.status2.carry);
-            REQUIRE(!registers.status2.negative);
-        }
-
-        SECTION("Carry, initially positive")
-        {
-            registers.val = 250;
-
-            OpCodes::CAD instruction({15, 0});
-            instruction(registers);
-
-            REQUIRE(static_cast<int>(registers.val) == static_cast<int>(static_cast<uint8_t>(250 + 15)));
-            REQUIRE(registers.status2.carry);
-            REQUIRE(!registers.status2.negative);
-        }
-
-        SECTION("Initially negative")
-        {
-            registers.val = static_cast<uint8_t>(-5);
-            registers.status2.negative = true;
-            REQUIRE(registers.val == static_cast<uint8_t>(-5));
-
-            SECTION("Still negative")
-            {
-                OpCodes::CAD instruction({3, 0});
-                instruction(registers);
-
-                REQUIRE(static_cast<int>(registers.val) == static_cast<uint8_t>(-2));
-                REQUIRE(!registers.status2.carry);
-                REQUIRE(registers.status2.negative);
-            }
-
-            SECTION("Then zero")
-            {
-                OpCodes::CAD instruction({5, 0});
-                instruction(registers);
-
-                REQUIRE(registers.val == 0);
-                REQUIRE(!registers.status2.carry);
-                REQUIRE(!registers.status2.negative);
-            }
-
-            SECTION("Then positive")
-            {
-                OpCodes::CAD instruction({6, 0});
-                instruction(registers);
-
-                REQUIRE(registers.val == 1);
-                REQUIRE(!registers.status2.carry);
-                REQUIRE(!registers.status2.negative);
-            }
-        }
-
-        REQUIRE(!registers.status1.sync);
-    }
-
-    SECTION("Sync")
-    {
-        OpCodes::CAD instruction({2, 1});
+        OpCodes::CAD instruction({2});
         instruction(registers);
 
         REQUIRE(registers.val == 2);
         REQUIRE(!registers.status2.carry);
         REQUIRE(!registers.status2.negative);
-        REQUIRE(registers.status1.sync);
     }
+
+    SECTION("Carry, initially positive")
+    {
+        registers.val = 250;
+
+        OpCodes::CAD instruction({15});
+        instruction(registers);
+
+        REQUIRE(static_cast<int>(registers.val) == static_cast<int>(static_cast<uint8_t>(250 + 15)));
+        REQUIRE(registers.status2.carry);
+        REQUIRE(!registers.status2.negative);
+    }
+
+    SECTION("Initially negative")
+    {
+        registers.val = static_cast<uint8_t>(-5);
+        registers.status2.negative = true;
+        REQUIRE(registers.val == static_cast<uint8_t>(-5));
+
+        SECTION("Still negative")
+        {
+            OpCodes::CAD instruction({3});
+            instruction(registers);
+
+            REQUIRE(static_cast<int>(registers.val) == static_cast<uint8_t>(-2));
+            REQUIRE(!registers.status2.carry);
+            REQUIRE(registers.status2.negative);
+        }
+
+        SECTION("Then zero")
+        {
+            OpCodes::CAD instruction({5});
+            instruction(registers);
+
+            REQUIRE(registers.val == 0);
+            REQUIRE(!registers.status2.carry);
+            REQUIRE(!registers.status2.negative);
+        }
+
+        SECTION("Then positive")
+        {
+            OpCodes::CAD instruction({6});
+            instruction(registers);
+
+            REQUIRE(registers.val == 1);
+            REQUIRE(!registers.status2.carry);
+            REQUIRE(!registers.status2.negative);
+        }
+    }
+
+    REQUIRE(!registers.status1.sync);
 }
 
 TEST_CASE("CSU")
@@ -647,75 +617,61 @@ TEST_CASE("LCS")
     Registers registers;
     Registers registers_expected;
 
-    SECTION("No sync")
+    SECTION("No overflow 1")
     {
-        SECTION("No overflow 1")
-        {
-            OpCodes::LLS instruction({1, 0});
-            registers.val = 0b0101'0101;
-            instruction(registers);
-
-            registers_expected.val = 0b1010'1010;
-            REQUIRE(registers == registers_expected);
-        }
-
-        SECTION("No overflow 2")
-        {
-            OpCodes::LLS instruction({3, 0});
-            registers.val = 0b0001'1101;
-            instruction(registers);
-
-            registers_expected.val = 0b1110'1000;
-            REQUIRE(registers == registers_expected);
-        }
-
-        SECTION("Overflow by 1")
-        {
-            // The carry flag is updated to the last bit shifted out, bit[n-1], of the register Rm.
-            OpCodes::LLS instruction({2, 0});
-            registers.val = 0b0101'0101;
-            instruction(registers);
-
-            registers_expected.val = 0b0101'0100;
-            registers_expected.status2.carry = true;
-            REQUIRE(registers == registers_expected);
-        }
-
-        SECTION("Overflow by 2")
-        {
-            OpCodes::LLS instruction({3, 0});
-            registers.val = 0b0101'0101;
-            instruction(registers);
-
-            registers_expected.val = 0b1010'1000;
-            registers_expected.status2.carry = false;
-            REQUIRE(registers == registers_expected);
-        }
-
-        SECTION("Shift by 8")
-        {
-            OpCodes::LLS instruction({8, 0});
-            registers.val = 0b1111'1111;
-            instruction(registers);
-
-            registers_expected.val = 0b0000'0000;
-            registers_expected.status2.carry = true;
-            REQUIRE(registers == registers_expected);
-        }
-
-        REQUIRE(!registers.status1.sync);
-    }
-
-    SECTION("Sync")
-    {
-        OpCodes::LLS instruction({1, 1});
+        OpCodes::LLS instruction({1});
         registers.val = 0b0101'0101;
         instruction(registers);
 
         registers_expected.val = 0b1010'1010;
-        registers_expected.status1.sync = true;
         REQUIRE(registers == registers_expected);
     }
+
+    SECTION("No overflow 2")
+    {
+        OpCodes::LLS instruction({3});
+        registers.val = 0b0001'1101;
+        instruction(registers);
+
+        registers_expected.val = 0b1110'1000;
+        REQUIRE(registers == registers_expected);
+    }
+
+    SECTION("Overflow by 1")
+    {
+        // The carry flag is updated to the last bit shifted out, bit[n-1], of the register Rm.
+        OpCodes::LLS instruction({2});
+        registers.val = 0b0101'0101;
+        instruction(registers);
+
+        registers_expected.val = 0b0101'0100;
+        registers_expected.status2.carry = true;
+        REQUIRE(registers == registers_expected);
+    }
+
+    SECTION("Overflow by 2")
+    {
+        OpCodes::LLS instruction({3});
+        registers.val = 0b0101'0101;
+        instruction(registers);
+
+        registers_expected.val = 0b1010'1000;
+        registers_expected.status2.carry = false;
+        REQUIRE(registers == registers_expected);
+    }
+
+    SECTION("Shift by 8")
+    {
+        OpCodes::LLS instruction({8});
+        registers.val = 0b1111'1111;
+        instruction(registers);
+
+        registers_expected.val = 0b0000'0000;
+        registers_expected.status2.carry = true;
+        REQUIRE(registers == registers_expected);
+    }
+
+    REQUIRE(!registers.status1.sync);
 }
 
 TEST_CASE("RLS")
@@ -723,75 +679,61 @@ TEST_CASE("RLS")
     Registers registers;
     Registers registers_expected;
 
-    SECTION("No sync")
+    SECTION("No overflow 1")
     {
-        SECTION("No overflow 1")
-        {
-            OpCodes::RLS instruction({1, 0});
-            registers.val = 0b1010'1010;
-            instruction(registers);
-
-            registers_expected.val = 0b0101'0101;
-            REQUIRE(registers == registers_expected);
-        }
-
-        SECTION("No overflow 2")
-        {
-            OpCodes::RLS instruction({3, 0});
-            registers.val = 0b0101'0000;
-            instruction(registers);
-
-            registers_expected.val = 0b0000'1010;
-            REQUIRE(registers == registers_expected);
-        }
-
-        SECTION("Overflow by 1")
-        {
-            // The carry flag is updated to the last bit shifted out
-            OpCodes::RLS instruction({2, 0});
-            registers.val = 0b1010'1010;
-            instruction(registers);
-
-            registers_expected.val = 0b0010'1010;
-            registers_expected.status2.carry = true;
-            REQUIRE(registers == registers_expected);
-        }
-
-        SECTION("Overflow by 2")
-        {
-            OpCodes::RLS instruction({3, 0});
-            registers.val = 0b1010'1010;
-            instruction(registers);
-
-            registers_expected.val = 0b0001'0101;
-            registers_expected.status2.carry = false;
-            REQUIRE(registers == registers_expected);
-        }
-
-        SECTION("Shift by 8")
-        {
-            OpCodes::RLS instruction({8, 0});
-            registers.val = 0b1111'1111;
-            instruction(registers);
-
-            registers_expected.val = 0b0000'0000;
-            registers_expected.status2.carry = true;
-            REQUIRE(registers == registers_expected);
-        }
-
-        REQUIRE(!registers.status1.sync);
-    }
-
-    SECTION("Sync")
-    {
-        OpCodes::RLS instruction({1, 1});
+        OpCodes::RLS instruction({1});
         registers.val = 0b1010'1010;
         instruction(registers);
 
         registers_expected.val = 0b0101'0101;
-        registers_expected.status1.sync = true;
         REQUIRE(registers == registers_expected);
     }
+
+    SECTION("No overflow 2")
+    {
+        OpCodes::RLS instruction({3});
+        registers.val = 0b0101'0000;
+        instruction(registers);
+
+        registers_expected.val = 0b0000'1010;
+        REQUIRE(registers == registers_expected);
+    }
+
+    SECTION("Overflow by 1")
+    {
+        // The carry flag is updated to the last bit shifted out
+        OpCodes::RLS instruction({2});
+        registers.val = 0b1010'1010;
+        instruction(registers);
+
+        registers_expected.val = 0b0010'1010;
+        registers_expected.status2.carry = true;
+        REQUIRE(registers == registers_expected);
+    }
+
+    SECTION("Overflow by 2")
+    {
+        OpCodes::RLS instruction({3});
+        registers.val = 0b1010'1010;
+        instruction(registers);
+
+        registers_expected.val = 0b0001'0101;
+        registers_expected.status2.carry = false;
+        REQUIRE(registers == registers_expected);
+    }
+
+    SECTION("Shift by 8")
+    {
+        OpCodes::RLS instruction({8});
+        registers.val = 0b1111'1111;
+        instruction(registers);
+
+        registers_expected.val = 0b0000'0000;
+        registers_expected.status2.carry = true;
+        REQUIRE(registers == registers_expected);
+    }
+
+    REQUIRE(!registers.status1.sync);
 }
 
 // TODO: Test HLT

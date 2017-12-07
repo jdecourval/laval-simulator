@@ -197,9 +197,9 @@ namespace OpCodes
 // Left logical shift
 // arg 1:4: shift amount
 // Arg 2:1: Sync after
-    struct LLS : public Instruction<4, 1>
+    struct LLS : public Instruction<4>
     {
-        using Instruction<4, 1>::Instruction;
+        using Instruction<4>::Instruction;
 
         bool operator()(Registers& registers) const override;
     };
@@ -208,9 +208,9 @@ namespace OpCodes
 // Right logical shift
 // arg 1:4: shift amount
 // Arg 2:1: Sync after
-    struct RLS : public Instruction<4, 1>
+    struct RLS : public Instruction<4>
     {
-        using Instruction<4, 1>::Instruction;
+        using Instruction<4>::Instruction;
 
         bool operator()(Registers& registers) const override;
     };
@@ -219,9 +219,9 @@ namespace OpCodes
 // Add a constant
 // arg 1:4: constant
 // Arg 2:1: Sync after
-    struct CAD : public Instruction<4, 1>
+    struct CAD : public Instruction<4>
     {
-        using Instruction<4, 1>::Instruction;
+        using Instruction<4>::Instruction;
 
         bool operator()(Registers& registers) const override;
     };
@@ -230,9 +230,9 @@ namespace OpCodes
 // Subtract a constant
 // arg 1:4: constant
 // Arg 2:1: Sync after
-    struct CSU : public Instruction<4, 1>
+    struct CSU : public Instruction<4>
     {
-        using Instruction<4, 1>::Instruction;
+        using Instruction<4>::Instruction;
 
         bool operator()(Registers& registers) const override;
     };
@@ -241,9 +241,9 @@ namespace OpCodes
     // Logical AND
     // arg 1:4: constant
     // Arg 2:1: Sync after
-    struct CAN : public Instruction<4, 1>
+    struct CAN : public Instruction<4>
     {
-        using Instruction<4, 1>::Instruction;
+        using Instruction<4>::Instruction;
 
         bool operator()(Registers& registers) const override;
     };
@@ -252,9 +252,9 @@ namespace OpCodes
     // Logical AND
     // arg 1:4: constant
     // Arg 2:1: Sync after
-    struct COR : public Instruction<4, 1>
+    struct COR : public Instruction<4>
     {
-        using Instruction<4, 1>::Instruction;
+        using Instruction<4>::Instruction;
 
         bool operator()(Registers& registers) const override;
     };

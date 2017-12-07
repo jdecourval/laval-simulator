@@ -52,6 +52,8 @@ TEST_CASE("Instruction factory")
             auto size3_raw = factory.dump(Size3(std::byte{3}));
             REQUIRE(size3_raw == 8);
         }
+
+        // TODO: Add more tests since those did not catch one bug
     }
 
     SECTION("Create")

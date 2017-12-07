@@ -24,14 +24,14 @@ uint8_t multiplication(uint8_t a, uint8_t b)
 
     Settings settings{};
     settings.dimensions = {1, 2, 3};
-    settings.bank_number = 9;
+    settings.bank_number = 10;
     settings.bank_size = 10;
 
     Memory memory{settings};
     Cpu cpu{settings};
 
     // Map four cores to four different membanks
-    std::vector<size_t> map {0, 5, 2, 8, 7, 8};
+    std::vector<size_t> map {0, 2, 4, 9, 7, 9};
 
     // Core 0: shift a
     // Membank 0, init a
@@ -46,40 +46,40 @@ uint8_t multiplication(uint8_t a, uint8_t b)
 
     // Core 1: return value to add
     // Membank 5, b & 1 != 0: return a
-    memory.at(5).at(0) = cpu.dump(MUX({Direction({Direction::CURRENT, Direction::CURRENT, Direction::AFTER}).dump()}));
-    memory.at(5).at(1) = cpu.dump(MXL({0}));
-    memory.at(5).at(2) = cpu.dump(CAN({1}));
-    memory.at(5).at(4) = cpu.dump(MUX({Direction({Direction::CURRENT, Direction::CURRENT, Direction::BEFORE}).dump()}));
-    memory.at(5).at(5) = cpu.dump(JEZ({6}));
-    memory.at(5).at(6) = cpu.dump(MXL({0}));    // TODO: Check instructions with integrated sync
-    memory.at(5).at(7) = cpu.dump(SYN());
-    memory.at(5).at(8) = cpu.dump(JMP({5}));
+    memory.at(2).at(0) = cpu.dump(MUX({Direction({Direction::CURRENT, Direction::CURRENT, Direction::AFTER}).dump()}));
+    memory.at(2).at(1) = cpu.dump(MXL({0}));
+    memory.at(2).at(2) = cpu.dump(CAN({1}));
+    memory.at(2).at(4) = cpu.dump(MUX({Direction({Direction::CURRENT, Direction::CURRENT, Direction::BEFORE}).dump()}));
+    memory.at(2).at(5) = cpu.dump(JEZ({3}));
+    memory.at(2).at(6) = cpu.dump(MXL({0}));
+    memory.at(2).at(7) = cpu.dump(SYN());
+    memory.at(2).at(8) = cpu.dump(JMP({2}));
 
     // Membank 6, return 0
-    memory.at(6).at(0) = cpu.dump(MXD());
-    memory.at(6).at(1) = cpu.dump(LCL({0}));
-    memory.at(6).at(2) = cpu.dump(LCH({0}));
-    memory.at(6).at(3) = cpu.dump(SYN());
-    memory.at(6).at(4) = cpu.dump(JMP({5}));
+    memory.at(3).at(0) = cpu.dump(MXD());
+    memory.at(3).at(1) = cpu.dump(LCL({0}));
+    memory.at(3).at(2) = cpu.dump(LCH({0}));
+    memory.at(3).at(3) = cpu.dump(SYN());
+    memory.at(3).at(4) = cpu.dump(JMP({2}));
 
 
     // Core 2: loop on b and shift b
     // Membank 2, init b
-    memory.at(2).at(0) = cpu.dump(LCL({b}));
-    memory.at(2).at(1) = cpu.dump(MUX({Direction({Direction::CURRENT, Direction::AFTER, Direction::BEFORE}).dump()}));
-    memory.at(2).at(2) = cpu.dump(JMP({3}));
+    memory.at(4).at(0) = cpu.dump(LCL({b}));
+    memory.at(4).at(1) = cpu.dump(MUX({Direction({Direction::CURRENT, Direction::AFTER, Direction::BEFORE}).dump()}));
+    memory.at(4).at(2) = cpu.dump(JMP({5}));
 
     // Membank 3, while b != 0, shift
-    memory.at(3).at(0) = cpu.dump(JEZ({4}));
-    memory.at(3).at(1) = cpu.dump(SYN());
-    memory.at(3).at(2) = cpu.dump(MXD());
-    memory.at(3).at(3) = cpu.dump(RLS({1}));
-    memory.at(3).at(4) = cpu.dump(JMP({3}));
+    memory.at(5).at(0) = cpu.dump(JEZ({6}));
+    memory.at(5).at(1) = cpu.dump(SYN());
+    memory.at(5).at(2) = cpu.dump(MXD());
+    memory.at(5).at(3) = cpu.dump(RLS({1}));
+    memory.at(5).at(4) = cpu.dump(JMP({5}));
 
     // Membank 4: halt
-    memory.at(4).at(0) = cpu.dump(SYN());
-    memory.at(4).at(1) = cpu.dump(MXL({0}));
-    memory.at(4).at(2) = cpu.dump(HLT());
+    memory.at(6).at(0) = cpu.dump(SYN());
+    memory.at(6).at(1) = cpu.dump(MXL({0}));
+    memory.at(6).at(2) = cpu.dump(HLT());
 
 
     // Core 4: accumulate c

@@ -1,6 +1,5 @@
 # TODO
 - Run tests on ARM
-- Test with clang
 - As most older 8 bits CPU, consider if using some 16 bits registers could prove useful
 - I/O
     - As of now, the solution is to use standard load instruction as input and the new HLT instruction as output
@@ -10,13 +9,15 @@
         - 8 bits could only index 256 at max
         - Limit to 256 cores ?
     - Have a configuration mode with a different set of instruction at boot
-
-# Tests/challenges idea
-- Float
-- 16 bits add
-- Reconsider immediate sync, this could save some instruction space
 - Double check dumped instructions, there seems to be some missing
 - Check with the undefined behaviour sanitizer
 - Deadlock detector
 - Output program size
 - Fix HLT when using a thread pool
+- Figure out how to return an array of data
+    - Maybe by having a global halt instruction
+- Assembler
+
+# Tests/challenges idea
+- Float
+- 16 bits add
