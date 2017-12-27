@@ -19,8 +19,8 @@ TEST_CASE("No argument and get_argument")
 {
     TestInstruction<> instruction;
 
-    REQUIRE_THROWS_AS(instruction.get_argument(0), const std::out_of_range&);
-    REQUIRE_THROWS_AS(instruction.get_argument(1), const std::out_of_range&);
+    REQUIRE_THROWS_AS(instruction.get_argument(0), std::out_of_range);
+    REQUIRE_THROWS_AS(instruction.get_argument(1), std::out_of_range);
 }
 
 TEST_CASE("Valid load from initializer_list and get_argument")
@@ -28,8 +28,8 @@ TEST_CASE("Valid load from initializer_list and get_argument")
     SECTION("One argument")
     {
         TestInstruction<1> instruction({1});
-        REQUIRE_THROWS_AS(instruction.get_argument(2), const std::out_of_range&);
-        REQUIRE_THROWS_AS(instruction.get_argument(3), const std::out_of_range&);
+        REQUIRE_THROWS_AS(instruction.get_argument(2), std::out_of_range);
+        REQUIRE_THROWS_AS(instruction.get_argument(3), std::out_of_range);
 
         REQUIRE(instruction.get_argument(0) == 1);
     }
@@ -37,8 +37,8 @@ TEST_CASE("Valid load from initializer_list and get_argument")
     SECTION("Three arguments")
     {
         TestInstruction<3, 2, 1> instruction({4, 2, 1});
-        REQUIRE_THROWS_AS(instruction.get_argument(3), const std::out_of_range&);
-        REQUIRE_THROWS_AS(instruction.get_argument(4), const std::out_of_range&);
+        REQUIRE_THROWS_AS(instruction.get_argument(3), std::out_of_range);
+        REQUIRE_THROWS_AS(instruction.get_argument(4), std::out_of_range);
 
         REQUIRE(instruction.get_argument(0) == 4);
         REQUIRE(instruction.get_argument(1) == 2);
@@ -75,17 +75,17 @@ TEST_CASE("Valid load from raw value and get_argument")
 
 TEST_CASE("Out of range load from raw value")
 {
-    REQUIRE_THROWS_AS(TestInstruction<3>(std::byte{8}), const std::out_of_range&);
+    REQUIRE_THROWS_AS(TestInstruction<3>(std::byte{8}), std::out_of_range);
 
     using WorkAroundTemplateInMacro = TestInstruction<1, 2>;
-    REQUIRE_THROWS_AS(WorkAroundTemplateInMacro(std::byte{8}), const std::out_of_range&);
+    REQUIRE_THROWS_AS(WorkAroundTemplateInMacro(std::byte{8}), std::out_of_range);
 }
 
 TEST_CASE("Out of range initializer_list argument")
 {
-    REQUIRE_THROWS_AS(TestInstruction<1>({2}), const std::out_of_range&);
-    REQUIRE_THROWS_AS(TestInstruction<1>({200}), const std::out_of_range&);
-    REQUIRE_THROWS_AS(TestInstruction<3>({8}), const std::out_of_range&);
+    REQUIRE_THROWS_AS(TestInstruction<1>({2}), std::out_of_range);
+    REQUIRE_THROWS_AS(TestInstruction<1>({200}), std::out_of_range);
+    REQUIRE_THROWS_AS(TestInstruction<3>({8}), std::out_of_range);
 }
 
 //TEST_CASE("Dump")

@@ -63,13 +63,13 @@ TEST_CASE("Special directions")
 
     SECTION("Invalid directions")
     {
-        REQUIRE_THROWS_AS(Direction{Direction::total()}, const std::out_of_range&);
+        REQUIRE_THROWS_AS(Direction{Direction::total()}, std::out_of_range);
 
-        REQUIRE_THROWS_AS(DirectionComplex {255}, const std::out_of_range&);
+        REQUIRE_THROWS_AS(DirectionComplex {255}, std::out_of_range);
 
         REQUIRE_THROWS_AS(DirectionComplex {Direction::total() + static_cast<int>(SpecialDirection::LAST_DO_NOT_USE)},
-                const std::out_of_range&);
+                std::out_of_range);
 
-        REQUIRE_THROWS_AS(DirectionComplex {SpecialDirection::LAST_DO_NOT_USE}, const std::out_of_range&);
+        REQUIRE_THROWS_AS(DirectionComplex {SpecialDirection::LAST_DO_NOT_USE}, std::out_of_range);
     }
 }

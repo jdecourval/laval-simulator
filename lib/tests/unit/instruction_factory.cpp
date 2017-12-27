@@ -85,7 +85,7 @@ TEST_CASE("Instruction factory")
 
         {
             auto instruction = factory.create(0);
-            REQUIRE_THROWS_AS(dynamic_cast<Size3&>(*instruction), const std::bad_cast&);
+            REQUIRE_THROWS_AS(dynamic_cast<Size3&>(*instruction), std::bad_cast);
         }
     }
 }

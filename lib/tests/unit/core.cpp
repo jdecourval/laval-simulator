@@ -30,7 +30,7 @@ TEST_CASE("Single core tests")
 
     SECTION("Cannot fetch if memory is unlinked")
     {
-        REQUIRE_THROWS_AS(core.fetch(), const std::logic_error&);
+        REQUIRE_THROWS_AS(core.fetch(), std::logic_error);
     }
 
     SECTION("Sync")
