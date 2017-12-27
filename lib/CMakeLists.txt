@@ -30,6 +30,7 @@ set(SOURCE_FILES
         impl/memory.cpp
         impl/opcodes.cpp
         impl/registers.cpp
+        impl/settings.cpp
         impl/thread_pool.cpp
         impl/thread_pool.hpp
         impl/tools.h
