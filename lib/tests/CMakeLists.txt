@@ -1,6 +1,7 @@
 add_executable(LavalTests
         integration/multiplication.cpp
 
+        unit/assembler.cpp
         unit/core.cpp
         unit/core_array.cpp
         unit/direction.cpp

@@ -3,15 +3,16 @@
 
 #include "settings.h"
 
+#include <gsl/gsl>
+
 #include <array>
 #include <functional>
-#include <gsl/gsl>
 
 
 class MemoryInterface
 {
 public:
-    using size_type = size_t;
+    using size_type = uint8_t;
 
     virtual size_type banks_size() const = 0;
 

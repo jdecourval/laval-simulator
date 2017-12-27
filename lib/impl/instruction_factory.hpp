@@ -1,3 +1,5 @@
+#include "demangle.h"
+
 template<typename T>
 void InstructionFactory::register_instruction()
 {
@@ -18,7 +20,7 @@ void InstructionFactory::register_helper(std::index_sequence<I...>)
         end++;
     }
 
-    assert(end <= 256);
+    assert(end <= 0xff);
 
     auto begin = counter;
     instruction_to_offset.emplace(typeid(T).hash_code(), begin);
@@ -39,12 +41,8 @@ void InstructionFactory::register_helper(std::index_sequence<I...>)
             }
         };
 
-        dump_file << static_cast<int>(counter) << ":" << typeid(T).name() << std::endl;
+        auto name = class_name<T>();
+        assert(name.size() >= 3);
+        name_to_instruction.emplace(name.substr(name.size() - 3), counter);
     }
-}
-
-template<typename T>
-uint8_t InstructionFactory::dump(const T& instruction) const
-{
-    return instruction_to_offset.at(typeid(T).hash_code()) + instruction.dump_args();
 }

@@ -8,13 +8,13 @@
 using namespace std::chrono_literals;
 
 Cpu::Cpu(const Settings& settings)
-    : Cpu(settings, Memory{settings}, std::vector<size_t>(std::accumulate(settings.dimensions.begin(), settings.dimensions.end(), 1ul, std::multiplies<>())))
+    : Cpu(settings, Memory{settings}, std::vector<MemoryInterface::size_type>(std::accumulate(settings.dimensions.begin(), settings.dimensions.end(), 1ul, std::multiplies<>())))
 {
     assert(settings.dimensions.size() == 3);
 }
 
 Cpu::Cpu(const Settings& settings, Memory&& memory, std::vector<MemoryInterface::size_type>&& core_to_mem_map)
-    : mem{std::move(memory)}, cores{settings.dimensions, mem}, core_to_mem_map{std::move(core_to_mem_map)}
+    : mem{std::move(memory)}, cores{std::vector<std::remove_cv_t<std::remove_reference_t<decltype(settings.dimensions.at(0))>>>(std::cbegin(settings.dimensions), std::cend(settings.dimensions)), mem}, core_to_mem_map{std::move(core_to_mem_map)}
 {
     assert(settings.dimensions.size() == 3);
 }

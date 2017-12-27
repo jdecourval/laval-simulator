@@ -5,12 +5,17 @@
 
 #include <cassert>
 #include <cstddef>
+#include <vector>
 
 
 struct InstructionBase
 {
     /// @return false if the instruction have to stall the pipeline
     virtual bool operator()(Registers& registers) const = 0;
+
+    virtual uint8_t dump_args() const = 0;
+
+    virtual void load_args(const std::vector<uint8_t>& args) = 0;
 };
 
 
@@ -25,7 +30,9 @@ struct Instruction : public InstructionBase
 
     constexpr explicit Instruction(std::byte args_raw);
 
-    uint8_t dump_args() const;
+    uint8_t dump_args() const override final;
+
+    void load_args(const std::vector<uint8_t>& args) override final;
 
 
 protected:

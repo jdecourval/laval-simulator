@@ -13,3 +13,13 @@ bool Debug::operator()(Registers& registers) const
 
     return true;
 }
+
+uint8_t Debug::dump_args() const
+{
+    return 0;
+}
+
+void Debug::load_args(const std::vector<uint8_t>&)
+{
+
+}

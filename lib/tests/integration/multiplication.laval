@@ -1,0 +1,63 @@
+.cores 1, 2, 3
+.mem_number 10
+.mem_size 10
+.mem_map 0, 2, 4, 9, 7, 9
+
+0:
+;    LCL A
+    LCL 3
+    JMP 1
+
+1:
+    SYN
+    LLS 1
+    JMP 1
+
+2:
+;    MUX 0, 0, 1
+    MUX 22
+    MXL 0
+    CAN 1
+;    MUX 0, 0, -1
+    MUX 4
+    JEZ 3
+    MXL 0
+    SYN
+    JMP 2
+
+3:
+    MXD
+    LCL 0
+    LCH 0
+    SYN
+    JMP 2
+    ; TODO: JMP alone did not create an error
+
+4:
+;    LCL B
+    LCL 2
+;    MUX 0, 1, 0
+    MUX 7
+    JMP 5
+
+5:
+    JEZ 6
+    SYN
+    MXD
+    RLS 1
+    JMP 5
+
+6:
+    SYN
+    MXL 0
+    HLT
+
+7:
+;    MUX 0, -1, 0
+    MUX 10
+    JMP 8
+
+8:
+    MXA 0
+    SYN
+    JMP 8

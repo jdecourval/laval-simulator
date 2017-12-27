@@ -3,6 +3,7 @@
 #include <cpu.h>
 #include <direction.h>
 #include <opcodes.h>
+#include <assembler.h>
 
 
 // Compute c = a * b
@@ -31,7 +32,7 @@ uint8_t multiplication(uint8_t a, uint8_t b)
     Cpu cpu{settings};
 
     // Map four cores to four different membanks
-    std::vector<size_t> map {0, 2, 4, 9, 7, 9};
+    std::vector<MemoryInterface::size_type> map {0, 2, 4, 9, 7, 9};
 
     // Core 0: shift a
     // Membank 0, init a
@@ -105,4 +106,20 @@ TEST_CASE("Multiplication")
             REQUIRE(multiplication(a, b) == a * b);
         }
     }
+}
+
+TEST_CASE("Multiplication ASM")
+{
+    auto assembly_input = std::ifstream("lib/tests/integration/multiplication.laval", std::ios::binary);
+    auto [ast, settings] = Assembler::build_ast(assembly_input);
+
+    auto output = std::ostringstream();
+
+    Assembler::assemble(ast, settings, output);
+
+    auto binary_input = std::istringstream(output.str());
+
+    auto cpu = Assembler::load_binary(binary_input);
+    auto answer = static_cast<int>(cpu.start());
+    REQUIRE(answer == 6);
 }

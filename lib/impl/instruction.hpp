@@ -107,3 +107,12 @@ uint8_t Instruction<ArgSizes...>::dump_args(uint8_t i, uint8_t shift) const
 {
     return safe_left_shift(args.at(i), shift);
 }
+
+template<uint8_t... ArgSizes>
+void Instruction<ArgSizes...>::load_args(const std::vector<uint8_t>& args)
+{
+    assert(args.size() == sizeof...(ArgSizes));
+
+    std::copy(std::cbegin(args), std::cend(args), std::begin(this->args));
+}
+

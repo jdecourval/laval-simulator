@@ -3,7 +3,7 @@
 #include "direction.h"
 
 
-CoreArray::CoreArray(const std::vector<size_t>& dimensions, const MemoryInterface& mem)
+CoreArray::CoreArray(const std::vector<uint16_t>& dimensions, const MemoryInterface& mem)
 {
     auto size = std::accumulate(dimensions.begin(), dimensions.end(), 1ull, std::multiplies<>());
     assert(size <= Tools::umaxof<size_t>() >> 1);

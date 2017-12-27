@@ -4,6 +4,7 @@ project(LavalLib)
 set(CMAKE_CXX_STANDARD 17)
 
 set(SOURCE_FILES
+        assembler.h
         core.h
         cpu.h
         direction.h
@@ -13,10 +14,13 @@ set(SOURCE_FILES
         registers.h
         thread_pool.h
 
+        impl/assembler.cpp
         impl/core.cpp
         impl/core_array.h
         impl/core_array.cpp
         impl/cpu.cpp
+        impl/demangle.h
+        impl/demangle.cpp
         impl/direction.cpp
         impl/direction.hpp
         impl/instruction.hpp
@@ -37,7 +41,15 @@ add_library(LavalLib ${SOURCE_FILES})
 find_package(Threads)
 
 target_link_libraries(LavalLib
-        ${CMAKE_THREAD_LIBS_INIT})
+        ${CMAKE_THREAD_LIBS_INIT}
+        )
+
+# Needed for std::experimental::filesyste,
+if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 8.0)
+    target_link_libraries(LavalLib
+            "-lstdc++fs"
+            )
+endif()
 
 target_include_directories(LavalLib
         PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}

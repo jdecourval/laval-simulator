@@ -1,11 +1,6 @@
 #include "instruction_factory.h"
 
 
-InstructionFactory::InstructionFactory()
-        : dump_file("dump")
-{
-}
-
 std::unique_ptr<InstructionBase> InstructionFactory::create(uint8_t val)
 {
     // Check if the instruction is valid
@@ -14,3 +9,19 @@ std::unique_ptr<InstructionBase> InstructionFactory::create(uint8_t val)
     return map.at(val)(val);
 }
 
+std::unique_ptr<InstructionBase> InstructionFactory::create(const std::pair<std::string, std::vector<uint8_t>>& ast)
+{
+    auto instruction = create(name_to_instruction.at(ast.first));
+
+    if (!ast.second.empty())
+    {
+        instruction->load_args(ast.second);
+    }
+
+    return instruction;
+}
+
+uint8_t InstructionFactory::dump(const InstructionBase& instruction) const
+{
+    return instruction_to_offset.at(typeid(instruction).hash_code()) + instruction.dump_args();
+}

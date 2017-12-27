@@ -11,7 +11,7 @@ class CoreArray
     static constexpr auto Wrap = false;
 
 public:
-    explicit CoreArray(const std::vector<size_t>& dimensions, const MemoryInterface& mem);
+    explicit CoreArray(const std::vector<uint16_t>& dimensions, const MemoryInterface& mem);
 
     Core& operator[](const size_t& index);
 

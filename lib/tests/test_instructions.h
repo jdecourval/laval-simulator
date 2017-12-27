@@ -14,6 +14,10 @@ public:
 
     bool operator()(Registers& registers) const override;
 
+    uint8_t dump_args() const override;
+
+    void load_args(const std::vector<uint8_t>& args) override;
+
 private:
     Registers& output;
 };
