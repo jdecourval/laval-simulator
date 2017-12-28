@@ -84,8 +84,9 @@ namespace Assembler
                 std::vector<uint8_t> args_int;
                 std::transform(std::cbegin(args), std::cend(args), std::back_inserter(args_int), [](auto& arg)
                 {
-                    auto arg_int = std::stoul(arg);
+                    auto arg_int = std::stol(arg);
                     assert(arg_int <= 0xff);
+                    assert(arg_int >= 0);
                     return arg_int;
                 });
 
@@ -101,7 +102,7 @@ namespace Assembler
                 std::vector<uint8_t> args_int;
                 std::transform(std::cbegin(args), std::cend(args), std::back_inserter(args_int), [](auto& arg)
                 {
-                    auto arg_int = std::stoul(arg);
+                    auto arg_int = std::stol(arg);
                     assert(arg_int <= 0xff);
                     return arg_int;
                 });
@@ -123,7 +124,7 @@ namespace Assembler
         return {blocks, settings};
     }
 
-    void assemble(const Ast& blocks, const SettingMap& setting_map, std::ostream& output)
+    void assemble(const Ast& ast, const SettingMap& setting_map, std::ostream& output)
     {
         auto settings = Settings::from_ast(setting_map);
         settings.dump(output);
@@ -138,15 +139,15 @@ namespace Assembler
         Core core;
         auto& factory = core.get_factory();
 
-        for (auto& membank: blocks)
+        for (auto& [bank_id, instructions]: ast)
         {
-            assert(membank.first < 0xff);
-            output.put(static_cast<uint8_t>(membank.first));
+            assert(bank_id <= 0xff);
+            output.put(static_cast<uint8_t>(bank_id));
 
-            assert(membank.second.size() < 0xff);
-            output.put(static_cast<uint8_t>(membank.second.size()));
+            assert(instructions.size() <= 0xff);
+            output.put(static_cast<uint8_t>(instructions.size()));
 
-            for (auto& instruction_ast: membank.second)
+            for (auto& instruction_ast: instructions)
             {
                 auto instruction = factory.create(instruction_ast);
                 auto instruction_raw = factory.dump(*instruction);

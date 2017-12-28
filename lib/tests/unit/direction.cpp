@@ -21,12 +21,27 @@ TEST_CASE("Load and dump")
 
 TEST_CASE("Direction constructor")
 {
-    Direction direction({Direction::AFTER, Direction::CURRENT, Direction::BEFORE});
-    auto iter = std::begin(direction);
+    {
+        Direction direction({Direction::AFTER, Direction::CURRENT, Direction::BEFORE});
+        auto iter = std::begin(direction);
 
-    REQUIRE(*iter == Direction::AFTER);
-    REQUIRE(*(++iter) == Direction::CURRENT);
-    REQUIRE(*(++iter) == Direction::BEFORE);
+        REQUIRE(*iter == Direction::AFTER);
+        REQUIRE(*(++iter) == Direction::CURRENT);
+        REQUIRE(*(++iter) == Direction::BEFORE);
+
+        REQUIRE(direction.dump() == std::byte{5});
+    }
+
+    {
+        Direction direction({Direction::CURRENT, Direction::AFTER, Direction::CURRENT});
+        auto iter = std::begin(direction);
+
+        REQUIRE(*iter == Direction::CURRENT);
+        REQUIRE(*(++iter) == Direction::AFTER);
+        REQUIRE(*(++iter) == Direction::CURRENT);
+
+        REQUIRE(direction.dump() == std::byte{16});
+    }
 }
 
 TEST_CASE("Special directions")

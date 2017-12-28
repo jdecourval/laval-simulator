@@ -3,6 +3,7 @@
 #include "answer.h"
 
 #include <iostream>
+#include <direction.h>
 
 
 using namespace OpCodes;
@@ -132,6 +133,27 @@ bool MUX::operator()(Registers& registers) const
     registers.status1.mux = get_argument(0);
 
     return true;
+}
+
+void MUX::load_args(const std::vector<uint8_t>& args)
+{
+    if (args.size() == 3)
+    {
+        auto directions = std::array<Direction::Direction1D, 3>();
+
+        auto i = 0u;
+        for (auto &direction: directions)
+        {
+            direction = static_cast<Direction::Direction1D>(static_cast<int8_t>(args.at(i)));
+            i++;
+        }
+
+        this->args.at(0) = static_cast<uint8_t>(Direction(directions).dump());
+    }
+    else
+    {
+        Instruction<5>::load_args(args);
+    }
 }
 
 bool LCL::operator()(Registers& registers) const

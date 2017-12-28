@@ -32,7 +32,7 @@ struct Instruction : public InstructionBase
 
     uint8_t dump_args() const override final;
 
-    void load_args(const std::vector<uint8_t>& args) override final;
+    void load_args(const std::vector<uint8_t>& args) override;
 
 
 protected:
@@ -63,7 +63,7 @@ private:
     uint8_t dump_args(uint8_t i, uint8_t shift) const;
 
 
-private:
+protected:
     std::array<uint8_t, sizeof...(ArgSizes)> args;
 };
 

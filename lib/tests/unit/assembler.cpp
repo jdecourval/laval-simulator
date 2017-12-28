@@ -10,7 +10,9 @@ TEST_CASE("Assembler")
 .mem_map 2
 
 1:
-    NOP
+    MUX 0, 0, 0
+    MUX 0, 1, 0
+    MUX 0, 0, -1
 
 2:
     ; Comment
@@ -23,16 +25,38 @@ TEST_CASE("Assembler")
     {
         auto [ast, settings] = Assembler::build_ast(stream);
 
-        REQUIRE(ast.at(1).size() == 1);
+        REQUIRE(ast.at(1).size() == 3);
         REQUIRE(ast.at(2).size() == 3);
 
-        auto& instruction_1_0 = ast.at(1).at(0);
-        REQUIRE(instruction_1_0.first == "NOP");
-        REQUIRE(instruction_1_0.second.empty());
+        {
+            auto &instruction = ast.at(1).at(0);
+            REQUIRE(instruction.first == "MUX");
+            REQUIRE(instruction.second == std::vector<uint8_t>({0, 0, 0}));
+        }
 
-        auto& instruction_2_0 = ast.at(2).at(0);
-        REQUIRE(instruction_2_0.first == "LCL");
-        REQUIRE(instruction_2_0.second == std::vector({uint8_t{2}}));
+        {
+            auto &instruction = ast.at(1).at(1);
+            REQUIRE(instruction.first == "MUX");
+            REQUIRE(instruction.second == std::vector<uint8_t>({0, 1, 0}));
+        }
+
+        {
+            auto &instruction = ast.at(1).at(2);
+            REQUIRE(instruction.first == "MUX");
+            REQUIRE(instruction.second == std::vector<uint8_t>({0, 0, static_cast<uint8_t>(-1)}));
+        }
+
+        {
+            auto &instruction = ast.at(2).at(0);
+            REQUIRE(instruction.first == "LCL");
+            REQUIRE(instruction.second == std::vector({uint8_t{2}}));
+        }
+
+        {
+            auto &instruction = ast.at(2).at(2);
+            REQUIRE(instruction.first == "HLT");
+            REQUIRE(instruction.second.empty());
+        }
 
         SECTION("assemble")
         {
@@ -40,7 +64,7 @@ TEST_CASE("Assembler")
             Assembler::assemble(ast, settings, output);
             auto binary = output.str();
 
-            REQUIRE(binary.size() == 26);
+            REQUIRE(binary.size() == 28);
 
             REQUIRE(binary.at(0) == 1);
             REQUIRE(binary.at(1) == 0);
@@ -66,8 +90,12 @@ TEST_CASE("Assembler")
             REQUIRE(binary.at(21) == 63);
             REQUIRE(binary.at(22) == 6);
             REQUIRE(binary.at(23) == 1);
-            REQUIRE(binary.at(24) == 1);
-            REQUIRE(binary.at(25) == 0);
+            REQUIRE(binary.at(24) == 3);
+            REQUIRE(binary.at(25) == 27);
+            REQUIRE(binary.at(26) == 30);
+            REQUIRE(binary.at(27) == 18);
+            // TODO: Actually the order of the membank is not predictable because of the unordered_map
+            // This may break this test and other
 
             SECTION("load_binary")
             {
@@ -79,3 +107,6 @@ TEST_CASE("Assembler")
         }
     }
 }
+
+// TODO: Consider having two separate MUX instructions for normal and special directions
+// This would simplify arguments loading

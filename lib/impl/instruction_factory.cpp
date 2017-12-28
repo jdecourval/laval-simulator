@@ -13,10 +13,7 @@ std::unique_ptr<InstructionBase> InstructionFactory::create(const std::pair<std:
 {
     auto instruction = create(name_to_instruction.at(ast.first));
 
-    if (!ast.second.empty())
-    {
-        instruction->load_args(ast.second);
-    }
+    instruction->load_args(ast.second);
 
     return instruction;
 }

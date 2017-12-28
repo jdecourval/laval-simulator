@@ -14,12 +14,10 @@
     JMP 1
 
 2:
-;    MUX 0, 0, 1
-    MUX 22
+    MUX 0, 0, 1
     MXL 0
     CAN 1
-;    MUX 0, 0, -1
-    MUX 4
+    MUX 0, 0, -1
     JEZ 3
     MXL 0
     SYN
@@ -31,13 +29,11 @@
     LCH 0
     SYN
     JMP 2
-    ; TODO: JMP alone did not create an error
 
 4:
 ;    LCL B
     LCL 2
-;    MUX 0, 1, 0
-    MUX 7
+    MUX 0, 1, -1
     JMP 5
 
 5:
@@ -53,8 +49,7 @@
     HLT
 
 7:
-;    MUX 0, -1, 0
-    MUX 10
+    MUX 0, -1, 0
     JMP 8
 
 8:
