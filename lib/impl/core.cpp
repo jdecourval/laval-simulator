@@ -62,17 +62,19 @@ void Core::initialize()
     factory.register_instruction<OpCodes::CSU>();
     factory.register_instruction<OpCodes::CAN>();
     factory.register_instruction<OpCodes::COR>();
+
+    std::cout << "Instructions space: " << static_cast<int>(factory.size()) << " / 256" << std::endl;
 }
 
 void Core::preload()
 {
-    auto direction_complex = DirectionComplex(registers.status1.mux);
+    auto direction_complex = Direction::decode(registers.status1.mux);
 
     try
     {
         assert(cores);
 
-        auto direction = std::get<Direction>(direction_complex);
+        auto direction = std::get<Direction::CoreDirection>(direction_complex);
 
         auto& pointed_core = cores->offset(registers.id, direction);
 
@@ -100,15 +102,15 @@ void Core::preload()
     }
     catch (const std::bad_variant_access&)
     {
-        auto direction = std::get<SpecialDirection>(direction_complex);
+        auto direction = std::get<Direction::SpecialDirection>(direction_complex);
 
         switch (direction)
         {
-            case SpecialDirection::PC:
+            case Direction::SpecialDirection::PC:
                 registers.preload = registers.pc;
                 break;
 
-            case SpecialDirection::MEMBANK:
+            case Direction::SpecialDirection::MEMBANK:
                 registers.preload = registers.status2.membank;
                 break;
 

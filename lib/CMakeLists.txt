@@ -22,7 +22,6 @@ set(SOURCE_FILES
         impl/demangle.h
         impl/demangle.cpp
         impl/direction.cpp
-        impl/direction.hpp
         impl/instruction.hpp
         impl/instruction_factory.cpp
         impl/instruction_factory.h
@@ -80,6 +79,8 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 #        PUBLIC "-Wconversion"              # Activate conversion warnings. This yield a large number of false positive.
 
         PUBLIC "-Wno-unknown-pragmas"       # Make GCC not scream about CLion/clang pragmas
+
+        PUBLIC "-Werror=return-type"
         )
 
 endif()

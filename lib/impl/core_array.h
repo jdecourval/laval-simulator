@@ -2,9 +2,8 @@
 #define SIMULATOR_MULTIDIMENSIONALARRAY_H
 
 #include "core.h"
+#include "direction.h"
 
-
-class Direction;
 
 class CoreArray
 {
@@ -15,9 +14,9 @@ public:
 
     Core& operator[](const size_t& index);
 
-    Core& operator[](const std::vector<size_t>& index_array);
+    Core& operator[](const std::array<size_t, 3>& index_array);
 
-    Core& offset(size_t id, const Direction& offsets);
+    Core& offset(size_t id, const Direction::CoreDirection& offsets);
 
     decltype(auto) cbegin() const noexcept
     {

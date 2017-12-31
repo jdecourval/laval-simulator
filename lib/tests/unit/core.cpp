@@ -99,7 +99,7 @@ TEST_CASE("Tests that need memory")
         REQUIRE(test_registers.pc == 0);
         REQUIRE(!test_registers.preload);
 
-        auto instruction = OpCodes::MUX({DirectionComplex{SpecialDirection::PC}.dump()});
+        auto instruction = OpCodes::MXR({0});
         core.execute(instruction);
         core.preload();
 
@@ -197,7 +197,7 @@ TEST_CASE("Fetch from linked core")
     core2.execute(OpCodes::LCL({2}));
 
     // Connect core1 to core2
-    core1.execute(OpCodes::MUX(Direction({Direction::CURRENT, Direction::CURRENT, Direction::AFTER}).dump()));
+    core1.execute(OpCodes::MUX({Direction::CURRENT, Direction::CURRENT, Direction::AFTER}));
 
     SECTION("Do not spontaneously load if no sync")
     {
@@ -264,7 +264,7 @@ TEST_CASE("Synchronization tests")
     {
         // TODO: Cleanup this test
         memory.at(0).at(0) = core1.get_factory().dump(
-        OpCodes::MUX({Direction({Direction::CURRENT, Direction::CURRENT, Direction::AFTER}).dump()}));
+        OpCodes::MUX({Direction::CURRENT, Direction::CURRENT, Direction::AFTER}));
         memory.at(0).at(1) = core1.get_factory().dump(OpCodes::MXL({0}));
         memory.at(0).at(2) = core1.get_factory().dump(OpCodes::MXL({0}));
 

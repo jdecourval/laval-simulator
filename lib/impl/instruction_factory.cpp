@@ -22,3 +22,8 @@ uint8_t InstructionFactory::dump(const InstructionBase& instruction) const
 {
     return instruction_to_offset.at(typeid(instruction).hash_code()) + instruction.dump_args();
 }
+
+uint8_t InstructionFactory::size() const
+{
+    return counter;
+}

@@ -3,10 +3,10 @@
 #include "impl/instruction_factory.h"
 
 
-template<uint8_t... ArgSizes>
-struct TestInstruction : Instruction<ArgSizes...>
+template<uint8_t... ArgsMaxes>
+struct TestInstruction : Instruction<ArgsMaxes...>
 {
-    using Instruction<ArgSizes...>::Instruction;
+    using Instruction<ArgsMaxes...>::Instruction;
 
     bool operator()(Registers&) const override
     {

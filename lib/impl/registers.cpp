@@ -1,8 +1,8 @@
 #include "registers.h"
 
-#include <ostream>
+#include "opcodes.h"
 
-#include "direction.h"
+#include <ostream>
 
 
 bool Registers::operator==(const Registers& other) const
@@ -18,7 +18,7 @@ bool Registers::Status1::operator==(const Registers::Status1& other) const
 
 Registers::Status1::Status1()
 {
-    mux = std::to_integer<uint8_t>(DirectionComplex{Direction{}}.dump());
+    mux = OpCodes::MUX({Direction::CURRENT, Direction::CURRENT, Direction::CURRENT}).dump_args();
     ctc = false;
     sync = false;
 }

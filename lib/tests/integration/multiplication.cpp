@@ -1,9 +1,7 @@
 #include <catch.hpp>
 
-#include <cpu.h>
-#include <direction.h>
-#include <opcodes.h>
 #include <assembler.h>
+#include <opcodes.h>
 
 
 // Compute c = a * b
@@ -47,10 +45,10 @@ uint8_t multiplication(uint8_t a, uint8_t b)
 
     // Core 1: return value to add
     // Membank 5, b & 1 != 0: return a
-    memory.at(2).at(0) = cpu.dump(MUX({Direction({Direction::CURRENT, Direction::CURRENT, Direction::AFTER}).dump()}));
+    memory.at(2).at(0) = cpu.dump(MUX({Direction::CURRENT, Direction::CURRENT, Direction::AFTER}));
     memory.at(2).at(1) = cpu.dump(MXL({0}));
     memory.at(2).at(2) = cpu.dump(CAN({1}));
-    memory.at(2).at(4) = cpu.dump(MUX({Direction({Direction::CURRENT, Direction::CURRENT, Direction::BEFORE}).dump()}));
+    memory.at(2).at(4) = cpu.dump(MUX({Direction::CURRENT, Direction::CURRENT, Direction::BEFORE}));
     memory.at(2).at(5) = cpu.dump(JEZ({3}));
     memory.at(2).at(6) = cpu.dump(MXL({0}));
     memory.at(2).at(7) = cpu.dump(SYN());
@@ -67,7 +65,7 @@ uint8_t multiplication(uint8_t a, uint8_t b)
     // Core 2: loop on b and shift b
     // Membank 2, init b
     memory.at(4).at(0) = cpu.dump(LCL({b}));
-    memory.at(4).at(1) = cpu.dump(MUX({Direction({Direction::CURRENT, Direction::AFTER, Direction::BEFORE}).dump()}));
+    memory.at(4).at(1) = cpu.dump(MUX({Direction::CURRENT, Direction::AFTER, Direction::BEFORE}));
     memory.at(4).at(2) = cpu.dump(JMP({5}));
 
     // Membank 3, while b != 0, shift
@@ -85,7 +83,7 @@ uint8_t multiplication(uint8_t a, uint8_t b)
 
     // Core 4: accumulate c
     // Membank 7, init c
-    memory.at(7).at(0) = cpu.dump(MUX({Direction({Direction::CURRENT, Direction::BEFORE, Direction::CURRENT}).dump()}));  // TODO: Put in another memory bank
+    memory.at(7).at(0) = cpu.dump(MUX({Direction::CURRENT, Direction::BEFORE, Direction::CURRENT}));  // TODO: Put in another memory bank
     memory.at(7).at(2) = cpu.dump(JMP({8}));
 
     // Membank 8, accumulate

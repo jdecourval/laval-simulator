@@ -14,10 +14,10 @@
     JMP 1
 
 2:
-    MUX 0, 0, 1
+    MUX 1, 1, 2
     MXL 0
     CAN 1
-    MUX 0, 0, -1
+    MUX 1, 1, 0
     JEZ 3
     MXL 0
     SYN
@@ -33,7 +33,7 @@
 4:
 ;    LCL B
     LCL 2
-    MUX 0, 1, -1
+    MUX 1, 2, 0
     JMP 5
 
 5:
@@ -49,7 +49,7 @@
     HLT
 
 7:
-    MUX 0, -1, 0
+    MUX 1, 0, 1
     JMP 8
 
 8:

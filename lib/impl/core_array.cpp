@@ -1,7 +1,5 @@
 #include "core_array.h"
 
-#include "direction.h"
-
 
 CoreArray::CoreArray(const std::vector<uint16_t>& dimensions, const MemoryInterface& mem)
 {
@@ -28,20 +26,23 @@ CoreArray::CoreArray(const std::vector<uint16_t>& dimensions, const MemoryInterf
     index_operands.push_back(1);
 }
 
-Core& CoreArray::operator[](const std::vector<size_t>& index_array)
+Core& CoreArray::operator[](const std::array<size_t, 3>& index_array)
 {
-    assert(index_array.size() == index_operands.size());
     auto index = std::inner_product(index_array.begin(), index_array.end(), index_operands.begin(), size_t{0});
     index = Wrap && index >= cores.size() ? index - cores.size() : index;
     assert(index < cores.size());
     return cores[index];
 }
 
-Core& CoreArray::offset(size_t id, const Direction& offsets)
+Core& CoreArray::offset(size_t id, const Direction::CoreDirection& offsets)
 {
     assert(offsets.size() == index_operands.size());
     auto long_size = static_cast<long>(cores.size());
-    auto index = std::inner_product(offsets.cbegin(), offsets.cend(), index_operands.begin(), static_cast<long>(id));
+    auto index = std::inner_product(offsets.cbegin(), offsets.cend(), index_operands.begin(), static_cast<long>(id),
+            std::plus<>(),
+            [](auto &offset, auto &a) {
+                return a * (static_cast<int>(offset) - 1);
+            });
     index = Wrap && index >= long_size ? index - long_size : index;
     index = Wrap && index < 0 ? index + long_size : index;
     assert(index < long_size);

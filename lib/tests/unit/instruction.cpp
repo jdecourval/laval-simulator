@@ -3,11 +3,11 @@
 #include "instruction.h"
 
 
-template<uint8_t... ArgSizes>
-struct TestInstruction : Instruction<ArgSizes...>
+template<uint8_t... ArgsMaxes>
+struct TestInstruction : Instruction<ArgsMaxes...>
 {
-    using Instruction<ArgSizes...>::Instruction;
-    using Instruction<ArgSizes...>::get_argument;
+    using Instruction<ArgsMaxes...>::Instruction;
+    using Instruction<ArgsMaxes...>::get_argument;
 
     bool operator()(Registers&) const override
     {
@@ -62,9 +62,9 @@ TEST_CASE("Valid load from raw value and get_argument")
         REQUIRE(instruction.get_argument(7) == 1);
     }
 
-    SECTION("Two bits arguments")
+    SECTION("Arguments with max of 3 (2 bits)")
     {
-        TestInstruction<2, 2, 2, 2> instruction(std::byte{0xb1});
+        TestInstruction<3, 3, 3, 3> instruction(std::byte{0xb1});
 
         REQUIRE(instruction.get_argument(0) == 0b01);
         REQUIRE(instruction.get_argument(1) == 0b00);
@@ -75,6 +75,8 @@ TEST_CASE("Valid load from raw value and get_argument")
 
 TEST_CASE("Out of range load from raw value")
 {
+    REQUIRE_NOTHROW(TestInstruction<3>(std::byte{3}));
+    REQUIRE_THROWS_AS(TestInstruction<3>(std::byte{4}), std::out_of_range);
     REQUIRE_THROWS_AS(TestInstruction<3>(std::byte{8}), std::out_of_range);
 
     using WorkAroundTemplateInMacro = TestInstruction<1, 2>;
@@ -88,20 +90,21 @@ TEST_CASE("Out of range initializer_list argument")
     REQUIRE_THROWS_AS(TestInstruction<3>({8}), std::out_of_range);
 }
 
-//TEST_CASE("Dump")
-//{
-//    {
-//        using WorkAroundTemplateInMacro = TestInstruction<>;
-//        REQUIRE(WorkAroundTemplateInMacro().dump() == 0);
-//    }
-//
-//    {
-//        using WorkAroundTemplateInMacro = TestInstruction<1, 1, 1, 1, 1, 1>;
-//        REQUIRE(WorkAroundTemplateInMacro(std::byte{13}).dump() == 13);
-//    }
-//
-//    {
-//        using WorkAroundTemplateInMacro = TestInstruction<6>;
-//        REQUIRE(WorkAroundTemplateInMacro(std::byte{50}).dump() == 50);
-//    }
-//}
+TEST_CASE("Dump args")
+{
+    {
+        using WorkAroundTemplateInMacro = TestInstruction<>;
+        REQUIRE(WorkAroundTemplateInMacro().dump_args() == 0);
+    }
+
+    {
+        using WorkAroundTemplateInMacro = TestInstruction<1, 1, 1, 1, 1, 1>;
+        REQUIRE(WorkAroundTemplateInMacro(std::byte{13}).dump_args() == 13);
+    }
+
+    {
+        using WorkAroundTemplateInMacro = TestInstruction<64>;
+        REQUIRE(WorkAroundTemplateInMacro(std::byte{50}).dump_args() == 50);
+    }
+}
+

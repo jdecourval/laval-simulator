@@ -21,6 +21,8 @@ public:
 
     uint8_t dump(const InstructionBase& instruction) const;
 
+    uint8_t size() const;
+
 private:
     template<typename T, size_t... I>
     void register_helper(std::index_sequence<I...>);

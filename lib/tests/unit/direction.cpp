@@ -3,88 +3,76 @@
 #include "direction.h"
 
 
-TEST_CASE("Load and dump")
+TEST_CASE("Direction decode")
 {
-    auto size = Direction::total();
-    INFO("Total directions: " << size);
-
-    for (uint8_t i = 0; i < size; i++)
+    SECTION("Always result in the right variant")
     {
-        DirectionComplex direction_complex{i};
-        Direction direction{i};
+        auto size = Direction::total_core_directions();
+        INFO("Total directions: " << size);
 
-        REQUIRE(std::holds_alternative<Direction>(direction_complex));
-        REQUIRE(direction.dump() == std::byte{i});
-        REQUIRE(direction_complex.dump() == std::byte{i});
-    }
-}
+        auto i = uint8_t{};
 
-TEST_CASE("Direction constructor")
-{
-    {
-        Direction direction({Direction::AFTER, Direction::CURRENT, Direction::BEFORE});
-        auto iter = std::begin(direction);
+        for (; i < size; i++)
+        {
+            auto direction = Direction::decode(i);
 
-        REQUIRE(*iter == Direction::AFTER);
-        REQUIRE(*(++iter) == Direction::CURRENT);
-        REQUIRE(*(++iter) == Direction::BEFORE);
+            REQUIRE(std::holds_alternative<Direction::CoreDirection>(direction));
+        }
 
-        REQUIRE(direction.dump() == std::byte{5});
-    }
+        for (; i < static_cast<uint8_t>(Direction::SpecialDirection::LAST_DO_NOT_USE); i++)
+        {
+            auto direction = Direction::decode(i);
 
-    {
-        Direction direction({Direction::CURRENT, Direction::AFTER, Direction::CURRENT});
-        auto iter = std::begin(direction);
+            REQUIRE(std::holds_alternative<Direction::SpecialDirection>(direction));
+        }
 
-        REQUIRE(*iter == Direction::CURRENT);
-        REQUIRE(*(++iter) == Direction::AFTER);
-        REQUIRE(*(++iter) == Direction::CURRENT);
-
-        REQUIRE(direction.dump() == std::byte{16});
-    }
-}
-
-TEST_CASE("Special directions")
-{
-    auto size = Direction::total();
-
-    SECTION("PC")
-    {
-        DirectionComplex direction{SpecialDirection::PC};
-        REQUIRE(std::holds_alternative<SpecialDirection>(direction));
-        REQUIRE(direction.dump() == static_cast<std::byte>(size));
+        for (; i < 0xffu; i++)
+        {
+            REQUIRE_THROWS_AS(Direction::decode(i), std::out_of_range);
+        }
     }
 
-    SECTION("MEMBANK")
+    SECTION("Test known values")
     {
-        DirectionComplex direction{SpecialDirection::MEMBANK};
-        REQUIRE(std::holds_alternative<SpecialDirection>(direction));
-        REQUIRE(direction.dump() == static_cast<std::byte>(size + 1));
+        REQUIRE(std::get<Direction::CoreDirection>(Direction::decode(0u)) ==
+                Direction::CoreDirection({
+                        Direction::Direction1D::BEFORE,
+                        Direction::Direction1D::BEFORE,
+                        Direction::Direction1D::BEFORE
+                }));
+
+        REQUIRE(std::get<Direction::CoreDirection>(Direction::decode(3u)) ==
+                Direction::CoreDirection({
+                        Direction::Direction1D::BEFORE,
+                        Direction::Direction1D::CURRENT,
+                        Direction::Direction1D::BEFORE
+                }));
+
+        REQUIRE(std::get<Direction::CoreDirection>(Direction::decode(14u)) ==
+                Direction::CoreDirection({
+                        Direction::Direction1D::AFTER,
+                        Direction::Direction1D::CURRENT,
+                        Direction::Direction1D::CURRENT
+                }));
+
+        REQUIRE(std::get<Direction::CoreDirection>(Direction::decode(22u)) ==
+                Direction::CoreDirection({
+                        Direction::Direction1D::CURRENT,
+                        Direction::Direction1D::CURRENT,
+                        Direction::Direction1D::AFTER
+                }));
     }
 
-    SECTION("PC from raw")
+    SECTION("Special directions")
     {
-        DirectionComplex direction{static_cast<uint8_t>(size)};
-        REQUIRE(std::holds_alternative<SpecialDirection>(direction));
-        REQUIRE(direction.dump() == static_cast<std::byte>(size));
-    }
+        {
+            auto direction = Direction::decode(static_cast<uint8_t>(Direction::SpecialDirection::PC));
+            REQUIRE(std::get<Direction::SpecialDirection>(direction) == Direction::SpecialDirection::PC);
+        }
 
-    SECTION("MEMBANK from raw")
-    {
-        DirectionComplex direction{static_cast<uint8_t>(size + 1)};
-        REQUIRE(std::holds_alternative<SpecialDirection>(direction));
-        REQUIRE(direction.dump() == static_cast<std::byte>(size + 1));
-    }
-
-    SECTION("Invalid directions")
-    {
-        REQUIRE_THROWS_AS(Direction{Direction::total()}, std::out_of_range);
-
-        REQUIRE_THROWS_AS(DirectionComplex {255}, std::out_of_range);
-
-        REQUIRE_THROWS_AS(DirectionComplex {Direction::total() + static_cast<int>(SpecialDirection::LAST_DO_NOT_USE)},
-                std::out_of_range);
-
-        REQUIRE_THROWS_AS(DirectionComplex {SpecialDirection::LAST_DO_NOT_USE}, std::out_of_range);
+        {
+            auto direction = Direction::decode(static_cast<uint8_t>(Direction::SpecialDirection::MEMBANK));
+            REQUIRE(std::get<Direction::SpecialDirection>(direction) == Direction::SpecialDirection::MEMBANK);
+        }
     }
 }

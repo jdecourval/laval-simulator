@@ -10,9 +10,9 @@ TEST_CASE("Assembler")
 .mem_map 2
 
 1:
-    MUX 0, 0, 0
-    MUX 0, 1, 0
-    MUX 0, 0, -1
+    MUX 1, 1, 1
+    MUX 1, 2, 1
+    MUX 1, 1, 0
 
 2:
     ; Comment
@@ -31,19 +31,19 @@ TEST_CASE("Assembler")
         {
             auto &instruction = ast.at(1).at(0);
             REQUIRE(instruction.first == "MUX");
-            REQUIRE(instruction.second == std::vector<uint8_t>({0, 0, 0}));
+            REQUIRE(instruction.second == std::vector<uint8_t>({1, 1, 1}));
         }
 
         {
             auto &instruction = ast.at(1).at(1);
             REQUIRE(instruction.first == "MUX");
-            REQUIRE(instruction.second == std::vector<uint8_t>({0, 1, 0}));
+            REQUIRE(instruction.second == std::vector<uint8_t>({1, 2, 1}));
         }
 
         {
             auto &instruction = ast.at(1).at(2);
             REQUIRE(instruction.first == "MUX");
-            REQUIRE(instruction.second == std::vector<uint8_t>({0, 0, static_cast<uint8_t>(-1)}));
+            REQUIRE(instruction.second == std::vector<uint8_t>({1, 1, 0}));
         }
 
         {
@@ -86,8 +86,8 @@ TEST_CASE("Assembler")
             REQUIRE(binary.at(17) == 2);
             REQUIRE(binary.at(18) == 2);
             REQUIRE(binary.at(19) == 3);
-            REQUIRE(binary.at(20) == 48);
-            REQUIRE(binary.at(21) == 63);
+            REQUIRE(binary.at(20) == 43);
+            REQUIRE(binary.at(21) == 58);
             REQUIRE(binary.at(22) == 6);
             REQUIRE(binary.at(23) == 1);
             REQUIRE(binary.at(24) == 3);
@@ -107,6 +107,3 @@ TEST_CASE("Assembler")
         }
     }
 }
-
-// TODO: Consider having two separate MUX instructions for normal and special directions
-// This would simplify arguments loading

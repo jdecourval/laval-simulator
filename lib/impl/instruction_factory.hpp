@@ -13,7 +13,8 @@ void InstructionFactory::register_helper(std::index_sequence<I...>)
 
     if constexpr (sizeof...(I) > 0)
     {
-        end += 1 << (I + ...);
+        assert((... && I));  // No argument must have a size of 0
+        end += ((I + 1) * ...);
     }
     else
     {

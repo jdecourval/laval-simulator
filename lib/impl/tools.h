@@ -2,36 +2,13 @@
 #define SIMULATOR_TOOLS_H
 
 #include <cstddef>
+#include <cstdint>
 #include <cassert>
 
 
 constexpr uint8_t operator "" _u8(unsigned long long value)
 {
     return static_cast<uint8_t>(value);
-}
-
-/// Perform the fastest shift possible while ensuring no undefined behaviour may happen
-constexpr uint8_t safe_right_shift(uint8_t a, unsigned long b)
-{
-    // Shifting is safe as long as:
-    // a and b are positive which is guaranteed for unsigned numbers
-    // b is smaller than the number of bits in the promoted a (int)
-    // Although this function is more severe since there really is no point in shifting more than the real integer size
-    assert(b < sizeof(a) * 8);
-
-    return static_cast<uint8_t>(a >> b);
-}
-
-/// Perform the fastest shift possible while ensuring no undefined behaviour may happen
-constexpr uint8_t safe_left_shift(uint8_t a, unsigned long b)
-{
-    // Shifting is safe as long as:
-    // a and b are positive which is guaranteed for unsigned numbers
-    // b is smaller than the number of bits in the promoted a (int)
-    // Although this function is more severe since there really is no point in shifting more than the real integer size
-    assert(b < sizeof(a) * 8);
-
-    return static_cast<uint8_t>(a << b);
 }
 
 namespace Tools
@@ -42,6 +19,8 @@ namespace Tools
 
     template<class T>
     T umaxof();
+
+    constexpr uint8_t three_pow(unsigned long n);
 }
 
 #include "tools.hpp"

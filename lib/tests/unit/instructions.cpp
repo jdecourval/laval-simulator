@@ -345,13 +345,32 @@ TEST_CASE("MUX")
 {
     Registers registers;
 
-    SECTION("Correctly set mux value")
+    SECTION("Correctly set mux value using raw argument")
     {
         OpCodes::MUX instruction({3});
-
         instruction(registers);
-
         REQUIRE(registers.status1.mux == 3);
+    }
+
+    SECTION("Correctly set mux value using list argument")
+    {
+        {
+            OpCodes::MUX instruction({0, 0, 2});
+            instruction(registers);
+            REQUIRE(registers.status1.mux == 18);
+        }
+
+        {
+            OpCodes::MUX instruction({2, 0, 0});
+            instruction(registers);
+            REQUIRE(registers.status1.mux == 2);
+        }
+
+        {
+            OpCodes::MUX instruction({0, 1, 1});
+            instruction(registers);
+            REQUIRE(registers.status1.mux == 12);
+        }
     }
 }
 

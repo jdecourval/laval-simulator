@@ -1,76 +1,37 @@
 #ifndef SIMULATOR_DIRECTION_H
 #define SIMULATOR_DIRECTION_H
 
-#include <cstdint>
-#include <cstddef>
-#include <cmath>
-#include <tuple>
+#include "impl/tools.h"
+
 #include <variant>
 
 
-class DirectionComplex;
-
-class Direction
+namespace Direction
 {
-    static constexpr auto Dimensions = 3u;
-
-public:
     enum Direction1D
     {
-        BEFORE = -1,
-        CURRENT = 0,
-        AFTER = 1
+        BEFORE = 0,
+        CURRENT = 1,
+        AFTER = 2
     };
 
-    Direction();
+    using CoreDirection = std::array<Direction1D, 3>;
 
-    explicit Direction(uint8_t raw);
+    constexpr unsigned total_core_directions()
+    {
+        return Tools::three_pow(Direction::AFTER + 1);
+    }
 
-    explicit Direction(const std::array<Direction1D, Dimensions>& directions);
+    enum class SpecialDirection: uint8_t
+    {
+        PC = total_core_directions(),
+        MEMBANK,
+        LAST_DO_NOT_USE
+    };
 
-    std::byte dump();
+    using DirectionComplex = std::variant<CoreDirection, SpecialDirection>;
 
-    constexpr decltype(auto) cbegin() const noexcept;
-
-    constexpr decltype(auto) begin() noexcept;
-
-    constexpr decltype(auto) cend() const noexcept;
-
-    constexpr decltype(auto) end() noexcept;
-
-    static constexpr size_t size();
-
-    static constexpr size_t total();
-
-private:
-    static constexpr uint8_t three_pow(unsigned long n);
-
-    // raw value is ordered LSB to MSB
-    std::array<Direction1D, Dimensions> directions;
-};
-
-
-enum class SpecialDirection: uint8_t
-{
-    PC,
-    MEMBANK,
-    LAST_DO_NOT_USE
-};
-
-
-class DirectionComplex : public std::variant<Direction, SpecialDirection>
-{
-    using Variant = std::variant<Direction, SpecialDirection>;
-
-public:
-    explicit DirectionComplex(SpecialDirection);
-    explicit DirectionComplex(const Direction&);
-    explicit DirectionComplex(uint8_t raw);
-
-    std::byte dump();
-};
-
-
-#include "impl/direction.hpp"
+    DirectionComplex decode(uint8_t);
+}
 
 #endif //SIMULATOR_DIRECTION_H

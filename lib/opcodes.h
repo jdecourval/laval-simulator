@@ -1,15 +1,13 @@
 #ifndef SIMULATOR_OPCODES_H
 #define SIMULATOR_OPCODES_H
 
+#include "direction.h"
 #include "instruction.h"
 #include "registers.h"
 
 
 namespace OpCodes
 {
-
-// 1 bits instructions
-
 // Do nothing for one cycle
 // arg: none
     struct NOP : public Instruction<>
@@ -88,9 +86,6 @@ namespace OpCodes
     };
 
 
-// TODO ?: Change sync mode: auto, manual
-
-// 2 bits instructions
 // Load from mux
 // Arg 1:1: Sync after
     struct MXL : public Instruction<1>
@@ -121,142 +116,142 @@ namespace OpCodes
     };
 
 
-// 4 bits instructions
-
-// Change mux address
-// arg 1:5: address
-    struct MUX : public Instruction<5>
+// Make mux points to another core
+// arg 1:2: offset on dimension 0
+// arg 3:4: offset on dimension 1
+// arg 5:6: offset on dimension 2
+    struct MUX : public Instruction<2, 2, 2>
     {
-        using Instruction<5>::Instruction;
+        using Instruction<2, 2, 2>::Instruction;
 
         bool operator()(Registers& registers) const override;
 
-        void load_args(const std::vector<uint8_t>& args) override;
+//        void load_args(const std::vector<uint8_t>& args) override;
+    };
+
+// Make mux points to a register
+    struct MXR : public Instruction<static_cast<uint8_t>(Direction::SpecialDirection::LAST_DO_NOT_USE)>
+    {
+        using Instruction<static_cast<uint8_t>(Direction::SpecialDirection::LAST_DO_NOT_USE)>::Instruction;
+
+        bool operator()(Registers& registers) const override;
     };
 
 // Load constant into low part
-// arg 1:4: constant
-    struct LCL : public Instruction<4>
+// arg 1:0xf: constant
+    struct LCL : public Instruction<0xf>
     {
-        using Instruction<4>::Instruction;
+        using Instruction<0xf>::Instruction;
 
         bool operator()(Registers& registers) const override;
     };
 
 
 // Load constant into high part
-// arg 1:4: constant
-    struct LCH : public Instruction<4>
+// arg 1:0xf: constant
+    struct LCH : public Instruction<0xf>
     {
-        using Instruction<4>::Instruction;
+        using Instruction<0xf>::Instruction;
 
         bool operator()(Registers& registers) const override;
     };
 
 
 // Jump if value less than 0. Change memory bank
-// arg 1:4: memory bank address
-    struct JLZ : public Instruction<4>
+// arg 1:0xf: memory bank address
+    struct JLZ : public Instruction<0xf>
     {
-        using Instruction<4>::Instruction;
+        using Instruction<0xf>::Instruction;
 
         bool operator()(Registers& registers) const override;
     };
 
 
 // Jump if value equals 0
-// arg 1:4: memory bank address
-    struct JEZ : public Instruction<4>
+// arg 1:0xf: memory bank address
+    struct JEZ : public Instruction<0xf>
     {
-        using Instruction<4>::Instruction;
+        using Instruction<0xf>::Instruction;
 
         bool operator()(Registers& registers) const override;
     };
 
 
 // Jump if value greater than 0
-// arg 1:4: memory bank address
-    struct JGZ : public Instruction<4>
+// arg 1:0xf: memory bank address
+    struct JGZ : public Instruction<0xf>
     {
-        using Instruction<4>::Instruction;
+        using Instruction<0xf>::Instruction;
 
         bool operator()(Registers& registers) const override;
     };
 
 
 // Jump unconditionally
-// arg 1:4: memory bank address
-    struct JMP : public Instruction<4>
+// arg 1:0xf: memory bank address
+    struct JMP : public Instruction<0xf>
     {
-        using Instruction<4>::Instruction;
+        using Instruction<0xf>::Instruction;
 
         bool operator()(Registers& registers) const override;
     };
 
 
-// 5 bits instructions
-
 // Left logical shift
-// arg 1:4: shift amount
-// Arg 2:1: Sync after
-    struct LLS : public Instruction<4>
+// arg 1:0xf: shift amount
+    struct LLS : public Instruction<0xf>
     {
-        using Instruction<4>::Instruction;
+        using Instruction<0xf>::Instruction;
 
         bool operator()(Registers& registers) const override;
     };
 
 
 // Right logical shift
-// arg 1:4: shift amount
-// Arg 2:1: Sync after
-    struct RLS : public Instruction<4>
+// arg 1:0xf: shift amount
+    struct RLS : public Instruction<0xf>
     {
-        using Instruction<4>::Instruction;
+        using Instruction<0xf>::Instruction;
 
         bool operator()(Registers& registers) const override;
     };
 
 
 // Add a constant
-// arg 1:4: constant
-// Arg 2:1: Sync after
-    struct CAD : public Instruction<4>
+// arg 1:0xf: constant
+    struct CAD : public Instruction<0xf>
     {
-        using Instruction<4>::Instruction;
+        using Instruction<0xf>::Instruction;
 
         bool operator()(Registers& registers) const override;
     };
 
 
 // Subtract a constant
-// arg 1:4: constant
-// Arg 2:1: Sync after
-    struct CSU : public Instruction<4>
+// arg 1:0xf: constant
+    struct CSU : public Instruction<0xf>
     {
-        using Instruction<4>::Instruction;
+        using Instruction<0xf>::Instruction;
 
         bool operator()(Registers& registers) const override;
     };
 
 
     // Logical AND
-    // arg 1:4: constant
-    // Arg 2:1: Sync after
-    struct CAN : public Instruction<4>
+    // arg 1:0xf: constant
+    struct CAN : public Instruction<0xf>
     {
-        using Instruction<4>::Instruction;
+        using Instruction<0xf>::Instruction;
 
         bool operator()(Registers& registers) const override;
     };
 
 
     // Logical AND
-    // arg 1:4: constant
-    // Arg 2:1: Sync after
-    struct COR : public Instruction<4>
+    // arg 1:0xf: constant
+    struct COR : public Instruction<0xf>
     {
-        using Instruction<4>::Instruction;
+        using Instruction<0xf>::Instruction;
 
         bool operator()(Registers& registers) const override;
     };

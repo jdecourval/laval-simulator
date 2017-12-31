@@ -2,11 +2,11 @@
 
 #include "impl/core_array.h"
 
-#include "direction.h"
 #include "test_instructions.h"
 
 
 using Memory_t = Memory;
+using namespace Direction;
 
 // TODO: Use operator== to compare cores
 TEST_CASE("ID are correctly set and operator[](size_t) return them in the correct order")
@@ -61,21 +61,18 @@ TEST_CASE("Offsets")
     core.execute(Debug{test_registers});
 
     {
-        auto& offsetted = cores.offset(test_registers.id,
-            Direction({Direction::CURRENT, Direction::CURRENT, Direction::CURRENT}));
+        auto& offsetted = cores.offset(test_registers.id, CoreDirection({CURRENT, CURRENT, CURRENT}));
         REQUIRE(core == offsetted);
     }
 
     {
-        auto& offsetted = cores.offset(test_registers.id,
-            Direction({Direction::BEFORE, Direction::CURRENT, Direction::CURRENT}));
+        auto& offsetted = cores.offset(test_registers.id, CoreDirection({BEFORE, CURRENT, CURRENT}));
         auto& compare = cores[{0, 1, 1}];
         REQUIRE(compare == offsetted);
     }
 
     {
-        auto& offsetted = cores.offset(test_registers.id,
-            Direction({Direction::AFTER, Direction::AFTER, Direction::AFTER}));
+        auto& offsetted = cores.offset(test_registers.id, CoreDirection({AFTER, AFTER, AFTER}));
         auto& compare = cores[{2, 2, 2}];
         REQUIRE(compare == offsetted);
     }
