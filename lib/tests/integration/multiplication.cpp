@@ -108,8 +108,10 @@ TEST_CASE("Multiplication")
 
 TEST_CASE("Multiplication ASM")
 {
+    auto buffer = std::stringstream();
     auto assembly_input = std::ifstream("lib/tests/integration/multiplication.laval", std::ios::binary);
-    auto [ast, settings] = Assembler::build_ast(assembly_input);
+    Assembler::preprocess(assembly_input, buffer);
+    auto [ast, settings] = Assembler::build_ast(buffer);
 
     auto output = std::ostringstream();
 

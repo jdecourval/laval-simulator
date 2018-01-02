@@ -28,8 +28,11 @@ namespace Assembler
     /// Parsed settings, part of the AST
     using SettingMap = std::unordered_map<std::string, std::vector<uint8_t>>;
 
+    /// Preprocess input into output
+    void preprocess(std::istream& input, std::ostream& output);
+
     /// Build an AST from an assembly file
-    std::pair<Ast, SettingMap> build_ast(std::istream& path);
+    std::pair<Ast, SettingMap> build_ast(std::istream& input);
 
     /// Assemble an AST to binary
     void assemble(const Ast&, const SettingMap&, std::ostream& output);

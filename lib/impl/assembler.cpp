@@ -48,6 +48,22 @@ namespace
 
 namespace Assembler
 {
+    void preprocess(std::istream& input, std::ostream& output)
+    {
+        for(std::string line; getline(input, line);)
+        {
+            using namespace Direction;
+
+            line = std::regex_replace(line, std::regex("BEFORE"), std::to_string(BEFORE));
+            line = std::regex_replace(line, std::regex("CURRENT"), std::to_string(CURRENT));
+            line = std::regex_replace(line, std::regex("AFTER"), std::to_string(AFTER));
+            line = std::regex_replace(line, std::regex("PC"), std::to_string(static_cast<int>(SpecialDirection::PC)));
+            line = std::regex_replace(line, std::regex("MEMBANK"), std::to_string(static_cast<int>(SpecialDirection::MEMBANK)));
+
+            output << line << std::endl;
+        }
+    }
+
     std::pair<Ast, SettingMap> build_ast(std::istream& input)
     {
         assert(input);
@@ -188,6 +204,12 @@ namespace Assembler
             assert(input);
         }
 
+        // TODO: How to handle arguments:
+        // 1. By restarting the CPU
+        //   1.a. Additionally return a vector of pointers to the memory cell having the arguments
+        //   1.b. Somehow store this vector inside Cpu and add a set_argument method
+        // 2. At runtime
+        //   2.a.
         return Cpu(settings, std::move(memory), std::move(core_to_mem_map));
     }
 }
