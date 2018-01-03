@@ -13,3 +13,7 @@ add_executable(simulator ${SOURCE_FILES})
 
 target_link_libraries(simulator
         LavalLib)
+
+target_include_directories(simulator SYSTEM
+        PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
+        )

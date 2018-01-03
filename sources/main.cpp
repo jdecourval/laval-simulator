@@ -1,25 +1,105 @@
 #include <assembler.h>
-#include <direction.h>
+
+#include <externals/CLI11.hpp>
 
 
 using namespace std::chrono_literals;
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "OCDFAInspection"
+#pragma ide diagnostic ignored "CannotResolve"
 int main(int argc, char* argv[])
 {
-    assert(argc == 2);
+    CLI::App app("LAVAL simulator");
 
-    auto assembly_input = std::ifstream(argv[1], std::ios::binary);
-    auto [ast, settings] = Assembler::build_ast(assembly_input);
+    std::string file_path;
+    app.add_option("file", file_path, "Assembly or binary program")->required()->check(CLI::ExistingFile);
 
+    auto preprocess = false;
+    auto preprocess_opt = app.add_flag("-E,--preprocess", preprocess, "Preprocess only, do not assemble or simulate");
+
+    auto compile = false;
+    app.add_flag("-c,--compile", compile, "Assemble only, do not compile or simulate");
+
+    std::string output_path;
+    app.add_option("-o,--output ", output_path, "Place the assembled or preprocessed output into <file>");
+
+    auto simulate = false;
+    app.add_flag("-s,--simulate ", simulate, "Simulate")->excludes(preprocess_opt);
+
+    CLI11_PARSE(app, argc, argv);
+
+    auto file = std::fstream(file_path, std::ios::binary | std::ios::in);
+    assert(file);
+
+
+    std::ostream* binary = nullptr;
+
+    if (preprocess || compile)
     {
-        auto output = std::fstream("multiplication.bin", std::ios::binary | std::ios::out);
+        std::ostream* preprocessed = nullptr;
 
-        Assembler::assemble(ast, settings, output);
+        if (preprocess)
+        {
+
+            if (output_path.empty())
+            {
+                preprocessed = &std::cout;
+            }
+            else
+            {
+                preprocessed = new std::fstream(output_path, std::ios::out | std::ios::binary);
+            }
+        }
+        else
+        {
+            preprocessed = new std::stringstream;
+        }
+
+        Assembler::preprocess(file, *preprocessed);
+
+        if (preprocess)
+        {
+            return 0;
+        }
+
+
+        auto preprocessed_input = dynamic_cast<std::istream*>(preprocessed);
+        assert(preprocessed_input);
+        preprocessed_input->seekg(0);
+        auto [ast, settings] = Assembler::build_ast(*preprocessed_input);
+
+
+        if (!output_path.empty())
+        {
+            binary = new std::fstream(output_path, std::ios::in | std::ios::out | std::ios::binary);
+        }
+        else
+        {
+            binary = new std::stringstream;
+        }
+
+        Assembler::assemble(ast, settings, *binary);
+
+    }
+    else
+    {
+        binary = &file;
     }
 
-    auto binary_input = std::fstream("multiplication.bin", std::ios::binary | std::ios::in);
+    if (simulate)
+    {
+        auto binary_input = dynamic_cast<std::istream*>(binary);
+        assert(binary_input);
+        binary_input->seekg(0);
+        auto cpu = Assembler::load_binary(*binary_input);
+//    auto cpu = Assembler::load_binary(binary, args);  // Arguments should be passed like this
 
-    auto cpu = Assembler::load_binary(binary_input);
-    auto answer = static_cast<int>(cpu.start());
-    std::cout << "answer: " << answer << std::endl;
+        auto answer = static_cast<int>(cpu.start());
+        std::cout << "answer: " << answer << std::endl;
+    }
+
+    return 0;
 }
+
+#pragma clang diagnostic pop
