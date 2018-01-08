@@ -17,7 +17,7 @@ class Cpu
 
 public:
     explicit Cpu(const Settings&);
-    explicit Cpu(const Settings&, Memory&& memory, std::vector<MemoryInterface::size_type>&& core_to_mem_map);
+    explicit Cpu(const Settings&, Memory&& memory, std::vector<MemoryInterface::size_type>&& core_to_mem_map, std::vector<std::vector<std::pair<int, int>>>&& parameters = {});
 
     void link_memory(Memory&& memory, std::vector<MemoryInterface::size_type>&& core_to_mem_map);
 
@@ -29,7 +29,7 @@ public:
         return cores[0].get_factory().dump(instruction);
     }
 
-    uint8_t start(const std::chrono::milliseconds& period = std::chrono::milliseconds(0));
+    uint8_t start(const std::chrono::milliseconds& period = std::chrono::milliseconds(0), const std::vector<uint8_t>& args = {});
 
     Cpu(Cpu&) = delete;
 
@@ -39,6 +39,7 @@ private:
     Memory mem;
     CoreArray cores;
     std::vector<MemoryInterface::size_type> core_to_mem_map;
+    std::vector<std::vector<std::pair<int, int>>> parameters;
 };
 
 

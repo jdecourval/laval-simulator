@@ -13,10 +13,15 @@ Cpu::Cpu(const Settings& settings)
     assert(settings.dimensions.size() == 3);
 }
 
-Cpu::Cpu(const Settings& settings, Memory&& memory, std::vector<MemoryInterface::size_type>&& core_to_mem_map)
-    : mem{std::move(memory)}, cores{std::vector<std::remove_cv_t<std::remove_reference_t<decltype(settings.dimensions.at(0))>>>(std::cbegin(settings.dimensions), std::cend(settings.dimensions)), mem}, core_to_mem_map{std::move(core_to_mem_map)}
+Cpu::Cpu(const Settings& settings, Memory&& memory, std::vector<MemoryInterface::size_type>&& core_to_mem_map, std::vector<std::vector<std::pair<int, int>>>&& parameters)
+    : mem{std::move(memory)}
+    , cores{std::vector<std::remove_cv_t<std::remove_reference_t<decltype(settings.dimensions.at(0))>>>(std::cbegin(settings.dimensions), std::cend(settings.dimensions)), mem}
+    , core_to_mem_map{std::move(core_to_mem_map)}
+    , parameters{std::move(parameters)}
 {
     assert(settings.dimensions.size() == 3);
+
+    // TODO: Check parameters
 }
 
 void Cpu::link_memory(Memory&& memory, std::vector<MemoryInterface::size_type>&& core_to_mem_map)
@@ -28,11 +33,39 @@ void Cpu::link_memory(Memory&& memory, std::vector<MemoryInterface::size_type>&&
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
 
-uint8_t Cpu::start(const std::chrono::milliseconds& period)
+uint8_t Cpu::start(const std::chrono::milliseconds& period, const std::vector<uint8_t>& args)
 {
     assert(period.count() >= 0);
     assert(cores.size() == core_to_mem_map.size());
+    assert(args.size() == parameters.size());
 
+    // Load args
+    for (auto i = 0u; i < args.size(); i++)
+    {
+        for (auto& [block, instruction_index]: parameters.at(i))
+        {
+            auto& instruction_raw = mem.at(block).at(instruction_index);
+            assert(cores.size() > 0);
+            auto instruction = cores[0].get_factory().create(instruction_raw);
+
+            if (dynamic_cast<OpCodes::LCL*>(instruction.get()))
+            {
+//                instruction->load_args(std::vector{static_cast<uint8_t>(args.at(i) & 0xff)});
+                instruction_raw += args.at(i) & 0xff;
+            }
+            else if (dynamic_cast<OpCodes::LCH*>(instruction.get()))
+            {
+//                instruction->load_args(std::vector{static_cast<uint8_t>(args.at(i) >> 4)});
+                instruction_raw += args.at(i) >> 4;
+            }
+            else
+            {
+                throw std::runtime_error("This version only support arguments on load instructions");
+            }
+        }
+    }
+
+    // Wire cores
     for(auto i = 0ull; i < core_to_mem_map.size(); i++)
     {
         assert(core_to_mem_map[i] < mem.banks_number());

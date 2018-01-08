@@ -108,18 +108,20 @@ TEST_CASE("Multiplication")
 
 TEST_CASE("Multiplication ASM")
 {
+    using namespace std::chrono_literals;
+
     auto buffer = std::stringstream();
     auto assembly_input = std::ifstream("lib/tests/integration/multiplication.laval", std::ios::binary);
     Assembler::preprocess(assembly_input, buffer);
-    auto [ast, settings] = Assembler::build_ast(buffer);
+    auto [ast, settings, variables] = Assembler::build_ast(buffer);
 
     auto output = std::ostringstream();
 
-    Assembler::assemble(ast, settings, output);
+    Assembler::assemble(ast, settings, variables, output);
 
     auto binary_input = std::istringstream(output.str());
 
     auto cpu = Assembler::load_binary(binary_input);
-    auto answer = static_cast<int>(cpu.start());
+    auto answer = static_cast<int>(cpu.start(0s, std::vector({2_u8, 3_u8})));
     REQUIRE(answer == 6);
 }

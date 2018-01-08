@@ -16,6 +16,8 @@ using path = std::filesystem::path;
 
 namespace Assembler
 {
+    using BlockId = int;
+
     /// An instruction with its optional arguments for use in the AST
     using Node = std::pair<std::string, std::vector<uint8_t>>;
 
@@ -23,7 +25,7 @@ namespace Assembler
     ///
     /// Represents the complete program structure
     /// This is not really a tree since assembly language does not need one
-    using Ast = std::unordered_map<int, std::vector<Node>>;
+    using Ast = std::unordered_map<BlockId, std::vector<Node>>;
 
     /// Parsed settings, part of the AST
     using SettingMap = std::unordered_map<std::string, std::vector<uint8_t>>;
@@ -32,10 +34,11 @@ namespace Assembler
     void preprocess(std::istream& input, std::ostream& output);
 
     /// Build an AST from an assembly file
-    std::pair<Ast, SettingMap> build_ast(std::istream& input);
+    std::tuple<Ast, SettingMap, std::vector<std::vector<std::pair<BlockId, int>>>> build_ast(std::istream& input);
 
     /// Assemble an AST to binary
-    void assemble(const Ast&, const SettingMap&, std::ostream& output);
+    // TODO: Standardize variable/parameter/arg naming
+    void assemble(const Ast&, const SettingMap&, std::vector<std::vector<std::pair<BlockId, int>>> variables, std::ostream& output);
 
     /// Configure a CPU instance with a binary input
     Cpu load_binary(std::istream& input);

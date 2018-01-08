@@ -15,6 +15,9 @@ int main(int argc, char* argv[])
     std::string file_path;
     app.add_option("file", file_path, "Assembly or binary program")->required()->check(CLI::ExistingFile);
 
+    std::vector<uint8_t> args;
+    app.add_option("args", args, "Program arguments");
+
     auto preprocess = false;
     auto preprocess_opt = app.add_flag("-E,--preprocess", preprocess, "Preprocess only, do not assemble or simulate");
 
@@ -32,7 +35,7 @@ int main(int argc, char* argv[])
     auto file = std::fstream(file_path, std::ios::binary | std::ios::in);
     assert(file);
 
-
+    // TODO: Maybe an unique_ptr with custom cleanup function could be used
     std::ostream* binary = nullptr;
 
     if (preprocess || compile)
@@ -67,20 +70,22 @@ int main(int argc, char* argv[])
         auto preprocessed_input = dynamic_cast<std::istream*>(preprocessed);
         assert(preprocessed_input);
         preprocessed_input->seekg(0);
-        auto [ast, settings] = Assembler::build_ast(*preprocessed_input);
+        auto [ast, settings, args] = Assembler::build_ast(*preprocessed_input);
 
 
         if (!output_path.empty())
         {
-            binary = new std::fstream(output_path, std::ios::in | std::ios::out | std::ios::binary);
+            binary = new std::fstream(output_path, std::ios::in | std::ios::out | std::ios::binary | std::ios::trunc);
+            assert(*binary);
         }
         else
         {
             binary = new std::stringstream;
         }
 
-        Assembler::assemble(ast, settings, *binary);
-
+        Assembler::assemble(ast, settings, args, *binary);
+        binary->flush();
+        preprocessed->flush();
     }
     else
     {
@@ -95,7 +100,7 @@ int main(int argc, char* argv[])
         auto cpu = Assembler::load_binary(*binary_input);
 //    auto cpu = Assembler::load_binary(binary, args);  // Arguments should be passed like this
 
-        auto answer = static_cast<int>(cpu.start());
+        auto answer = static_cast<int>(cpu.start(0s, args));
         std::cout << "answer: " << answer << std::endl;
     }
 
