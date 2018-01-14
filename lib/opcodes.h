@@ -247,7 +247,7 @@ namespace OpCodes
     };
 
 
-    // Logical AND
+    // Logical OR
     // arg 1:0xf: constant
     struct COR : public Instruction<0xf>
     {

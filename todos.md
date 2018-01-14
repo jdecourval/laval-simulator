@@ -11,6 +11,9 @@
 - Consider adding other logical operators
 - Consider adding AND and OR instructions affecting the high part
 - Consider vector loading
+- Consider multiple parallel bytes return
+- Consider multiple serial bytes return (maybe RET or OUT, write to stderr)
+- Consider multiple serial bytes input (maybe REA OR INP, read from stdin)
 
 # Tests/challenges idea
 - Float
