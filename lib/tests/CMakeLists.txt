@@ -1,5 +1,6 @@
 add_executable(LavalTests
         integration/multiplication.cpp
+        integration/log2.cpp
 
         unit/assembler.cpp
         unit/core.cpp

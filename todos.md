@@ -30,9 +30,9 @@
 - Simple subtraction
 - Sum with multiple numbers
 - Division
-- Logarithm (base 2)
 - Logarithm (other than base 2) $ log_2 x / log_2 base $
 - Common divisor
+- popcnt
 
 ## Need additional features
 - 16 bits add

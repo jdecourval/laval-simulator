@@ -1,0 +1,33 @@
+.cores 1, 1, 2
+.mem_number 5
+.mem_size 5
+.mem_map 0, 3
+
+0:
+    LCL a
+    LCH a
+    MUX CURRENT, CURRENT, AFTER
+    JMP 1
+
+1:
+    JEZ 2
+    RLS 1
+    MXD
+    SYN
+    JMP 1
+
+2:
+    MXL 0
+    SYN
+    CSU 1
+    HLT
+
+3:
+    MUX CURRENT, CURRENT, BEFORE
+    JMP 4
+
+4:
+    SYN
+    MXD
+    CAD 1
+    JMP 4
