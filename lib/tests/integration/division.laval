@@ -1,0 +1,52 @@
+.cores 1, 2, 2
+.mem_number 8
+.mem_size 5
+.mem_map 0, 3, 7, 5
+
+
+; Subtractor
+0:
+    LCL a
+    LCH a
+    MUX CURRENT, CURRENT, AFTER
+    JMP 1
+
+1:
+    JEZ 2
+    MXS 0
+    JMP 1
+
+2:
+    SYN
+
+
+; Send operand
+3:
+    LCL b
+    LCH b
+    MUX CURRENT, AFTER, CURRENT
+    JMP 4
+
+4:
+    SYN
+    MXD
+    JMP 4
+
+
+; Counter
+5:
+    MUX CURRENT, BEFORE, CURRENT
+    JMP 6
+
+6:
+    SYN
+    CAD 1
+    JMP 6
+
+; Check when its time to halt
+7:
+    MUX CURRENT, BEFORE, CURRENT
+    MXD
+    MUX CURRENT, CURRENT, AFTER
+    MXL 0
+    HLT
