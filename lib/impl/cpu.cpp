@@ -50,8 +50,8 @@ uint8_t Cpu::start(const std::chrono::milliseconds& period, const std::vector<ui
 
             if (dynamic_cast<OpCodes::LCL*>(instruction.get()))
             {
-//                instruction->load_args(std::vector{static_cast<uint8_t>(args.at(i) & 0xff)});
-                instruction_raw += args.at(i) & 0xff;
+//                instruction->load_args(std::vector{static_cast<uint8_t>(args.at(i) & 0xf)});
+                instruction_raw += args.at(i) & 0xf;
             }
             else if (dynamic_cast<OpCodes::LCH*>(instruction.get()))
             {
