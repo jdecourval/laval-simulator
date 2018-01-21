@@ -70,6 +70,8 @@ bool MXL::operator()(Registers& registers) const
     }
 
     registers.val = *registers.preload;
+    registers.status2.negative = registers.preload_negative;
+    registers.status2.carry = false;
 
     if (get_argument(0))
     {
