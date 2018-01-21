@@ -1,6 +1,8 @@
+; Perform an integer division such as: return = a / b
+
 .cores 1, 2, 2
-.mem_number 8
-.mem_size 5
+.mem_number 9
+.mem_size 7
 .mem_map 0, 3, 7, 5
 
 
@@ -13,6 +15,7 @@
 
 1:
     JEZ 2
+    JLZ 2
     MXS 0
     JMP 1
 
@@ -46,7 +49,14 @@
 ; Check when its time to halt
 7:
     MUX CURRENT, BEFORE, CURRENT
-    MXD
+    MXL 0
+    JEZ 8
+    MUX CURRENT, CURRENT, AFTER
+    MXL 0
+    CSU 1
+    HLT
+
+8:
     MUX CURRENT, CURRENT, AFTER
     MXL 0
     HLT
