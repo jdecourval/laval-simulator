@@ -14,23 +14,24 @@ CpuException::CpuException(const char* expression, const char* file, int line, c
 {
     std::ostringstream outputStream;
 
-    if (!message.empty())
-    {
-        outputStream << message << ": ";
-    }
-
     std::string expressionString = expression;
 
     if (expressionString == "false" || expressionString == "0" || expressionString == "FALSE")
     {
-        outputStream << "Unreachable code assertion";
+        outputStream << "Unreachable code assertion" << "\n";
     }
     else
     {
-        outputStream << "Assertion '" << expression << "'";
+        outputStream << "Assertion '" << expression << "'" << "\n";
     }
 
-    outputStream << " failed in file '" << file << "' line " << line << "\n";
+    outputStream <<"Failed in file '" << file << "' line " << line << "\n";
+
+    if (!message.empty())
+    {
+        outputStream << "\n" << message << "\n";
+    }
+
     report = outputStream.str();
 }
 

@@ -35,7 +35,7 @@ void Core::wire(uint8_t membank)
 
 void Core::initialize()
 {
-    throw_cpu_exception_if(mem == nullptr || mem->banks_size() <= std::numeric_limits<decltype(registers.pc)>::max() + 1, "Too many memory banks");
+    cpu_assert(mem == nullptr || mem->banks_size() <= std::numeric_limits<decltype(registers.pc)>::max() + 1, "Too many memory banks");
 
     factory.register_instruction<OpCodes::NOP>();
     factory.register_instruction<OpCodes::SYN>();
@@ -71,7 +71,7 @@ void Core::preload()
 
     try
     {
-        throw_cpu_exception_if(cores, "CPU have no cores");
+        cpu_assert(cores, "CPU have no cores");
 
         auto direction = std::get<Direction::CoreDirection>(direction_complex);
 

@@ -21,7 +21,7 @@ void InstructionFactory::register_helper(std::index_sequence<I...>)
         end++;
     }
 
-    throw_cpu_exception_if(end <= 0xff, "Instruction space overflow");
+    cpu_assert(end <= 0xff, "Instruction space overflow");
 
     auto begin = counter;
     instruction_to_offset.emplace(typeid(T).hash_code(), begin);

@@ -1,6 +1,6 @@
 #include "settings.h"
 
-#include <throw_assert.h>
+#include "throw_assert.h"
 
 #include <algorithm>
 #include <cstring>
@@ -10,7 +10,7 @@ Settings Settings::from_ast(const std::unordered_map<std::string, std::vector<ui
 {
     Settings settings;
 
-    throw_cpu_exception_if(ast.at("cores").size() == 3, "Wrong number of dimensions");
+    cpu_assert(ast.at("cores").size() == 3, "Wrong number of dimensions");
     settings.dimensions.at(0) = ast.at("cores").at(0);
     settings.dimensions.at(1) = ast.at("cores").at(1);
     settings.dimensions.at(2) = ast.at("cores").at(2);
@@ -27,7 +27,7 @@ Settings Settings::load(std::istream& raw)
     std::array<char, sizeof(settings)> buffer;
     auto& status = raw.read(buffer.data(), buffer.size());
 
-    throw_cpu_exception_if(status, std::strerror(errno));
+    cpu_assert(status, std::strerror(errno));
 
     std::copy_n(buffer.data(), sizeof(settings), reinterpret_cast<uint8_t*>(&settings));
 

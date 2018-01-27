@@ -66,7 +66,7 @@ namespace Assembler
 
     std::tuple<Ast, SettingMap, std::vector<std::vector<std::pair<BlockId, int>>>> build_ast(std::istream& input)
     {
-        throw_cpu_exception_if(input, "Invalid input");
+        cpu_assert(input, "Invalid input");
 
         // Regex
         std::regex find_setting(R"(\.(\w+) ([\d, ]*))");
@@ -103,7 +103,7 @@ namespace Assembler
                 std::transform(std::cbegin(args), std::cend(args), std::back_inserter(args_int), [&line_number](auto& arg)
                 {
                     auto arg_int = std::stol(arg);
-                    throw_cpu_exception_if(arg_int <= 0xff, "Too large setting at line " << line_number);
+                    cpu_assert(arg_int <= 0xff, "Too large setting at line " << line_number);
                     assert(arg_int >= 0);
                     return arg_int;
                 });
@@ -138,7 +138,7 @@ namespace Assembler
                 std::transform(std::cbegin(args), std::cend(args), std::back_inserter(args_int), [&line_number](auto& arg)
                 {
                     auto arg_int = std::stol(arg);
-                    throw_cpu_exception_if(arg_int < 0xff, "Too large argument at line " << line_number);
+                    cpu_assert(arg_int < 0xff, "Too large argument at line " << line_number);
                     assert(arg_int >= 0);
                     return arg_int;
                 });
@@ -153,7 +153,7 @@ namespace Assembler
             }
             else
             {
-                throw_cpu_exception_if(false, "Unrecognized expression at line " << line_number);
+                cpu_assert(false, "Unrecognized expression at line " << line_number);
             }
         }
 
@@ -161,7 +161,7 @@ namespace Assembler
         auto i = 0;
         for (auto& variable: variables)
         {
-            throw_cpu_exception_if(!variable.empty(), "Variable " << i++ << " is unassigned");
+            cpu_assert(!variable.empty(), "Variable " << i++ << " is unassigned");
         }
 
         return {blocks, settings, variables};
@@ -174,13 +174,13 @@ namespace Assembler
         settings.dump(output);
 
         auto& core_to_mem_map = setting_map.at("mem_map");
-        throw_cpu_exception_if(core_to_mem_map.size() <= 0xff, "Error in mem_map. This implementation supports only 256 cores.");
+        cpu_assert(core_to_mem_map.size() <= 0xff, "Error in mem_map. This implementation supports only 256 cores.");
         output.put(static_cast<uint8_t>(core_to_mem_map.size()));
         assert(sizeof(core_to_mem_map[0]) == 1);
         output.write(reinterpret_cast<const char*>(core_to_mem_map.data()), core_to_mem_map.size());
 
         // Variables
-        throw_cpu_exception_if(variables.size() <= 0xff, "This implementation supports a maximum of 256 variables");
+        cpu_assert(variables.size() <= 0xff, "This implementation supports a maximum of 256 variables");
         output.put(static_cast<uint8_t>(variables.size()));
 
         for (auto& variable: variables)
@@ -204,10 +204,10 @@ namespace Assembler
 
         for (auto& [bank_id, instructions]: ast)
         {
-            throw_cpu_exception_if(bank_id <= 0xff, "This implementation supports a maximum of 256 memory banks");
+            cpu_assert(bank_id <= 0xff, "This implementation supports a maximum of 256 memory banks");
             output.put(static_cast<uint8_t>(bank_id));
 
-            throw_cpu_exception_if(instructions.size() <= 0xff, "This implementation supports only a maximum of 256 instructions per bank");
+            cpu_assert(instructions.size() <= 0xff, "This implementation supports only a maximum of 256 instructions per bank");
             output.put(static_cast<uint8_t>(instructions.size()));
 
             auto instruction_line = 1;
@@ -278,8 +278,12 @@ namespace Assembler
             auto membank_len = char{};
             input.get(membank_len);
             assert(input);
-            throw_cpu_exception_if(memory.banks_size() >= membank_len, "Using " << membank_len << " instructions out of a maximum of " << memory.banks_size() << " in membank " << membank_id);
+            cpu_assert(memory.banks_size() >= membank_len,
+                    "Using " << static_cast<int>(membank_len) << " instructions out of a maximum of "
+                             << static_cast<int>(memory.banks_size()) << " in membank "
+                             << static_cast<int>(membank_id));
 
+            cpu_assert(membank_id < memory.banks_number(), "More membank than specified in settings");
             input.read(reinterpret_cast<char*>(memory.at(membank_id).data()), membank_len);
             assert(input);
         }

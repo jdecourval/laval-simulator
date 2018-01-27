@@ -35,7 +35,7 @@ int main(int argc, char* argv[])
     CLI11_PARSE(app, argc, argv);
 
     auto file = std::fstream(file_path, std::ios::binary | std::ios::in);
-    throw_cpu_exception_if(file, std::strerror(errno));
+    cpu_assert(file, std::strerror(errno));
 
     // TODO: Maybe an unique_ptr with custom cleanup function could be used
     std::ostream* binary = nullptr;
@@ -56,7 +56,7 @@ int main(int argc, char* argv[])
             else
             {
                 preprocessed = new std::fstream(output_path, std::ios::out | std::ios::binary);
-                throw_cpu_exception_if(*preprocessed, std::strerror(errno));
+                cpu_assert(*preprocessed, std::strerror(errno));
             }
         }
         else
@@ -73,7 +73,7 @@ int main(int argc, char* argv[])
 
 
         auto preprocessed_input = dynamic_cast<std::istream*>(preprocessed);
-        throw_cpu_exception_if(preprocessed_input, std::strerror(errno));
+        cpu_assert(preprocessed_input, std::strerror(errno));
         preprocessed_input->seekg(0);
         auto[ast, settings, args] = Assembler::build_ast(*preprocessed_input);
 
@@ -81,7 +81,7 @@ int main(int argc, char* argv[])
         if (!output_path.empty())
         {
             binary = new std::fstream(output_path, std::ios::in | std::ios::out | std::ios::binary | std::ios::trunc);
-            throw_cpu_exception_if(*binary, std::strerror(errno));
+            cpu_assert(*binary, std::strerror(errno));
         }
         else
         {
@@ -100,7 +100,7 @@ int main(int argc, char* argv[])
     if (simulate)
     {
         auto binary_input = dynamic_cast<std::istream*>(binary);
-        throw_cpu_exception_if(binary_input, std::strerror(errno));
+        cpu_assert(binary_input, std::strerror(errno));
         binary_input->seekg(0);
         auto cpu = Assembler::load_binary(*binary_input);
 

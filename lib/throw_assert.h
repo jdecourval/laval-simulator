@@ -69,7 +69,7 @@ private:
 
 
 /// Assert that EXPRESSION evaluates to true, otherwise rise CpuException with associated MESSAGE (which may use C++ stream-style message formatting)
-#define throw_cpu_exception_if(EXPRESSION, MESSAGE) if(!(EXPRESSION)) { throw CpuException(#EXPRESSION, __FILE__, __LINE__, (CpuException::StreamFormatter() << MESSAGE)); }
+#define cpu_assert(EXPRESSION, MESSAGE) if(!(EXPRESSION)) { throw CpuException(#EXPRESSION, __FILE__, __LINE__, (CpuException::StreamFormatter() << MESSAGE)); }
 
 
 #endif //THROW_ASSERT_H

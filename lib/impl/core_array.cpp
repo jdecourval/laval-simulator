@@ -4,7 +4,7 @@
 CoreArray::CoreArray(const std::vector<uint16_t>& dimensions, const MemoryInterface& mem)
 {
     auto size = std::accumulate(dimensions.begin(), dimensions.end(), 1ull, std::multiplies<>());
-    throw_cpu_exception_if(size <= Tools::umaxof<size_t>() >> 1, "Too many cores");
+    cpu_assert(size <= Tools::umaxof<size_t>() >> 1, "Too many cores");
 
     for (auto id = 0u; id < size; ++id)
     {
@@ -30,13 +30,13 @@ Core& CoreArray::operator[](const std::array<size_t, 3>& index_array)
 {
     auto index = std::inner_product(index_array.begin(), index_array.end(), index_operands.begin(), size_t{0});
     index = Wrap && index >= cores.size() ? index - cores.size() : index;
-    throw_cpu_exception_if(index < cores.size(), "No such core at index " << index_array.at(0) << ":" << index_array.at(1) << ":" << index_array.at(2));
+    cpu_assert(index < cores.size(), "No such core at index " << index_array.at(0) << ":" << index_array.at(1) << ":" << index_array.at(2));
     return cores[index];
 }
 
 Core& CoreArray::offset(size_t id, const Direction::CoreDirection& offsets)
 {
-    throw_cpu_exception_if(offsets.size() == index_operands.size(), "Offset do not have the right number of dimensions");
+    cpu_assert(offsets.size() == index_operands.size(), "Offset do not have the right number of dimensions");
     auto long_size = static_cast<long>(cores.size());
     auto index = std::inner_product(offsets.cbegin(), offsets.cend(), index_operands.begin(), static_cast<long>(id),
             std::plus<>(),
@@ -45,7 +45,7 @@ Core& CoreArray::offset(size_t id, const Direction::CoreDirection& offsets)
             });
     index = Wrap && index >= long_size ? index - long_size : index;
     index = Wrap && index < 0 ? index + long_size : index;
-    throw_cpu_exception_if(index < long_size && index >= 0, "No such core at offset " << offsets.at(0) - 1 << ":" << offsets.at(1) - 1 << ":" << offsets.at(2) - 1);
+    cpu_assert(index < long_size && index >= 0, "No such core at offset " << offsets.at(0) - 1 << ":" << offsets.at(1) - 1 << ":" << offsets.at(2) - 1);
     return cores[index];
 }
 

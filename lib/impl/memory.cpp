@@ -1,5 +1,6 @@
 #include "memory.h"
 
+#include "throw_assert.h"
 #include "tools.h"
 
 
@@ -21,12 +22,12 @@ MemoryInterface::size_type Memory::banks_number() const
 
 gsl::span<uint8_t> Memory::at(MemoryInterface::size_type i)
 {
-    // TODO: Disable bound checking in release builds
-    return gsl::make_span(banks.at(i));
+    cpu_assert(i < banks.size(), "Memory access out of bound");
+    return gsl::make_span(banks[i]);
 }
 
 gsl::span<const uint8_t> Memory::at(MemoryInterface::size_type i) const
 {
-    // TODO: Disable bound checking in release builds
-    return gsl::make_span(banks.at(i));
+    cpu_assert(i < banks.size(), "Memory access out of bound");
+    return gsl::make_span(banks[i]);
 }

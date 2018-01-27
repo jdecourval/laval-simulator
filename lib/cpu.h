@@ -4,7 +4,7 @@
 #include "memory.h"
 #include "impl/core_array.h"
 
-#include <throw_assert.h>
+#include "throw_assert.h"
 
 #include <memory>
 #include <chrono>
@@ -26,7 +26,7 @@ public:
     template <typename Instruction_t>
     uint8_t dump(const Instruction_t& instruction)
     {
-        throw_cpu_exception_if(cores.size() > 0, "CPU have no core");
+        cpu_assert(cores.size() > 0, "CPU have no core");
 
         return cores[0].get_factory().dump(instruction);
     }

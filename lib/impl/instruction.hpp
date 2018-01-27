@@ -1,6 +1,6 @@
 #include "tools.h"
 
-#include <throw_assert.h>
+#include "throw_assert.h"
 
 #include <climits>
 
@@ -41,13 +41,7 @@ constexpr void Instruction<ArgsMaxes...>::sync(Registers& registers)
 template<uint8_t... ArgsMaxes>
 constexpr void Instruction<ArgsMaxes...>::set_arg(uint8_t args_raw)
 {
-    // Check if argument fits in the instruction
-#ifndef NDEBUG
-    if (args_raw >= ((ArgsMaxes + 1) * ...))
-    {
-        throw std::out_of_range("Too big arguments");
-    }
-#endif
+    cpu_assert(args_raw < ((ArgsMaxes + 1) * ...), "Too large arguments");
 
     set_arg<ArgsMaxes...>(args_raw, 0);
 }
@@ -104,8 +98,9 @@ uint8_t Instruction<ArgsMaxes...>::dump_args(uint8_t i, uint8_t accumulated_max)
 template<uint8_t... ArgsMaxes>
 void Instruction<ArgsMaxes...>::load_args(const std::vector<uint8_t>& args)
 {
-    throw_cpu_exception_if(args.size() == sizeof...(ArgsMaxes), "Instruction requires " << sizeof...(ArgsMaxes) << " arguments");
+    cpu_assert(args.size() == sizeof...(ArgsMaxes), "Instruction requires " << sizeof...(ArgsMaxes) << " arguments");
 
+    // TODO: Test for out of range arguments
     std::copy(std::cbegin(args), std::cend(args), std::begin(this->args));
 }
 
