@@ -15,7 +15,7 @@ template<uint8_t... ArgsMaxes>
 constexpr Instruction<ArgsMaxes...>::Instruction(const std::array<uint8_t, sizeof...(ArgsMaxes)>& args)
 : args(args)
 {
-
+    check_args();
 }
 
 template<uint8_t... ArgsMaxes>
@@ -44,6 +44,7 @@ constexpr void Instruction<ArgsMaxes...>::set_arg(uint8_t args_raw)
     cpu_assert(args_raw < ((ArgsMaxes + 1) * ...), "Too large arguments");
 
     set_arg<ArgsMaxes...>(args_raw, 0);
+    check_args();
 }
 
 template<uint8_t... ArgsMaxes>
@@ -100,7 +101,30 @@ void Instruction<ArgsMaxes...>::load_args(const std::vector<uint8_t>& args)
 {
     cpu_assert(args.size() == sizeof...(ArgsMaxes), "Instruction requires " << sizeof...(ArgsMaxes) << " arguments");
 
-    // TODO: Test for out of range arguments
     std::copy(std::cbegin(args), std::cend(args), std::begin(this->args));
+    check_args();
 }
 
+template<uint8_t... ArgsMaxes>
+void Instruction<ArgsMaxes...>::check_args() const
+{
+    if constexpr (sizeof...(ArgsMaxes))
+    {
+        check_args<ArgsMaxes...>(0);
+    }
+}
+
+template<uint8_t... ArgsMaxes>
+template<uint8_t LastArgSize>
+void Instruction<ArgsMaxes...>::check_args(int i) const
+{
+    cpu_assert(args.at(i) <= LastArgSize, "Out of range argument #" << i);
+}
+
+template<uint8_t... ArgsMaxes>
+template<uint8_t FirstArgSize, uint8_t SecondArgSize, uint8_t... OtherArgsMaxes>
+void Instruction<ArgsMaxes...>::check_args(int i) const
+{
+    check_args<FirstArgSize>(i);
+    check_args<SecondArgSize, OtherArgsMaxes...>(i + 1);
+}

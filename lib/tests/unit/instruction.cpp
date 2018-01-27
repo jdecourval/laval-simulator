@@ -36,11 +36,11 @@ TEST_CASE("Valid load from initializer_list and get_argument")
 
     SECTION("Three arguments")
     {
-        TestInstruction<3, 2, 1> instruction({4, 2, 1});
+        TestInstruction<3, 2, 1> instruction({3, 2, 1});
         REQUIRE_THROWS_AS(instruction.get_argument(3), std::out_of_range);
         REQUIRE_THROWS_AS(instruction.get_argument(4), std::out_of_range);
 
-        REQUIRE(instruction.get_argument(0) == 4);
+        REQUIRE(instruction.get_argument(0) == 3);
         REQUIRE(instruction.get_argument(1) == 2);
         REQUIRE(instruction.get_argument(2) == 1);
     }
@@ -76,18 +76,18 @@ TEST_CASE("Valid load from raw value and get_argument")
 TEST_CASE("Out of range load from raw value")
 {
     REQUIRE_NOTHROW(TestInstruction<3>(std::byte{3}));
-    REQUIRE_THROWS_AS(TestInstruction<3>(std::byte{4}), std::out_of_range);
-    REQUIRE_THROWS_AS(TestInstruction<3>(std::byte{8}), std::out_of_range);
+    REQUIRE_THROWS_AS(TestInstruction<3>(std::byte{4}), CpuException);
+    REQUIRE_THROWS_AS(TestInstruction<3>(std::byte{8}), CpuException);
 
     using WorkAroundTemplateInMacro = TestInstruction<1, 2>;
-    REQUIRE_THROWS_AS(WorkAroundTemplateInMacro(std::byte{8}), std::out_of_range);
+    REQUIRE_THROWS_AS(WorkAroundTemplateInMacro(std::byte{8}), CpuException);
 }
 
 TEST_CASE("Out of range initializer_list argument")
 {
-    REQUIRE_THROWS_AS(TestInstruction<1>({2}), std::out_of_range);
-    REQUIRE_THROWS_AS(TestInstruction<1>({200}), std::out_of_range);
-    REQUIRE_THROWS_AS(TestInstruction<3>({8}), std::out_of_range);
+    REQUIRE_THROWS_AS(TestInstruction<1>({2}), CpuException);
+    REQUIRE_THROWS_AS(TestInstruction<1>({200}), CpuException);
+    REQUIRE_THROWS_AS(TestInstruction<3>({8}), CpuException);
 }
 
 TEST_CASE("Dump args")

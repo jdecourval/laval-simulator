@@ -59,6 +59,14 @@ private:
     template<uint8_t FirstArgSize, uint8_t SecondArgSize, uint8_t... OtherArgsMaxes>
     uint8_t dump_args(uint8_t i, uint8_t shift) const;
 
+    void check_args() const;
+
+    template<uint8_t LastArgSize>
+    void check_args(int i) const;
+
+    template<uint8_t FirstArgSize, uint8_t SecondArgSize, uint8_t... OtherArgsMaxes>
+    void check_args(int i) const;
+
 
 private:
     // Arguments are packed in little-endianish notation (last argument have the smallest numerical value)

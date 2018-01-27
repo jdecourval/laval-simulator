@@ -347,7 +347,7 @@ TEST_CASE("MUX")
 
     SECTION("Correctly set mux value using raw argument")
     {
-        OpCodes::MUX instruction({3});
+        OpCodes::MUX instruction(std::byte{3});
         instruction(registers);
         REQUIRE(registers.status1.mux == 3);
     }
