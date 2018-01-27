@@ -13,6 +13,7 @@ set(SOURCE_FILES
         opcodes.h
         registers.h
         thread_pool.h
+        throw_assert.h
 
         impl/assembler.cpp
         impl/core.cpp
@@ -32,6 +33,7 @@ set(SOURCE_FILES
         impl/settings.cpp
         impl/thread_pool.cpp
         impl/thread_pool.hpp
+        impl/throw_assert.cpp
         impl/tools.h
         impl/tools.hpp
         )

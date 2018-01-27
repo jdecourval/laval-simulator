@@ -1,7 +1,6 @@
 #include "core.h"
 
 #include "core_array.h"
-#include "direction.h"
 #include "opcodes.h"
 
 
@@ -36,7 +35,7 @@ void Core::wire(uint8_t membank)
 
 void Core::initialize()
 {
-    assert(mem == nullptr || mem->banks_size() <= std::numeric_limits<decltype(registers.pc)>::max() + 1);
+    throw_cpu_exception_if(mem == nullptr || mem->banks_size() <= std::numeric_limits<decltype(registers.pc)>::max() + 1, "Too many memory banks");
 
     factory.register_instruction<OpCodes::NOP>();
     factory.register_instruction<OpCodes::SYN>();
@@ -72,7 +71,7 @@ void Core::preload()
 
     try
     {
-        assert(cores);
+        throw_cpu_exception_if(cores, "CPU have no cores");
 
         auto direction = std::get<Direction::CoreDirection>(direction_complex);
 
@@ -118,31 +117,44 @@ void Core::preload()
                 throw std::logic_error("Invalid direction");
         }
     }
+    catch (CpuException& exception)
+    {
+        exception.add_registers(registers);
+        throw;
+    }
 }
 
 void Core::fetch()
 {
-#ifndef NDEBUG
-    if (!mem)
+    try
     {
-        throw std::logic_error{"Memory is not linked"};
-    }
+#ifndef NDEBUG
+        if (!mem)
+        {
+            throw std::logic_error{"Memory is not linked"};
+        }
 #endif
 
-    registers.status1.sync = false;
+        registers.status1.sync = false;
 
-    auto raw_instruction = mem->at(registers.status2.membank).at(registers.pc);
+        auto raw_instruction = mem->at(registers.status2.membank).at(registers.pc);
 
-    auto instruction = factory.create(raw_instruction);
+        auto instruction = factory.create(raw_instruction);
 
-    // Increment PC only if the instruction does not needs to stall the pipeline
-    if ((*instruction)(registers))
-    {
-        // Safe to cast since the modulo limits the value and a check about that is done in initialize.
-        registers.pc = static_cast<uint8_t>((registers.pc + 1) % mem->banks_size());
+        // Increment PC only if the instruction does not needs to stall the pipeline
+        if ((*instruction)(registers))
+        {
+            // Safe to cast since the modulo limits the value and a check about that is done in initialize.
+            registers.pc = static_cast<uint8_t>((registers.pc + 1) % mem->banks_size());
+        }
+
+        registers.status2.unlock = false;
     }
-
-    registers.status2.unlock = false;
+    catch (CpuException& exception)
+    {
+        exception.add_registers(registers);
+        throw;
+    }
 }
 
 bool Core::execute(const InstructionBase& raw_instruction)

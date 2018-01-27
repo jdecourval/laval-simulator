@@ -13,7 +13,7 @@ void InstructionFactory::register_helper(std::index_sequence<I...>)
 
     if constexpr (sizeof...(I) > 0)
     {
-        assert((... && I));  // No argument must have a size of 0
+        static_assert((... && I), "No argument must have a size of 0");
         end += ((I + 1) * ...);
     }
     else
@@ -21,7 +21,7 @@ void InstructionFactory::register_helper(std::index_sequence<I...>)
         end++;
     }
 
-    assert(end <= 0xff);
+    throw_cpu_exception_if(end <= 0xff, "Instruction space overflow");
 
     auto begin = counter;
     instruction_to_offset.emplace(typeid(T).hash_code(), begin);

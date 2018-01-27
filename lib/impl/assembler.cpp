@@ -66,12 +66,12 @@ namespace Assembler
 
     std::tuple<Ast, SettingMap, std::vector<std::vector<std::pair<BlockId, int>>>> build_ast(std::istream& input)
     {
-        assert(input);
+        throw_cpu_exception_if(input, "Invalid input");
 
         // Regex
         std::regex find_setting(R"(\.(\w+) ([\d, ]*))");
         std::regex find_block(R"((\d+):)");
-        std::regex find_instruction(R"((\w{3})( -?\d+(?:, ?-?\d+)*)?)");
+        std::regex find_instruction(R"((\w{3})( -?\d+(?:, ?\d+)*)?)");
         std::regex find_load_with_arg(R"((LC[LH]) ([a-z]))");
 
         // Result
@@ -84,7 +84,7 @@ namespace Assembler
         auto current_block = std::optional<int>();
         std::smatch base_match;
 
-        for (std::string line; getline(input, line);)
+        for (auto [line, line_number] = std::make_pair(std::string(), 1); getline(input, line); line_number++)
         {
             trim(line);
 
@@ -100,10 +100,10 @@ namespace Assembler
                 auto args = split(base_match[2], ',');
 
                 std::vector<uint8_t> args_int;
-                std::transform(std::cbegin(args), std::cend(args), std::back_inserter(args_int), [](auto& arg)
+                std::transform(std::cbegin(args), std::cend(args), std::back_inserter(args_int), [&line_number](auto& arg)
                 {
                     auto arg_int = std::stol(arg);
-                    assert(arg_int <= 0xff);
+                    throw_cpu_exception_if(arg_int <= 0xff, "Too large setting at line " << line_number);
                     assert(arg_int >= 0);
                     return arg_int;
                 });
@@ -116,6 +116,8 @@ namespace Assembler
 
                 auto instruction = base_match[1];
                 auto var = base_match[2].str()[0] - 'a';    // Check distance between the first possible argument
+
+                assert(var >= 0 && var < 26);
 
                 blocks[*current_block].emplace_back(instruction, std::vector({0_u8}));
                 if (variables.size() < var + 1u)
@@ -133,10 +135,11 @@ namespace Assembler
                 auto args = split(base_match[2], ',');
 
                 std::vector<uint8_t> args_int;
-                std::transform(std::cbegin(args), std::cend(args), std::back_inserter(args_int), [](auto& arg)
+                std::transform(std::cbegin(args), std::cend(args), std::back_inserter(args_int), [&line_number](auto& arg)
                 {
                     auto arg_int = std::stol(arg);
-                    assert(arg_int <= 0xff);
+                    throw_cpu_exception_if(arg_int < 0xff, "Too large argument at line " << line_number);
+                    assert(arg_int >= 0);
                     return arg_int;
                 });
 
@@ -150,14 +153,15 @@ namespace Assembler
             }
             else
             {
-                std::cout << "error" << std::endl;
+                throw_cpu_exception_if(false, "Unrecognized expression at line " << line_number);
             }
         }
 
         // Check if there is no hole.
-        for (auto& i: variables)
+        auto i = 0;
+        for (auto& variable: variables)
         {
-            assert(!i.empty());
+            throw_cpu_exception_if(!variable.empty(), "Variable " << i++ << " is unassigned");
         }
 
         return {blocks, settings, variables};
@@ -170,13 +174,13 @@ namespace Assembler
         settings.dump(output);
 
         auto& core_to_mem_map = setting_map.at("mem_map");
-        assert(core_to_mem_map.size() <= 0xff);
+        throw_cpu_exception_if(core_to_mem_map.size() <= 0xff, "Error in mem_map. This implementation supports only 256 cores.");
         output.put(static_cast<uint8_t>(core_to_mem_map.size()));
         assert(sizeof(core_to_mem_map[0]) == 1);
         output.write(reinterpret_cast<const char*>(core_to_mem_map.data()), core_to_mem_map.size());
 
         // Variables
-        assert(variables.size() <= 0xff);
+        throw_cpu_exception_if(variables.size() <= 0xff, "This implementation supports a maximum of 256 variables");
         output.put(static_cast<uint8_t>(variables.size()));
 
         for (auto& variable: variables)
@@ -200,17 +204,28 @@ namespace Assembler
 
         for (auto& [bank_id, instructions]: ast)
         {
-            assert(bank_id <= 0xff);
+            throw_cpu_exception_if(bank_id <= 0xff, "This implementation supports a maximum of 256 memory banks");
             output.put(static_cast<uint8_t>(bank_id));
 
-            assert(instructions.size() <= 0xff);
+            throw_cpu_exception_if(instructions.size() <= 0xff, "This implementation supports only a maximum of 256 instructions per bank");
             output.put(static_cast<uint8_t>(instructions.size()));
 
+            auto instruction_line = 1;
             for (auto& instruction_ast: instructions)
             {
-                auto instruction = factory.create(instruction_ast);
-                auto instruction_raw = factory.dump(*instruction);
-                output.put(instruction_raw);
+                try
+                {
+                    auto instruction = factory.create(instruction_ast);
+                    auto instruction_raw = factory.dump(*instruction);
+                    output.put(instruction_raw);
+                }
+                catch(CpuException& exception)
+                {
+                    exception.add_line_infos(bank_id, instruction_line);
+                    throw;
+                }
+
+                instruction_line++;
             }
         }
     }
@@ -263,7 +278,7 @@ namespace Assembler
             auto membank_len = char{};
             input.get(membank_len);
             assert(input);
-            assert(memory.banks_size() >= membank_len);
+            throw_cpu_exception_if(memory.banks_size() >= membank_len, "Using " << membank_len << " instructions out of a maximum of " << memory.banks_size() << " in membank " << membank_id);
 
             input.read(reinterpret_cast<char*>(memory.at(membank_id).data()), membank_len);
             assert(input);

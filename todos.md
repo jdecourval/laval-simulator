@@ -1,6 +1,4 @@
 # Required for CSGames 2018
-- Convert assertions to proper error messages
-    Without this, simulator may crash on improper input with unclear errors.
 - Finish documentation
 - Add a couple of tests/challenges
 - Produce some figures to help documentation

@@ -4,13 +4,15 @@
 std::unique_ptr<InstructionBase> InstructionFactory::create(uint8_t val)
 {
     // Check if the instruction is valid
-    assert(val < counter);
+    throw_cpu_exception_if(val < counter, "Invalid instruction");
 
     return map.at(val)(val);
 }
 
 std::unique_ptr<InstructionBase> InstructionFactory::create(const std::pair<std::string, std::vector<uint8_t>>& ast)
 {
+    throw_cpu_exception_if(name_to_instruction.count(ast.first), "Unknown instruction")
+
     auto instruction = create(name_to_instruction.at(ast.first));
 
     instruction->load_args(ast.second);

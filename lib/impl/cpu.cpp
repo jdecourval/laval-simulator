@@ -10,7 +10,7 @@ using namespace std::chrono_literals;
 Cpu::Cpu(const Settings& settings)
     : Cpu(settings, Memory{settings}, std::vector<MemoryInterface::size_type>(std::accumulate(settings.dimensions.begin(), settings.dimensions.end(), 1ul, std::multiplies<>())))
 {
-    assert(settings.dimensions.size() == 3);
+    throw_cpu_exception_if(settings.dimensions.size() == 3, "Incorrect number of dimensions");
 }
 
 Cpu::Cpu(const Settings& settings, Memory&& memory, std::vector<MemoryInterface::size_type>&& core_to_mem_map, std::vector<std::vector<std::pair<int, int>>>&& parameters)
@@ -19,7 +19,7 @@ Cpu::Cpu(const Settings& settings, Memory&& memory, std::vector<MemoryInterface:
     , core_to_mem_map{std::move(core_to_mem_map)}
     , parameters{std::move(parameters)}
 {
-    assert(settings.dimensions.size() == 3);
+    throw_cpu_exception_if(settings.dimensions.size() == 3, "Incorrect number of dimensions");
 
     // TODO: Check parameters
 }
@@ -35,9 +35,9 @@ void Cpu::link_memory(Memory&& memory, std::vector<MemoryInterface::size_type>&&
 
 uint8_t Cpu::start(const std::chrono::milliseconds& period, const std::vector<uint8_t>& args)
 {
-    assert(period.count() >= 0);
-    assert(cores.size() == core_to_mem_map.size());
-    assert(args.size() == parameters.size());
+    throw_cpu_exception_if(period.count() >= 0, "Invalid period");
+    throw_cpu_exception_if(cores.size() == core_to_mem_map.size(), "Non-matching number of cores and number of entries in core to memory map");
+    throw_cpu_exception_if(args.size() == parameters.size(), args.size() << "arguments specified instead of " << parameters.size());
 
     // Load args
     for (auto i = 0u; i < args.size(); i++)
@@ -45,7 +45,7 @@ uint8_t Cpu::start(const std::chrono::milliseconds& period, const std::vector<ui
         for (auto& [block, instruction_index]: parameters.at(i))
         {
             auto& instruction_raw = mem.at(block).at(instruction_index);
-            assert(cores.size() > 0);
+            throw_cpu_exception_if(cores.size() > 0, "Need at least one core");
             auto instruction = cores[0].get_factory().create(instruction_raw);
 
             if (dynamic_cast<OpCodes::LCL*>(instruction.get()))
@@ -60,7 +60,7 @@ uint8_t Cpu::start(const std::chrono::milliseconds& period, const std::vector<ui
             }
             else
             {
-                throw std::runtime_error("This version only support arguments on load instructions");
+                throw_cpu_exception_if(false, "This version only support arguments on load instructions");
             }
         }
     }
@@ -68,7 +68,7 @@ uint8_t Cpu::start(const std::chrono::milliseconds& period, const std::vector<ui
     // Wire cores
     for(auto i = 0ull; i < core_to_mem_map.size(); i++)
     {
-        assert(core_to_mem_map[i] < mem.banks_number());
+        throw_cpu_exception_if(core_to_mem_map[i] < mem.banks_number(), "Core to memory map contains an out of range core");
         cores[i].wire(core_to_mem_map[i]);      // TODO: Not yet initialized
     }
 

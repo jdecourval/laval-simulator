@@ -10,6 +10,8 @@ using namespace std::chrono_literals;
 #pragma ide diagnostic ignored "CannotResolve"
 int main(int argc, char* argv[])
 {
+    std::ios_base::sync_with_stdio(false);
+
     CLI::App app("LAVAL simulator");
 
     std::string file_path;
@@ -33,11 +35,13 @@ int main(int argc, char* argv[])
     CLI11_PARSE(app, argc, argv);
 
     auto file = std::fstream(file_path, std::ios::binary | std::ios::in);
-    assert(file);
+    throw_cpu_exception_if(file, std::strerror(errno));
 
     // TODO: Maybe an unique_ptr with custom cleanup function could be used
     std::ostream* binary = nullptr;
 
+    try
+    {
     if (preprocess || compile)
     {
         std::ostream* preprocessed = nullptr;
@@ -52,6 +56,7 @@ int main(int argc, char* argv[])
             else
             {
                 preprocessed = new std::fstream(output_path, std::ios::out | std::ios::binary);
+                throw_cpu_exception_if(*preprocessed, std::strerror(errno));
             }
         }
         else
@@ -68,15 +73,15 @@ int main(int argc, char* argv[])
 
 
         auto preprocessed_input = dynamic_cast<std::istream*>(preprocessed);
-        assert(preprocessed_input);
+        throw_cpu_exception_if(preprocessed_input, std::strerror(errno));
         preprocessed_input->seekg(0);
-        auto [ast, settings, args] = Assembler::build_ast(*preprocessed_input);
+        auto[ast, settings, args] = Assembler::build_ast(*preprocessed_input);
 
 
         if (!output_path.empty())
         {
             binary = new std::fstream(output_path, std::ios::in | std::ios::out | std::ios::binary | std::ios::trunc);
-            assert(*binary);
+            throw_cpu_exception_if(*binary, std::strerror(errno));
         }
         else
         {
@@ -95,13 +100,17 @@ int main(int argc, char* argv[])
     if (simulate)
     {
         auto binary_input = dynamic_cast<std::istream*>(binary);
-        assert(binary_input);
+        throw_cpu_exception_if(binary_input, std::strerror(errno));
         binary_input->seekg(0);
         auto cpu = Assembler::load_binary(*binary_input);
-//    auto cpu = Assembler::load_binary(binary, args);  // Arguments should be passed like this
 
         auto answer = static_cast<int>(cpu.start(0s, args));
         std::cout << "answer: " << answer << std::endl;
+    }
+}
+    catch (const CpuException& exception)
+    {
+        std::cerr << exception.what() << std::endl;
     }
 
     return 0;

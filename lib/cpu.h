@@ -1,11 +1,13 @@
 #ifndef SIMULATOR_CPU_H
 #define SIMULATOR_CPU_H
 
-#include <memory>
-#include <chrono>
-
 #include "memory.h"
 #include "impl/core_array.h"
+
+#include <throw_assert.h>
+
+#include <memory>
+#include <chrono>
 
 
 class CoreArray;
@@ -24,7 +26,7 @@ public:
     template <typename Instruction_t>
     uint8_t dump(const Instruction_t& instruction)
     {
-        assert(cores.size() > 0);
+        throw_cpu_exception_if(cores.size() > 0, "CPU have no core");
 
         return cores[0].get_factory().dump(instruction);
     }

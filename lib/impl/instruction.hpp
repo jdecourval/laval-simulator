@@ -1,6 +1,8 @@
-#include <climits>
-
 #include "tools.h"
+
+#include <throw_assert.h>
+
+#include <climits>
 
 
 template<uint8_t... ArgsMaxes>
@@ -102,7 +104,7 @@ uint8_t Instruction<ArgsMaxes...>::dump_args(uint8_t i, uint8_t accumulated_max)
 template<uint8_t... ArgsMaxes>
 void Instruction<ArgsMaxes...>::load_args(const std::vector<uint8_t>& args)
 {
-    assert(args.size() == sizeof...(ArgsMaxes));
+    throw_cpu_exception_if(args.size() == sizeof...(ArgsMaxes), "Instruction requires " << sizeof...(ArgsMaxes) << " arguments");
 
     std::copy(std::cbegin(args), std::cend(args), std::begin(this->args));
 }
