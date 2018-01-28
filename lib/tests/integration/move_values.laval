@@ -1,0 +1,17 @@
+; Move values coming from top inputs to bottom outputs
+
+.cores 1, 2, 2
+.mem_number 2
+.mem_size 3
+.mem_map 0, 0, 0, 0
+.in 0 1
+.out 2 3
+
+0:
+    MUX CURRENT, BEFORE, CURRENT
+    JMP 1
+
+1:
+    MXL
+    SYN
+    JMP 1
