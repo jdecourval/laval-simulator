@@ -3,6 +3,9 @@
 
 #include "core.h"
 #include "direction.h"
+#include "input.h"
+
+#include <unordered_map>
 
 
 class CoreArray
@@ -10,13 +13,13 @@ class CoreArray
     static constexpr auto Wrap = false;
 
 public:
-    explicit CoreArray(const std::vector<uint16_t>& dimensions, const MemoryInterface& mem);
+    explicit CoreArray(const std::vector<uint16_t>& dimensions, const MemoryInterface& mem, std::unordered_map<size_t, Input>& inputs);
 
     Core& operator[](const size_t& index);
 
     Core& operator[](const std::array<size_t, 3>& index_array);
 
-    Core& offset(size_t id, const Direction::CoreDirection& offsets);
+    Fetchable& offset(size_t id, const Direction::CoreDirection& offsets);
 
     decltype(auto) cbegin() const noexcept
     {
@@ -50,6 +53,7 @@ public:
 private:
     std::vector<Core> cores;
     std::vector<size_t> index_operands;
+    std::unordered_map<size_t, Input>& inputs;
 };
 
 

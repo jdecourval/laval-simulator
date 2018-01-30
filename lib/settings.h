@@ -1,8 +1,8 @@
 #ifndef PROJECT_SETTINGS_H
 #define PROJECT_SETTINGS_H
 
-#include <unordered_map>
-#include <vector>
+#include <cereal/types/array.hpp>
+#include <cereal/types/vector.hpp>
 
 
 struct Settings
@@ -10,15 +10,17 @@ struct Settings
     std::array<uint16_t, 3> dimensions = {10, 10, 10};
     uint32_t bank_number = 16u;
     uint32_t bank_size = 256u;
-    // TODO: Add core_to_mem_map here ?
-
+    std::vector<uint8_t> core_to_mem_map;
+    std::vector<size_t> inputs;
+    std::vector<size_t> outputs;
 
     static Settings from_ast(const std::unordered_map<std::string, std::vector<uint8_t>>& ast);
 
-    static Settings load(std::istream& raw);
-
-    // TODO: Use operator<< and operator>>
-    void dump(std::ostream& output);
+    template<class Archive>
+    void serialize(Archive& archive)
+    {
+        archive(dimensions, bank_number, bank_size, core_to_mem_map, inputs, outputs);
+    }
 };
 
 

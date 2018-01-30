@@ -8,62 +8,38 @@
 using namespace std::chrono_literals;
 
 Cpu::Cpu(const Settings& settings)
-    : Cpu(settings, Memory{settings}, std::vector<MemoryInterface::size_type>(std::accumulate(settings.dimensions.begin(), settings.dimensions.end(), 1ul, std::multiplies<>())))
+    : Cpu(settings, Memory{settings})
 {
-    cpu_assert(settings.dimensions.size() == 3, "Incorrect number of dimensions");
+
 }
 
-Cpu::Cpu(const Settings& settings, Memory&& memory, std::vector<MemoryInterface::size_type>&& core_to_mem_map, std::vector<std::vector<std::pair<int, int>>>&& parameters)
+Cpu::Cpu(const Settings& settings, Memory&& memory)
     : mem{std::move(memory)}
-    , cores{std::vector<std::remove_cv_t<std::remove_reference_t<decltype(settings.dimensions.at(0))>>>(std::cbegin(settings.dimensions), std::cend(settings.dimensions)), mem}
-    , core_to_mem_map{std::move(core_to_mem_map)}
-    , parameters{std::move(parameters)}
+    , cores{std::vector<std::remove_cv_t<std::remove_reference_t<decltype(settings.dimensions.at(0))>>>(std::cbegin(settings.dimensions), std::cend(settings.dimensions)), mem, inputs}
+    , core_to_mem_map{settings.core_to_mem_map}
+    , outputs{settings.outputs}
 {
     cpu_assert(settings.dimensions.size() == 3, "Incorrect number of dimensions");
 
     // TODO: Check parameters
+
+    for(auto i: settings.inputs)
+    {
+        inputs.emplace(i, Input());
+    }
 }
 
-void Cpu::link_memory(Memory&& memory, std::vector<MemoryInterface::size_type>&& core_to_mem_map)
+void Cpu::link_memory(Memory&& memory, const Settings& settings)
 {
     mem = std::move(memory);
-    this->core_to_mem_map = std::move(core_to_mem_map);
+    this->core_to_mem_map = settings.core_to_mem_map;
+    // TODO: Add inputs
 }
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wmissing-noreturn"
-
-uint8_t Cpu::start(const std::chrono::milliseconds& period, const std::vector<uint8_t>& args)
+uint8_t Cpu::start(const std::chrono::milliseconds& period)
 {
     cpu_assert(period.count() >= 0, "Invalid period");
     cpu_assert(cores.size() == core_to_mem_map.size(), "Non-matching number of cores and number of entries in core to memory map");
-    cpu_assert(args.size() == parameters.size(), args.size() << "arguments specified instead of " << parameters.size());
-
-    // Load args
-    for (auto i = 0u; i < args.size(); i++)
-    {
-        for (auto& [block, instruction_index]: parameters.at(i))
-        {
-            auto& instruction_raw = mem.at(block).at(instruction_index);
-            cpu_assert(cores.size() > 0, "Need at least one core");
-            auto instruction = cores[0].get_factory().create(instruction_raw);
-
-            if (dynamic_cast<OpCodes::LCL*>(instruction.get()))
-            {
-//                instruction->load_args(std::vector{static_cast<uint8_t>(args.at(i) & 0xf)});
-                instruction_raw += args.at(i) & 0xf;
-            }
-            else if (dynamic_cast<OpCodes::LCH*>(instruction.get()))
-            {
-//                instruction->load_args(std::vector{static_cast<uint8_t>(args.at(i) >> 4)});
-                instruction_raw += args.at(i) >> 4;
-            }
-            else
-            {
-                cpu_assert(false, "This version only support arguments on load instructions");
-            }
-        }
-    }
 
     // Wire cores
     for(auto i = 0ull; i < core_to_mem_map.size(); i++)
@@ -98,6 +74,14 @@ uint8_t Cpu::start(const std::chrono::milliseconds& period, const std::vector<ui
             loops = 0;
         }
 
+        for(auto& output_id: outputs)
+        {
+            if (auto value = cores[output_id].get_from(false))
+            {
+                std::cout << static_cast<int>(value->second) << std::endl;
+            }
+        }
+
         pool.apply(std::begin(cores), std::end(cores), [](auto& core){ core.preload(); });
 
         try
@@ -126,6 +110,5 @@ uint8_t Cpu::start(const std::chrono::milliseconds& period, const std::vector<ui
     }
 }
 
-#pragma clang diagnostic pop
 
 // TODO: Calibrate function

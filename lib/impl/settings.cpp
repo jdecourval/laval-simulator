@@ -2,7 +2,6 @@
 
 #include "throw_assert.h"
 
-#include <algorithm>
 #include <cstring>
 
 
@@ -16,25 +15,9 @@ Settings Settings::from_ast(const std::unordered_map<std::string, std::vector<ui
     settings.dimensions.at(2) = ast.at("cores").at(2);
     settings.bank_number = ast.at("mem_number").at(0);
     settings.bank_size = ast.at("mem_size").at(0);
+    settings.core_to_mem_map = ast.at("mem_map");
+    std::copy(std::cbegin(ast.at("in")), std::cend(ast.at("in")), std::back_inserter(settings.inputs));
+    std::copy(std::cbegin(ast.at("out")), std::cend(ast.at("out")), std::back_inserter(settings.outputs));
 
     return settings;
-}
-
-Settings Settings::load(std::istream& raw)
-{
-    Settings settings;
-
-    std::array<char, sizeof(settings)> buffer;
-    auto& status = raw.read(buffer.data(), buffer.size());
-
-    cpu_assert(status, std::strerror(errno));
-
-    std::copy_n(buffer.data(), sizeof(settings), reinterpret_cast<uint8_t*>(&settings));
-
-    return settings;
-}
-
-void Settings::dump(std::ostream& output)
-{
-    std::copy_n(reinterpret_cast<char*>(this), sizeof(*this), std::ostreambuf_iterator(output));
 }

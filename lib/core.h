@@ -1,6 +1,7 @@
 #ifndef SIMULATOR_CORE_H
 #define SIMULATOR_CORE_H
 
+#include "fetchable.h"
 #include "memory.h"
 #include "registers.h"
 
@@ -10,7 +11,7 @@
 class CoreArray;
 
 
-class Core
+class Core : public Fetchable
 {
 public:
     Core();
@@ -28,6 +29,20 @@ public:
     bool execute(const InstructionBase& raw_instruction);
 
     void step();
+
+    std::optional<std::pair<bool, uint8_t>> get_from(bool carry) override
+    {
+        if (registers.status1.sync)
+        {
+            registers.status2.unlock = true;
+
+            return {{ registers.status2.negative, carry ? registers.status2.carry : registers.val }};
+        }
+        else
+        {
+            return {};
+        }
+    }
 
     InstructionFactory& get_factory();
 

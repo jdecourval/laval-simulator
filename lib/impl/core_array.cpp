@@ -1,7 +1,8 @@
 #include "core_array.h"
 
 
-CoreArray::CoreArray(const std::vector<uint16_t>& dimensions, const MemoryInterface& mem)
+CoreArray::CoreArray(const std::vector<uint16_t>& dimensions, const MemoryInterface& mem, std::unordered_map<size_t, Input>& inputs)
+: inputs(inputs)
 {
     auto size = std::accumulate(dimensions.begin(), dimensions.end(), 1ull, std::multiplies<>());
     cpu_assert(size <= Tools::umaxof<size_t>() >> 1, "Too many cores");
@@ -34,18 +35,33 @@ Core& CoreArray::operator[](const std::array<size_t, 3>& index_array)
     return cores[index];
 }
 
-Core& CoreArray::offset(size_t id, const Direction::CoreDirection& offsets)
+Fetchable& CoreArray::offset(size_t id, const Direction::CoreDirection& offsets)
 {
     cpu_assert(offsets.size() == index_operands.size(), "Offset do not have the right number of dimensions");
+
     auto long_size = static_cast<long>(cores.size());
     auto index = std::inner_product(offsets.cbegin(), offsets.cend(), index_operands.begin(), static_cast<long>(id),
             std::plus<>(),
             [](auto &offset, auto &a) {
                 return a * (static_cast<int>(offset) - 1);
             });
+
     index = Wrap && index >= long_size ? index - long_size : index;
     index = Wrap && index < 0 ? index + long_size : index;
-    cpu_assert(index < long_size && index >= 0, "No such core at offset " << offsets.at(0) - 1 << ":" << offsets.at(1) - 1 << ":" << offsets.at(2) - 1);
+
+    if (index < long_size && index >= 0)
+    {
+        return cores[index];
+    }
+    else if (auto it = inputs.find(id); it != std::cend(inputs))
+    {
+        return inputs.at(id);
+    }
+    else
+    {
+        cpu_assert(false, "No such core at offset " << offsets.at(0) - 1 << ":" << offsets.at(1) - 1 << ":" << offsets.at(2) - 1);
+    }
+
     return cores[index];
 }
 

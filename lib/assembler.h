@@ -34,11 +34,10 @@ namespace Assembler
     void preprocess(std::istream& input, std::ostream& output);
 
     /// Build an AST from an assembly file
-    std::tuple<Ast, SettingMap, std::vector<std::vector<std::pair<BlockId, int>>>> build_ast(std::istream& input);
+    std::tuple<Ast, SettingMap> build_ast(std::istream& input);
 
     /// Assemble an AST to binary
-    // TODO: Standardize variable/parameter/arg naming
-    void assemble(const Ast&, const SettingMap&, std::vector<std::vector<std::pair<BlockId, int>>> variables, std::ostream& output);
+    void assemble(const Ast&, const SettingMap&, std::ostream& output);
 
     /// Configure a CPU instance with a binary input
     Cpu load_binary(std::istream& input);

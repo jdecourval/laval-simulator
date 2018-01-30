@@ -1,5 +1,7 @@
 #include "assembler.h"
 
+#include <cereal/archives/binary.hpp>
+
 #include <regex>
 
 
@@ -64,20 +66,18 @@ namespace Assembler
         }
     }
 
-    std::tuple<Ast, SettingMap, std::vector<std::vector<std::pair<BlockId, int>>>> build_ast(std::istream& input)
+    std::tuple<Ast, SettingMap> build_ast(std::istream& input)
     {
         cpu_assert(input, "Invalid input");
 
         // Regex
-        std::regex find_setting(R"(\.(\w+) ([\d, ]*))");
-        std::regex find_block(R"((\d+):)");
-        std::regex find_instruction(R"((\w{3})( -?\d+(?:, ?\d+)*)?)");
-        std::regex find_load_with_arg(R"((LC[LH]) ([a-z]))");
+        std::regex find_setting(R"(\.(\w+) ([\d, ]*)\s*(?:;.*)?)");
+        std::regex find_block(R"((\d+):\s*(?:;.*)?)");
+        std::regex find_instruction(R"((\w{3})( -?\d+(?:, ?\d+)*)?\s*(?:;.*)?)");
 
         // Result
         Ast blocks;
         SettingMap settings;
-        std::vector<std::vector<std::pair<BlockId, int>>> variables;
 
         // State machine
         auto setting_done = false;
@@ -110,23 +110,6 @@ namespace Assembler
 
                 settings.emplace(name, args_int);
             }
-            else if (current_block && std::regex_match(line, base_match, find_load_with_arg))
-            {
-                assert(base_match.size() == 3);  // All + OPCode + arg
-
-                auto instruction = base_match[1];
-                auto var = base_match[2].str()[0] - 'a';    // Check distance between the first possible argument
-
-                assert(var >= 0 && var < 26);
-
-                blocks[*current_block].emplace_back(instruction, std::vector({0_u8}));
-                if (variables.size() < var + 1u)
-                {
-                    variables.resize(var + 1u);
-                }
-
-                variables.at(var).emplace_back(*current_block, blocks[*current_block].size() - 1);
-            }
             else if (current_block && std::regex_match(line, base_match, find_instruction))
             {
                 assert(base_match.size() == 3);  // All + OPCode + args
@@ -157,45 +140,25 @@ namespace Assembler
             }
         }
 
-        // Check if there is no hole.
-        auto i = 0;
-        for (auto& variable: variables)
-        {
-            cpu_assert(!variable.empty(), "Variable " << i++ << " is unassigned");
-        }
-
-        return {blocks, settings, variables};
+        return {blocks, settings};
     }
 
-    void assemble(const Ast& ast, const SettingMap& setting_map, std::vector<std::vector<std::pair<BlockId, int>>> variables, std::ostream& output)
+    void assemble(const Ast& ast, const SettingMap& setting_map, std::ostream& output)
     {
         // Settings
-        auto settings = Settings::from_ast(setting_map);
-        settings.dump(output);
-
-        auto& core_to_mem_map = setting_map.at("mem_map");
-        cpu_assert(core_to_mem_map.size() <= 0xff, "Error in mem_map. This implementation supports only 256 cores.");
-        output.put(static_cast<uint8_t>(core_to_mem_map.size()));
-        assert(sizeof(core_to_mem_map[0]) == 1);
-        output.write(reinterpret_cast<const char*>(core_to_mem_map.data()), core_to_mem_map.size());
-
-        // Variables
-        cpu_assert(variables.size() <= 0xff, "This implementation supports a maximum of 256 variables");
-        output.put(static_cast<uint8_t>(variables.size()));
-
-        for (auto& variable: variables)
+        try
         {
-            assert(variable.size() <= 0xff);
-            output.put(static_cast<char>(variable.size()));
-            for (auto& j: variable)
+            auto settings = Settings::from_ast(setting_map);
             {
-                assert(j.first <= 0xff);
-                assert(j.second <= 0xff);
-                output.put(static_cast<char>(j.first));
-                output.put(static_cast<char>(j.second));
+                cereal::BinaryOutputArchive oarchive(output);
+
+                oarchive(settings);
             }
         }
-
+        catch (const std::out_of_range&)
+        {
+            cpu_assert(false, "Mandatory setting missing");
+        }
 
         // Instructions
         // TODO: Remove core requirement
@@ -233,37 +196,14 @@ namespace Assembler
     Cpu load_binary(std::istream& input)
     {
         // Settings
-        auto settings = Settings::load(input);
-        auto memory = Memory(settings);
-
-        auto core_to_mem_map_size = char{};
-        input.get(core_to_mem_map_size);
-        assert(input);
-
-        auto core_to_mem_map = std::vector<uint8_t>(core_to_mem_map_size);
-
-        input.read(reinterpret_cast<char*>(core_to_mem_map.data()), core_to_mem_map.capacity());
-        assert(input);
-
-        // Variables
-        std::vector<std::vector<std::pair<BlockId, int>>> variables;
-        auto variables_number = char{};
-        input.get(variables_number);
-        variables.resize(variables_number);
-
-        for (auto& variable: variables)
+        Settings settings;
         {
-            input.get(variables_number);
-            variable.resize(variables_number);
-            for (auto& affected_instructions: variable)
-            {
-                auto temp = char{};
-                input.get(temp);
-                affected_instructions.first = temp;
-                input.get(temp);
-                affected_instructions.second = temp;
-            }
+            cereal::BinaryInputArchive iarchive(input);
+
+            iarchive(settings);
         }
+
+        auto memory = Memory(settings);
 
         // Instructions
         while (true)
@@ -294,6 +234,6 @@ namespace Assembler
         //   1.b. Somehow store this vector inside Cpu and add a set_argument method
         // 2. At runtime
         //   2.a.
-        return Cpu(settings, std::move(memory), std::move(core_to_mem_map), std::move(variables));
+        return Cpu(settings, std::move(memory));
     }
 }

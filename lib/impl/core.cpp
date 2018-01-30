@@ -75,28 +75,36 @@ void Core::preload()
 
         auto direction = std::get<Direction::CoreDirection>(direction_complex);
 
-        auto& pointed_core = cores->offset(registers.id, direction);
-
-        if (pointed_core.registers.status1.sync)
+        try
         {
-            registers.preload = registers.status1.ctc ? pointed_core.registers.status2.carry
-                                                      : pointed_core.registers.val;
-            registers.preload_negative = pointed_core.registers.status2.negative;
+            auto& pointed_core = cores->offset(registers.id, direction);
+
 
             // TODO: This is duplicated
             auto raw_instruction = mem->at(registers.status2.membank).at(registers.pc);
             auto instruction = factory.create(raw_instruction);
 
             // TODO: Should be in the instructions
-            if (dynamic_cast<OpCodes::MXL*>(instruction.get()) || dynamic_cast<OpCodes::MXA*>(instruction.get()) || dynamic_cast<OpCodes::MXS*>(instruction.get()) ||
-                dynamic_cast<OpCodes::MXD*>(instruction.get()))
+            if(dynamic_cast<OpCodes::MXL*>(instruction.get()) || dynamic_cast<OpCodes::MXA*>(instruction.get()) || dynamic_cast<OpCodes::MXS*>(instruction.get()) ||
+                          dynamic_cast<OpCodes::MXD*>(instruction.get()))
             {
-                pointed_core.registers.status2.unlock = true;
+                if (auto import = pointed_core.get_from(registers.status1.ctc))
+                {
+                    registers.preload = import->second;
+                    registers.preload_negative = import->first;
+                }
+                else
+                {
+                    registers.preload = {};
+                }
             }
+
         }
-        else
+        catch (const std::out_of_range& exception)
         {
-            registers.preload = {};
+            cpu_assert(registers.status2.input, exception.what());
+
+
         }
     }
     catch (const std::bad_variant_access&)

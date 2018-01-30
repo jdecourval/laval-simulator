@@ -19,9 +19,9 @@ class Cpu
 
 public:
     explicit Cpu(const Settings&);
-    explicit Cpu(const Settings&, Memory&& memory, std::vector<MemoryInterface::size_type>&& core_to_mem_map, std::vector<std::vector<std::pair<int, int>>>&& parameters = {});
+    explicit Cpu(const Settings&, Memory&& memory);
 
-    void link_memory(Memory&& memory, std::vector<MemoryInterface::size_type>&& core_to_mem_map);
+    void link_memory(Memory&& memory, const Settings& settings);
 
     template <typename Instruction_t>
     uint8_t dump(const Instruction_t& instruction)
@@ -31,7 +31,7 @@ public:
         return cores[0].get_factory().dump(instruction);
     }
 
-    uint8_t start(const std::chrono::milliseconds& period = std::chrono::milliseconds(0), const std::vector<uint8_t>& args = {});
+    uint8_t start(const std::chrono::milliseconds& period = std::chrono::milliseconds(0));
 
     Cpu(Cpu&) = delete;
 
@@ -41,7 +41,8 @@ private:
     Memory mem;
     CoreArray cores;
     std::vector<MemoryInterface::size_type> core_to_mem_map;
-    std::vector<std::vector<std::pair<int, int>>> parameters;
+    std::unordered_map<size_t, Input> inputs;
+    std::vector<size_t> outputs;
 };
 
 
