@@ -11,7 +11,7 @@ using namespace Direction;
 // TODO: Use operator== to compare cores
 TEST_CASE("ID are correctly set and operator[](size_t) return them in the correct order")
 {
-    Memory_t mem(Settings{{4, 4, 4}, 1, 1});
+    Memory_t mem(Settings{{4, 4, 4}, 1, 1, {}, {}, {}});
     Registers test_registers;
 
     CoreArray cores({4, 4, 4}, mem);
@@ -29,7 +29,7 @@ TEST_CASE("ID are correctly set and operator[](size_t) return them in the correc
 
 TEST_CASE("Operator[](std::vector)")
 {
-    Memory_t mem(Settings{{4, 4, 4}, 1, 1});
+    Memory_t mem(Settings{{4, 4, 4}, 1, 1, {}, {}, {}});
     Registers test_registers;
 
     CoreArray cores({4, 4, 4}, mem);
@@ -53,7 +53,7 @@ TEST_CASE("Operator[](std::vector)")
 
 TEST_CASE("Offsets")
 {
-    Memory_t mem(Settings{{4, 4, 4}, 1, 1});
+    Memory_t mem(Settings{{4, 4, 4}, 1, 1, {}, {}, {}});
     Registers test_registers;
 
     CoreArray cores({4, 4, 4}, mem);
@@ -62,19 +62,19 @@ TEST_CASE("Offsets")
 
     {
         auto& offsetted = cores.offset(test_registers.id, CoreDirection({CURRENT, CURRENT, CURRENT}));
-        REQUIRE(core == offsetted);
+        REQUIRE(core == dynamic_cast<Core&>(offsetted));
     }
 
     {
         auto& offsetted = cores.offset(test_registers.id, CoreDirection({BEFORE, CURRENT, CURRENT}));
         auto& compare = cores[{0, 1, 1}];
-        REQUIRE(compare == offsetted);
+        REQUIRE(compare == dynamic_cast<Core&>(offsetted));
     }
 
     {
         auto& offsetted = cores.offset(test_registers.id, CoreDirection({AFTER, AFTER, AFTER}));
         auto& compare = cores[{2, 2, 2}];
-        REQUIRE(compare == offsetted);
+        REQUIRE(compare == dynamic_cast<Core&>(offsetted));
     }
 }
 

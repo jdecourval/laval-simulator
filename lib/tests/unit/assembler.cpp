@@ -23,7 +23,7 @@ TEST_CASE("Assembler")
 
     SECTION("build_ast")
     {
-        auto [ast, settings, variables] = Assembler::build_ast(stream);
+        auto [ast, settings] = Assembler::build_ast(stream);
 
         REQUIRE(ast.at(1).size() == 3);
         REQUIRE(ast.at(2).size() == 3);
@@ -61,7 +61,7 @@ TEST_CASE("Assembler")
         SECTION("assemble")
         {
             auto output = std::ostringstream();
-            Assembler::assemble(ast, settings, variables, output);
+            Assembler::assemble(ast, settings, output);
             auto binary = output.str();
 
             REQUIRE(binary.size() == 28);
@@ -101,7 +101,7 @@ TEST_CASE("Assembler")
             {
                 auto binary_stream = std::istringstream(binary);
                 auto cpu = Assembler::load_binary(binary_stream);
-                auto result = cpu.start();
+                auto result = cpu.start(std::cin, std::cout);
                 REQUIRE(result == 18);
             }
         }

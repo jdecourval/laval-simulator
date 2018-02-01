@@ -22,7 +22,7 @@ public:
 
     void initialize();
 
-    void preload();
+    void preload(bool force = false);
 
     void fetch();
 

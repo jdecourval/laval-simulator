@@ -1,6 +1,12 @@
 #include "core_array.h"
 
 
+CoreArray::CoreArray(const std::vector<uint16_t>& dimensions, const MemoryInterface& mem)
+: CoreArray(dimensions, mem, default_input)
+{
+
+}
+
 CoreArray::CoreArray(const std::vector<uint16_t>& dimensions, const MemoryInterface& mem, std::unordered_map<size_t, Input>& inputs)
 : inputs(inputs)
 {

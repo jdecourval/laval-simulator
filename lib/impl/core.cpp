@@ -16,9 +16,9 @@ Core::Core()
 }
 
 Core::Core(CoreArray& cores, size_t id, const MemoryInterface& mem)
-    : registers()
-      , mem(&mem)
-      , cores(&cores)
+        : registers()
+          , mem(&mem)
+          , cores(&cores)
 {
     // This simulator rely on the fact that the simulating CPU uses two's complement notation
     static_assert(-1 == ~0, "Your CPU architecture is too weird to use this simulator");
@@ -35,7 +35,8 @@ void Core::wire(uint8_t membank)
 
 void Core::initialize()
 {
-    cpu_assert(mem == nullptr || mem->banks_size() <= std::numeric_limits<decltype(registers.pc)>::max() + 1, "Too many memory banks");
+    cpu_assert(mem == nullptr || mem->banks_size() <= std::numeric_limits<decltype(registers.pc)>::max() + 1,
+            "Too many memory banks");
 
     factory.register_instruction<OpCodes::NOP>();
     factory.register_instruction<OpCodes::SYN>();
@@ -65,7 +66,7 @@ void Core::initialize()
     std::cout << "Instructions space: " << static_cast<int>(factory.size()) << " / 256" << std::endl;
 }
 
-void Core::preload()
+void Core::preload(bool force)
 {
     auto direction_complex = Direction::decode(registers.status1.mux);
 
@@ -82,8 +83,11 @@ void Core::preload()
         auto instruction = factory.create(raw_instruction);
 
         // TODO: Should be in the instructions
-        if(dynamic_cast<OpCodes::MXL*>(instruction.get()) || dynamic_cast<OpCodes::MXA*>(instruction.get()) || dynamic_cast<OpCodes::MXS*>(instruction.get()) ||
-                      dynamic_cast<OpCodes::MXD*>(instruction.get()))
+        if (force || dynamic_cast<OpCodes::MXL*>(instruction.get()) ||
+            dynamic_cast<OpCodes::MXA*>(instruction.get()) ||
+            dynamic_cast<OpCodes::MXS*>(instruction.get()) ||
+            dynamic_cast<OpCodes::MXD*>(instruction.get())
+                )
         {
             if (auto import = pointed_core.get_from(registers.status1.ctc))
             {

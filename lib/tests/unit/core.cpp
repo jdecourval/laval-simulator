@@ -63,7 +63,7 @@ TEST_CASE("Single core tests")
 
 TEST_CASE("Tests that need memory")
 {
-    Memory memory(Settings{{1, 1, 1}, 1, 10});
+    Memory memory(Settings{{1, 1, 1}, 1, 10, {}, {}, {}});
     CoreArray core_array({1, 1, 1}, memory);
     Core& core = core_array[0];
     Registers test_registers;
@@ -101,7 +101,7 @@ TEST_CASE("Tests that need memory")
 
         auto instruction = OpCodes::MXR({0});
         core.execute(instruction);
-        core.preload();
+        core.preload(true);
 
         core.execute(Debug{test_registers});
         REQUIRE(test_registers.preload.value() == 0);
@@ -109,7 +109,7 @@ TEST_CASE("Tests that need memory")
         // To increment PC
         core.fetch();
 
-        core.preload();
+        core.preload(true);
 
         core.execute(Debug{test_registers});
         REQUIRE(test_registers.preload.value() == 1);
@@ -120,7 +120,7 @@ TEST_CASE("Tests with memory")
 {
     SECTION("Execute from linked memory")
     {
-        Memory memory(Settings{{1, 1, 1}, 1, 50});
+        Memory memory(Settings{{1, 1, 1}, 1, 50, {}, {}, {}});
         CoreArray core_array({1, 1, 1}, memory);
         Core& core = core_array[{0, 0, 0}];
         Registers test_registers;
@@ -180,7 +180,7 @@ TEST_CASE("Tests with memory")
 
 TEST_CASE("Fetch from linked core")
 {
-    Memory memory(Settings{{1, 1, 1}, 1, 50});
+    Memory memory(Settings{{1, 1, 1}, 1, 50, {}, {}, {}});
     CoreArray core_array({1, 1, 2}, memory);
     Core& core1 = core_array[{0, 0, 0}];
     Core& core2 = core_array[{0, 0, 1}];
@@ -202,14 +202,14 @@ TEST_CASE("Fetch from linked core")
     SECTION("Do not spontaneously load if no sync")
     {
         // We have to manually preload since its not automatic from execute
-        core1.preload();
+        core1.preload(true);
         core1.execute(Debug{test_registers});
         REQUIRE(test_registers.val == 0);
     }
 
     SECTION("Do not load if no sync")
     {
-        core1.preload();
+        core1.preload(true);
         core1.execute(OpCodes::MXL({0}));
 
         core1.execute(Debug{test_registers});
@@ -221,7 +221,7 @@ TEST_CASE("Fetch from linked core")
     {
         core2.execute(OpCodes::SYN());
 
-        core1.preload();
+        core1.preload(true);
         core1.execute(OpCodes::MXL({0}));
 
         core1.execute(Debug{test_registers});
@@ -234,7 +234,7 @@ TEST_CASE("Fetch from linked core")
 
         core2.execute(OpCodes::SYN());
 
-        core1.preload();
+        core1.preload(true);
         core1.execute(OpCodes::MXL({0}));
 
         core1.execute(Debug{test_registers});
@@ -249,7 +249,7 @@ TEST_CASE("Fetch from linked core")
 
 TEST_CASE("Synchronization tests")
 {
-    Memory memory(Settings{{1, 1, 1}, 2, 50});
+    Memory memory(Settings{{1, 1, 1}, 2, 50, {}, {}, {}});
     CoreArray core_array({1, 1, 2}, memory);
     Core& core1 = core_array[{0, 0, 0}];
     Core& core2 = core_array[{0, 0, 1}];
@@ -276,8 +276,8 @@ TEST_CASE("Synchronization tests")
         core2.wire(1);
 
         // MUX, SYN
-        core1.preload();
-        core2.preload();
+        core1.preload(true);
+        core2.preload(true);
 
         core1.execute(Debug{test_registers});
         REQUIRE(!test_registers.status2.unlock);
@@ -299,8 +299,8 @@ TEST_CASE("Synchronization tests")
         REQUIRE(test_registers.pc == 0);    // core2 is blocked until MXL in core1
 
         // MXL (1st), SYN
-        core1.preload();
-        core2.preload();
+        core1.preload(true);
+        core2.preload(true);
 
         core1.execute(Debug{test_registers});
         REQUIRE(!test_registers.status2.unlock);
@@ -323,8 +323,8 @@ TEST_CASE("Synchronization tests")
         REQUIRE(test_registers.pc == 1);    // core2 was unlocked
 
         // MXL (2nd), NOP
-        core1.preload();
-        core2.preload();
+        core1.preload(true);
+        core2.preload(true);
 
         core1.execute(Debug{test_registers});
         REQUIRE(!test_registers.status2.unlock);
@@ -346,8 +346,8 @@ TEST_CASE("Synchronization tests")
         REQUIRE(test_registers.pc == 2);
 
         // MXL (2nd), SYN
-        core1.preload();
-        core2.preload();
+        core1.preload(true);
+        core2.preload(true);
 
         core1.execute(Debug{test_registers});
         REQUIRE(!test_registers.status2.unlock);
@@ -369,8 +369,8 @@ TEST_CASE("Synchronization tests")
         REQUIRE(test_registers.pc == 2);
 
         // MXL (2nd), SYN
-        core1.preload();
-        core2.preload();
+        core1.preload(true);
+        core2.preload(true);
 
         core1.execute(Debug{test_registers});
         REQUIRE(!test_registers.status2.unlock);
