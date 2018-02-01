@@ -75,37 +75,27 @@ void Core::preload()
 
         auto direction = std::get<Direction::CoreDirection>(direction_complex);
 
-        try
+        auto& pointed_core = cores->offset(registers.id, direction);
+
+        // TODO: This is duplicated
+        auto raw_instruction = mem->at(registers.status2.membank).at(registers.pc);
+        auto instruction = factory.create(raw_instruction);
+
+        // TODO: Should be in the instructions
+        if(dynamic_cast<OpCodes::MXL*>(instruction.get()) || dynamic_cast<OpCodes::MXA*>(instruction.get()) || dynamic_cast<OpCodes::MXS*>(instruction.get()) ||
+                      dynamic_cast<OpCodes::MXD*>(instruction.get()))
         {
-            auto& pointed_core = cores->offset(registers.id, direction);
-
-
-            // TODO: This is duplicated
-            auto raw_instruction = mem->at(registers.status2.membank).at(registers.pc);
-            auto instruction = factory.create(raw_instruction);
-
-            // TODO: Should be in the instructions
-            if(dynamic_cast<OpCodes::MXL*>(instruction.get()) || dynamic_cast<OpCodes::MXA*>(instruction.get()) || dynamic_cast<OpCodes::MXS*>(instruction.get()) ||
-                          dynamic_cast<OpCodes::MXD*>(instruction.get()))
+            if (auto import = pointed_core.get_from(registers.status1.ctc))
             {
-                if (auto import = pointed_core.get_from(registers.status1.ctc))
-                {
-                    registers.preload = import->second;
-                    registers.preload_negative = import->first;
-                }
-                else
-                {
-                    registers.preload = {};
-                }
+                registers.preload = import->second;
+                registers.preload_negative = import->first;
             }
-
+            else
+            {
+                registers.preload = {};
+            }
         }
-        catch (const std::out_of_range& exception)
-        {
-            cpu_assert(registers.status2.input, exception.what());
 
-
-        }
     }
     catch (const std::bad_variant_access&)
     {
