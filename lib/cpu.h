@@ -31,18 +31,24 @@ public:
         return cores[0].get_factory().dump(instruction);
     }
 
-    uint8_t start(const std::chrono::milliseconds& period = std::chrono::milliseconds(0));
+    uint8_t start(std::istream& input, std::ostream& output, const std::chrono::milliseconds& period = std::chrono::milliseconds(0));
 
     Cpu(Cpu&) = delete;
 
     Cpu& operator=(Cpu&) = delete;
 
 private:
+    void handle_output(std::ostream&);
+    void handle_input(std::istream&);
+
+
     Memory mem;
     CoreArray cores;
     std::vector<MemoryInterface::size_type> core_to_mem_map;
     std::unordered_map<size_t, Input> inputs;
     std::vector<size_t> outputs;
+
+    std::mutex input_lock;
 };
 
 

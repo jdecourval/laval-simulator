@@ -103,8 +103,7 @@ int main(int argc, char* argv[])
         cpu_assert(binary_input, std::strerror(errno));
         binary_input->seekg(0);
         auto cpu = Assembler::load_binary(*binary_input);
-
-        auto answer = static_cast<int>(cpu.start(0s));
+        auto answer = static_cast<int>(cpu.start(std::cin, std::cout));
         std::cout << "answer: " << answer << std::endl;
     }
 }

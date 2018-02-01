@@ -4,25 +4,35 @@
 #include "fetchable.h"
 
 #include <cstdint>
-#include <optional>
+#include <mutex>
+#include <queue>
 
 
 class Input : public Fetchable
 {
 public:
+    explicit Input(std::mutex& mutex)
+    : mutex(mutex)
+    {
+
+    }
+
     void put(uint8_t value)
     {
-        this->value = value;
+        queue.push(value);
     }
 
     std::optional<std::pair<bool, uint8_t>> get_from(bool carry) override
     {
         cpu_assert(!carry, "Cannot get carry from input");
 
-        return {{false, 8}};
-        if (value)
+        std::lock_guard lock(mutex);
+
+        if (!queue.empty())
         {
-            return {{false, *value}};
+            auto value = queue.back();
+            queue.pop();
+            return {{false, value}};
         }
         else
         {
@@ -31,7 +41,8 @@ public:
     }
 
 private:
-    std::optional<uint8_t> value;
+    std::queue<uint8_t> queue;
+    std::mutex& mutex;
 };
 
 

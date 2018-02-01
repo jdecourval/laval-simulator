@@ -25,7 +25,7 @@ Cpu::Cpu(const Settings& settings, Memory&& memory)
 
     for(auto i: settings.inputs)
     {
-        inputs.emplace(i, Input());
+        inputs.emplace(i, input_lock);
     }
 }
 
@@ -36,7 +36,80 @@ void Cpu::link_memory(Memory&& memory, const Settings& settings)
     // TODO: Add inputs
 }
 
-uint8_t Cpu::start(const std::chrono::milliseconds& period)
+
+void Cpu::handle_output(std::ostream& output)
+{
+    auto first = true;
+
+    for (auto& output_id: outputs)
+    {
+        if (auto value = cores[output_id].get_from(false))
+        {
+            if (first)
+            {
+                first = false;
+            }
+            else
+            {
+                output << " ";
+            }
+            output << output_id << "," << static_cast<int>(value->second);
+        }
+    }
+
+    if (!first)
+    {
+        output << std::endl;
+    }
+}
+
+void Cpu::handle_input(std::istream& input)
+{
+
+    while(true)
+    {
+        {
+            std::unordered_map<size_t, uint8_t> queue;
+
+            while (true)
+            {
+                auto core_id = 0ull;
+                auto value = 0;
+                auto comma = '\0';
+
+                if (!(input >> core_id >> comma >> value))
+                {
+                    cpu_assert(false, "Input error");
+                }
+
+                auto delimiter = input.get();
+
+                cpu_assert(inputs.count(core_id), "No such core: " << core_id);
+                cpu_assert(comma == ',', "Unexpected input");
+
+                cpu_assert(value <= 0xff, "Too large input");
+                cpu_assert(value > 0, "Only unsigned values are supported");
+                queue.emplace(core_id, value);
+
+                if (delimiter == '\n')
+                {
+                    break;
+                }
+
+                cpu_assert(delimiter == ' ', "Unexpected input");
+            }
+
+            std::lock_guard lock(input_lock);
+            for (auto [core_id, value]: queue)
+            {
+                inputs.at(core_id).put(value);
+            }
+        }
+    }
+
+}
+
+uint8_t Cpu::start(std::istream& input, std::ostream& output, const std::chrono::milliseconds& period)
 {
     cpu_assert(period.count() >= 0, "Invalid period");
     cpu_assert(cores.size() == core_to_mem_map.size(), "Non-matching number of cores and number of entries in core to memory map");
@@ -57,6 +130,8 @@ uint8_t Cpu::start(const std::chrono::milliseconds& period)
         std::cout << "starting cpu at max speed" << std::endl;
     }
 
+    auto input_handler = std::thread([this, &input]() { handle_input(input); });
+
     auto time_before_execution = BenchmarkClock::now();
     auto last_report_time = BenchmarkClock::now();
     auto loops = 0ull;
@@ -69,18 +144,12 @@ uint8_t Cpu::start(const std::chrono::milliseconds& period)
 
         if (time_since_report >= 3s)
         {
-            std::cout << "Real period: " << 1000.0 * 1000 * 1000 * loops / time_since_report.count() << " Hz" << std::endl;
+            std::cerr << "Real period: " << 1000.0 * 1000 * 1000 * loops / time_since_report.count() << " Hz" << std::endl;
             last_report_time = time_before_execution;
             loops = 0;
         }
 
-        for(auto& output_id: outputs)
-        {
-            if (auto value = cores[output_id].get_from(false))
-            {
-                std::cout << static_cast<int>(value->second) << std::endl;
-            }
-        }
+        handle_output(output);
 
         pool.apply(std::begin(cores), std::end(cores), [](auto& core){ core.preload(); });
 
