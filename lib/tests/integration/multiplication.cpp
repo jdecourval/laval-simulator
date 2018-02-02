@@ -107,20 +107,24 @@ uint8_t multiplication(uint8_t a, uint8_t b)
 //    }
 //}
 
-//TEST_CASE("Multiplication ASM")
-//{
-//    using namespace std::chrono_literals;
-//
-//    auto buffer = std::stringstream();
-//    auto assembly_input = std::ifstream("lib/tests/integration/multiplication.laval", std::ios::binary);
-//    Assembler::preprocess(assembly_input, buffer);
-//    auto [ast, settings] = Assembler::build_ast(buffer);
-//
-//    auto output = std::stringstream();
-//
-//    Assembler::assemble(ast, settings, variables, output);
-//
-//    auto cpu = Assembler::load_binary(output);
-//    auto answer = static_cast<int>(cpu.start(0s, std::vector({2_u8, 3_u8})));
-//    REQUIRE(answer == 6);
-//}
+TEST_CASE("Multiplication ASM")
+{
+    using namespace std::chrono_literals;
+
+    auto buffer = std::stringstream();
+    auto assembly_input = std::ifstream("lib/tests/integration/multiplication.laval", std::ios::binary);
+    Assembler::preprocess(assembly_input, buffer);
+    auto [ast, settings] = Assembler::build_ast(buffer);
+
+    auto output = std::stringstream();
+
+    Assembler::assemble(ast, settings, output);
+
+    auto cpu = Assembler::load_binary(output);
+
+    auto input_str = "0,2 2,3";
+    std::istringstream input(input_str);
+
+    auto answer = static_cast<int>(cpu.start(input, std::cout));
+    REQUIRE(answer == 6);
+}

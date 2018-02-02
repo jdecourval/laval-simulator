@@ -4,12 +4,13 @@
 .mem_number 9
 .mem_size 7
 .mem_map 0, 3, 7, 5
+.in 0, 1
 
 
 ; Subtractor
 0:
-    LCL a
-    LCH a
+    MUX CURRENT, BEFORE, CURRENT
+    MXL 0
     MUX CURRENT, CURRENT, AFTER
     JMP 1
 
@@ -25,8 +26,8 @@
 
 ; Send operand
 3:
-    LCL b
-    LCH b
+    MUX CURRENT, BEFORE, CURRENT
+    MXL 0
     MUX CURRENT, AFTER, CURRENT
     JMP 4
 

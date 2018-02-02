@@ -2,15 +2,16 @@
 .mem_number 2
 .mem_size 5
 .mem_map 0, 1
+.in 0, 1
 
 0:
-    LCL a
-    LCH a
+    MUX CURRENT, BEFORE, CURRENT
+    MXL 0
     MUX CURRENT, CURRENT, AFTER
     MXS 0
     HLT
 
 1:
-    LCL b
-    LCH b
+    MUX CURRENT, BEFORE, CURRENT
+    MXL 0
     SYN

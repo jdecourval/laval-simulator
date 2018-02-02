@@ -4,10 +4,11 @@
 .mem_number 5
 .mem_size 5
 .mem_map 0, 3
+.in 0
 
 0:
-    LCL a
-    LCH a
+    MUX CURRENT, BEFORE, CURRENT
+    MXL 0
     MUX CURRENT, CURRENT, AFTER
     JMP 1
 

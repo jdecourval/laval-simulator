@@ -2,10 +2,12 @@
 .mem_number 10
 .mem_size 10
 .mem_map 0, 2, 4, 9, 7, 9
+.in 0, 2
 
 0:
-    LCL a
-    LCH a
+    MUX CURRENT, BEFORE, CURRENT
+    MXL 0
+    DBG
     JMP 1
 
 1:
@@ -31,8 +33,9 @@
     JMP 2
 
 4:
-    LCL b
-    LCH b
+    MUX CURRENT, BEFORE, CURRENT
+    MXL 0
+    DBG
     MUX CURRENT, AFTER, BEFORE
     JMP 5
 

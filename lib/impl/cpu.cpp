@@ -4,6 +4,8 @@
 #include "opcodes.h"
 #include "thread_pool.h"
 
+#include <future>
+
 
 using namespace std::chrono_literals;
 
@@ -63,11 +65,12 @@ void Cpu::handle_output(std::ostream& output)
     }
 }
 
-void Cpu::handle_input(std::istream& input)
+void Cpu::handle_input(std::istream& input, std::atomic<bool>& stop_signal)
 {
 
-    while(true)
+    while(!stop_signal)
     {
+        try
         {
             std::unordered_map<size_t, uint8_t> queue;
 
@@ -79,7 +82,7 @@ void Cpu::handle_input(std::istream& input)
 
                 if (!(input >> core_id >> comma >> value))
                 {
-                    cpu_assert(false, "Input error");
+                    cpu_assert(false, "Input error: " << std::strerror(errno));
                 }
 
                 auto delimiter = input.get();
@@ -88,12 +91,18 @@ void Cpu::handle_input(std::istream& input)
                 cpu_assert(comma == ',', "Unexpected input");
 
                 cpu_assert(value <= 0xff, "Too large input");
-                cpu_assert(value > 0, "Only unsigned values are supported");
+                cpu_assert(value >= 0, "Only unsigned values are supported");
                 queue.emplace(core_id, value);
 
                 if (delimiter == '\n')
                 {
                     break;
+                }
+
+                if (input.eof())
+                {
+                    stop_signal = true;
+                    return;
                 }
 
                 cpu_assert(delimiter == ' ', "Unexpected input");
@@ -104,6 +113,11 @@ void Cpu::handle_input(std::istream& input)
             {
                 inputs.at(core_id).put(value);
             }
+        }
+        catch(...)
+        {
+            stop_signal = true;
+            throw;
         }
     }
 
@@ -130,53 +144,71 @@ uint8_t Cpu::start(std::istream& input, std::ostream& output, const std::chrono:
         std::cout << "starting cpu at max speed" << std::endl;
     }
 
-    auto input_handler = std::thread([this, &input]() { handle_input(input); });
+    std::atomic<bool> stop_signal{};
+    auto input_handler = std::async(std::launch::async, [this, &input, &stop_signal]() { return handle_input(input, stop_signal); });
 
     auto time_before_execution = BenchmarkClock::now();
     auto last_report_time = BenchmarkClock::now();
     auto loops = 0ull;
-    ThreadPool<1> pool;
 
-    while (true)
+    try
     {
-        time_before_execution = BenchmarkClock::now();
-        auto time_since_report = time_before_execution - last_report_time;
 
-        if (time_since_report >= 3s)
+        while (!stop_signal)
         {
-            std::cerr << "Real period: " << 1000.0 * 1000 * 1000 * loops / time_since_report.count() << " Hz" << std::endl;
-            last_report_time = time_before_execution;
-            loops = 0;
-        }
+            time_before_execution = BenchmarkClock::now();
+            auto time_since_report = time_before_execution - last_report_time;
 
-        handle_output(output);
-
-        pool.apply(std::begin(cores), std::end(cores), [](auto& core){ core.preload(); });
-
-        try
-        {
-            pool.apply(std::begin(cores), std::end(cores), [](auto& core){ core.fetch(); });
-        }
-        catch (const Answer& answer)
-        {
-            return answer.content;
-        }
-
-        if (period > 0s)
-        {
-            // TODO: Replace OpCodes::DBG by a local implementation
-            std::for_each(std::begin(cores), std::end(cores), [](auto& core) { core.execute(OpCodes::DBG()); });
-
-            auto time_to_sleep = period - (BenchmarkClock::now() - time_before_execution);
-
-            if (time_to_sleep > 0ns)
+            if (time_since_report >= 3s)
             {
-                std::this_thread::sleep_for(time_to_sleep);
+                std::cerr << "Real period: " << 1000.0 * 1000 * 1000 * loops / time_since_report.count() << " Hz"
+                          << std::endl;
+                last_report_time = time_before_execution;
+                loops = 0;
             }
-        }
 
-        loops++;
+            handle_output(output);
+
+            std::for_each(std::begin(cores), std::end(cores), [](auto& core)
+            { core.preload(); });
+
+            try
+            {
+                std::for_each(std::begin(cores), std::end(cores), [](auto& core)
+                { core.fetch(); });
+            }
+            catch (const Answer& answer)
+            {
+                stop_signal = true;
+                input_handler.get();
+                return answer.content;
+            }
+
+            if (period > 0s)
+            {
+                // TODO: Replace OpCodes::DBG by a local implementation
+                std::for_each(std::begin(cores), std::end(cores), [](auto& core)
+                { core.execute(OpCodes::DBG()); });
+
+                auto time_to_sleep = period - (BenchmarkClock::now() - time_before_execution);
+
+                if (time_to_sleep > 0ns)
+                {
+                    std::this_thread::sleep_for(time_to_sleep);
+                }
+            }
+
+            loops++;
+        }
     }
+    catch(...)
+    {
+        stop_signal = true;
+        throw;
+    }
+
+    input_handler.get();
+    return 0;
 }
 
 

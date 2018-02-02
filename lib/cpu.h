@@ -39,7 +39,7 @@ public:
 
 private:
     void handle_output(std::ostream&);
-    void handle_input(std::istream&);
+    void handle_input(std::istream&, std::atomic<bool>& stop_signal);
 
 
     Memory mem;
