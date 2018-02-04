@@ -65,7 +65,7 @@ void Cpu::handle_output(std::ostream& output)
     }
 }
 
-void Cpu::handle_input(std::istream& input, std::atomic<bool>& stop_signal)
+void Cpu::handle_input(std::istream& input, std::atomic<bool>& stop_signal, std::exception_ptr& thread_exception)
 {
 
     while(!stop_signal)
@@ -116,8 +116,8 @@ void Cpu::handle_input(std::istream& input, std::atomic<bool>& stop_signal)
         }
         catch(...)
         {
+            thread_exception = std::current_exception();
             stop_signal = true;
-            throw;
         }
     }
 
@@ -145,7 +145,8 @@ uint8_t Cpu::start(std::istream& input, std::ostream& output, const std::chrono:
     }
 
     std::atomic<bool> stop_signal{};
-    auto input_handler = std::async(std::launch::async, [this, &input, &stop_signal]() { return handle_input(input, stop_signal); });
+    std::exception_ptr thread_exception{};
+    auto input_handler = std::thread([this, &input, &stop_signal, &thread_exception]() { return handle_input(input, stop_signal, thread_exception); });
 
     auto time_before_execution = BenchmarkClock::now();
     auto last_report_time = BenchmarkClock::now();
@@ -161,8 +162,8 @@ uint8_t Cpu::start(std::istream& input, std::ostream& output, const std::chrono:
 
             if (time_since_report >= 3s)
             {
-                std::cerr << "Real period: " << 1000.0 * 1000 * 1000 * loops / time_since_report.count() << " Hz"
-                          << std::endl;
+//                std::cerr << "Real period: " << 1000.0 * 1000 * 1000 * loops / time_since_report.count() << " Hz"
+//                          << std::endl;
                 last_report_time = time_before_execution;
                 loops = 0;
             }
@@ -180,7 +181,13 @@ uint8_t Cpu::start(std::istream& input, std::ostream& output, const std::chrono:
             catch (const Answer& answer)
             {
                 stop_signal = true;
-                input_handler.get();
+                input_handler.detach();
+
+                if (thread_exception)
+                {
+                    std::rethrow_exception(thread_exception);
+                }
+
                 return answer.content;
             }
 
@@ -207,7 +214,13 @@ uint8_t Cpu::start(std::istream& input, std::ostream& output, const std::chrono:
         throw;
     }
 
-    input_handler.get();
+    input_handler.join();
+
+    if (thread_exception)
+    {
+        std::rethrow_exception(thread_exception);
+    }
+
     return 0;
 }
 

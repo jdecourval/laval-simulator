@@ -2,6 +2,9 @@
 - Finish documentation
 - Add a couple of tests/challenges
 - Produce some figures to help documentation
+- Test I/O
+    * Should be impossible to wire I/O to cores not on an edge
+- Add a 0x prefix to hexadecimal values
 
 # Optional for CSGames 2018
 - Fix HLT when using a thread pool

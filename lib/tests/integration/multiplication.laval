@@ -7,7 +7,6 @@
 0:
     MUX CURRENT, BEFORE, CURRENT
     MXL
-    DBG
     JMP 1
 
 1:
@@ -35,7 +34,6 @@
 4:
     MUX CURRENT, BEFORE, CURRENT
     MXL
-    DBG
     MUX CURRENT, AFTER, BEFORE
     JMP 5
 
