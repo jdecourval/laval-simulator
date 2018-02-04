@@ -12,6 +12,6 @@
     JMP 1
 
 1:
-    MXL 0
+    MXL
     SYN
     JMP 1

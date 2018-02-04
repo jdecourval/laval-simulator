@@ -46,11 +46,11 @@ uint8_t multiplication(uint8_t a, uint8_t b)
     // Core 1: return value to add
     // Membank 5, b & 1 != 0: return a
     memory.at(2).at(0) = cpu.dump(MUX({Direction::CURRENT, Direction::CURRENT, Direction::AFTER}));
-    memory.at(2).at(1) = cpu.dump(MXL({0}));
+    memory.at(2).at(1) = cpu.dump(MXL());
     memory.at(2).at(2) = cpu.dump(CAN({1}));
     memory.at(2).at(4) = cpu.dump(MUX({Direction::CURRENT, Direction::CURRENT, Direction::BEFORE}));
     memory.at(2).at(5) = cpu.dump(JEZ({3}));
-    memory.at(2).at(6) = cpu.dump(MXL({0}));
+    memory.at(2).at(6) = cpu.dump(MXL());
     memory.at(2).at(7) = cpu.dump(SYN());
     memory.at(2).at(8) = cpu.dump(JMP({2}));
 
@@ -77,7 +77,7 @@ uint8_t multiplication(uint8_t a, uint8_t b)
 
     // Membank 4: halt
     memory.at(6).at(0) = cpu.dump(SYN());
-    memory.at(6).at(1) = cpu.dump(MXL({0}));
+    memory.at(6).at(1) = cpu.dump(MXL());
     memory.at(6).at(2) = cpu.dump(HLT());
 
 
@@ -87,7 +87,7 @@ uint8_t multiplication(uint8_t a, uint8_t b)
     memory.at(7).at(2) = cpu.dump(JMP({8}));
 
     // Membank 8, accumulate
-    memory.at(8).at(0) = cpu.dump(MXA({0}));
+    memory.at(8).at(0) = cpu.dump(MXA());
     memory.at(8).at(1) = cpu.dump(SYN());
     memory.at(8).at(2) = cpu.dump(JMP({8}));
 

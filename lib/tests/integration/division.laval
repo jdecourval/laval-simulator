@@ -10,14 +10,14 @@
 ; Subtractor
 0:
     MUX CURRENT, BEFORE, CURRENT
-    MXL 0
+    MXL
     MUX CURRENT, CURRENT, AFTER
     JMP 1
 
 1:
     JEZ 2
     JLZ 2
-    MXS 0
+    MXS
     JMP 1
 
 2:
@@ -27,7 +27,7 @@
 ; Send operand
 3:
     MUX CURRENT, BEFORE, CURRENT
-    MXL 0
+    MXL
     MUX CURRENT, AFTER, CURRENT
     JMP 4
 
@@ -50,14 +50,14 @@
 ; Check when its time to halt
 7:
     MUX CURRENT, BEFORE, CURRENT
-    MXL 0
+    MXL
     JEZ 8
     MUX CURRENT, CURRENT, AFTER
-    MXL 0
+    MXL
     CSU 1
     HLT
 
 8:
     MUX CURRENT, CURRENT, AFTER
-    MXL 0
+    MXL
     HLT

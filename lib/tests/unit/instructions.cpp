@@ -77,7 +77,7 @@ TEST_CASE("MXL")
 
     SECTION("Without sync")
     {
-        OpCodes::MXL instruction({0});
+        OpCodes::MXL instruction;
         instruction(registers);
 
         REQUIRE(registers.preload == 5);
@@ -89,16 +89,6 @@ TEST_CASE("MXL")
         REQUIRE(registers.preload == 5);
         REQUIRE(registers.val == registers.preload);
         REQUIRE(!registers.status1.sync);
-    }
-
-    SECTION("With sync")
-    {
-        OpCodes::MXL instruction({1});
-        instruction(registers);
-
-        REQUIRE(registers.preload == 5);
-        REQUIRE(registers.val == registers.preload);
-        REQUIRE(registers.status1.sync);
     }
 }
 
@@ -111,7 +101,7 @@ TEST_CASE("MXA")
         SECTION("Initially zero, add positive")
         {
             registers.preload = 2;
-            OpCodes::MXA instruction({0});
+            OpCodes::MXA instruction;
             instruction(registers);
 
             REQUIRE(registers.val == 2);
@@ -123,7 +113,7 @@ TEST_CASE("MXA")
         {
             registers.preload = -2;
             registers.preload_negative = true;
-            OpCodes::MXA instruction({0});
+            OpCodes::MXA instruction;
             instruction(registers);
 
             REQUIRE(registers.val == static_cast<uint8_t>(-2));
@@ -139,7 +129,7 @@ TEST_CASE("MXA")
         registers.val = 250;
         registers.preload = 15;
 
-        OpCodes::MXA instruction({0});
+        OpCodes::MXA instruction;
         instruction(registers);
 
         REQUIRE(static_cast<int>(registers.val) == static_cast<int>(static_cast<uint8_t>(250 + 15)));
@@ -154,7 +144,7 @@ TEST_CASE("MXA")
         registers.preload = static_cast<uint8_t>(-15);
         registers.preload_negative = true;
 
-        OpCodes::MXA instruction({0});
+        OpCodes::MXA instruction;
         instruction(registers);
 
         REQUIRE(static_cast<int>(registers.val) == static_cast<int>(static_cast<uint8_t>(-127 - 15)));
@@ -173,7 +163,7 @@ TEST_CASE("MXA")
         {
             registers.preload = 3;
 
-            OpCodes::MXA instruction({0});
+            OpCodes::MXA instruction;
             instruction(registers);
 
             REQUIRE(static_cast<int>(registers.val) == static_cast<uint8_t>(-2));
@@ -186,7 +176,7 @@ TEST_CASE("MXA")
         {
             registers.preload = 5;
 
-            OpCodes::MXA instruction({0});
+            OpCodes::MXA instruction;
             instruction(registers);
 
             REQUIRE(registers.val == 0);
@@ -199,7 +189,7 @@ TEST_CASE("MXA")
         {
             registers.preload = 6;
 
-            OpCodes::MXA instruction({0});
+            OpCodes::MXA instruction;
             instruction(registers);
 
             REQUIRE(registers.val == 1);
@@ -223,7 +213,7 @@ TEST_CASE("MXS")
             SECTION("Initially zero, subtract positive")
             {
                 registers.preload = 2;
-                OpCodes::MXS instruction({0});
+                OpCodes::MXS instruction;
                 instruction(registers);
 
                 REQUIRE(registers.val == static_cast<uint8_t>(-2));
@@ -235,7 +225,7 @@ TEST_CASE("MXS")
             {
                 registers.preload = -2;
                 registers.preload_negative = true;
-                OpCodes::MXS instruction({0});
+                OpCodes::MXS instruction;
                 instruction(registers);
 
                 REQUIRE(registers.val == 2);
@@ -252,7 +242,7 @@ TEST_CASE("MXS")
             registers.preload = static_cast<uint8_t>(-15);
             registers.preload_negative = true;
 
-            OpCodes::MXS instruction({0});
+            OpCodes::MXS instruction;
             instruction(registers);
 
             REQUIRE(static_cast<int>(registers.val) == static_cast<int>(static_cast<uint8_t>(250 + 15)));
@@ -266,7 +256,7 @@ TEST_CASE("MXS")
             registers.val = static_cast<uint8_t>(-127);
             registers.preload = 15;
 
-            OpCodes::MXS instruction({0});
+            OpCodes::MXS instruction;
             instruction(registers);
 
             REQUIRE(static_cast<int>(registers.val) == static_cast<int>(static_cast<uint8_t>(-127 - 15)));
@@ -286,7 +276,7 @@ TEST_CASE("MXS")
                 registers.preload = static_cast<uint8_t>(-3);
                 registers.preload_negative = true;
 
-                OpCodes::MXS instruction({0});
+                OpCodes::MXS instruction;
                 instruction(registers);
 
                 REQUIRE(static_cast<int>(registers.val) == static_cast<uint8_t>(-2));
@@ -300,7 +290,7 @@ TEST_CASE("MXS")
                 registers.preload = static_cast<uint8_t>(-5);
                 registers.preload_negative = true;
 
-                OpCodes::MXS instruction({0});
+                OpCodes::MXS instruction;
                 instruction(registers);
 
                 REQUIRE(registers.val == 0);
@@ -314,7 +304,7 @@ TEST_CASE("MXS")
                 registers.preload = static_cast<uint8_t>(-6);
                 registers.preload_negative = true;
 
-                OpCodes::MXS instruction({0});
+                OpCodes::MXS instruction;
                 instruction(registers);
 
                 REQUIRE(registers.val == 1);
@@ -325,19 +315,6 @@ TEST_CASE("MXS")
         }
 
         REQUIRE(!registers.status1.sync);
-    }
-
-    SECTION("Sync")
-    {
-        registers.preload = 2;
-        OpCodes::MXS instruction({1});
-        instruction(registers);
-
-        REQUIRE(registers.val == static_cast<uint8_t>(-2));
-        REQUIRE(!registers.status2.carry);
-        REQUIRE(registers.status2.negative);
-        REQUIRE(registers.preload == 2);
-        REQUIRE(registers.status1.sync);
     }
 }
 

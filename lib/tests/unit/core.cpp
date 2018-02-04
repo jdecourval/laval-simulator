@@ -210,7 +210,7 @@ TEST_CASE("Fetch from linked core")
     SECTION("Do not load if no sync")
     {
         core1.preload(true);
-        core1.execute(OpCodes::MXL({0}));
+        core1.execute(OpCodes::MXL());
 
         core1.execute(Debug{test_registers});
         REQUIRE(test_registers.val == 0);
@@ -222,7 +222,7 @@ TEST_CASE("Fetch from linked core")
         core2.execute(OpCodes::SYN());
 
         core1.preload(true);
-        core1.execute(OpCodes::MXL({0}));
+        core1.execute(OpCodes::MXL());
 
         core1.execute(Debug{test_registers});
         REQUIRE(test_registers.val == 2);
@@ -235,7 +235,7 @@ TEST_CASE("Fetch from linked core")
         core2.execute(OpCodes::SYN());
 
         core1.preload(true);
-        core1.execute(OpCodes::MXL({0}));
+        core1.execute(OpCodes::MXL());
 
         core1.execute(Debug{test_registers});
         REQUIRE(test_registers.val == 1);
@@ -265,8 +265,8 @@ TEST_CASE("Synchronization tests")
         // TODO: Cleanup this test
         memory.at(0).at(0) = core1.get_factory().dump(
         OpCodes::MUX({Direction::CURRENT, Direction::CURRENT, Direction::AFTER}));
-        memory.at(0).at(1) = core1.get_factory().dump(OpCodes::MXL({0}));
-        memory.at(0).at(2) = core1.get_factory().dump(OpCodes::MXL({0}));
+        memory.at(0).at(1) = core1.get_factory().dump(OpCodes::MXL());
+        memory.at(0).at(2) = core1.get_factory().dump(OpCodes::MXL());
 
         memory.at(1).at(0) = core2.get_factory().dump(OpCodes::SYN());
         memory.at(1).at(1) = core2.get_factory().dump(OpCodes::NOP());

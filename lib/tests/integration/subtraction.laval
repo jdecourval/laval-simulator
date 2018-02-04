@@ -6,12 +6,12 @@
 
 0:
     MUX CURRENT, BEFORE, CURRENT
-    MXL 0
+    MXL
     MUX CURRENT, CURRENT, AFTER
-    MXS 0
+    MXS
     HLT
 
 1:
     MUX CURRENT, BEFORE, CURRENT
-    MXL 0
+    MXL
     SYN

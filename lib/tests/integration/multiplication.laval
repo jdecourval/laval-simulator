@@ -6,7 +6,7 @@
 
 0:
     MUX CURRENT, BEFORE, CURRENT
-    MXL 0
+    MXL
     DBG
     JMP 1
 
@@ -17,11 +17,11 @@
 
 2:
     MUX CURRENT, CURRENT, AFTER
-    MXL 0
+    MXL
     CAN 1
     MUX CURRENT, CURRENT, BEFORE
     JEZ 3
-    MXL 0
+    MXL
     SYN
     JMP 2
 
@@ -34,7 +34,7 @@
 
 4:
     MUX CURRENT, BEFORE, CURRENT
-    MXL 0
+    MXL
     DBG
     MUX CURRENT, AFTER, BEFORE
     JMP 5
@@ -48,7 +48,7 @@
 
 6:
     SYN
-    MXL 0
+    MXL
     HLT
 
 7:
@@ -56,6 +56,6 @@
     JMP 8
 
 8:
-    MXA 0
+    MXA
     SYN
     JMP 8

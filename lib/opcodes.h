@@ -88,9 +88,9 @@ namespace OpCodes
 
 // Load from mux
 // Arg 1:1: Sync after
-    struct MXL : public Instruction<1>
+    struct MXL : public Instruction<>
     {
-        using Instruction<1>::Instruction;
+        using Instruction<>::Instruction;
 
         bool operator()(Registers& registers) const override;
     };
@@ -98,9 +98,9 @@ namespace OpCodes
 
 // Add from mux
 // Arg 1:1: Sync after
-    struct MXA : public Instruction<1>
+    struct MXA : public Instruction<>
     {
-        using Instruction<1>::Instruction;
+        using Instruction<>::Instruction;
 
         bool operator()(Registers& registers) const override;
     };
@@ -108,9 +108,9 @@ namespace OpCodes
 
 // Subtract from mux
 // Arg 1:1: Sync after
-    struct MXS : public Instruction<1>
+    struct MXS : public Instruction<>
     {
-        using Instruction<1>::Instruction;
+        using Instruction<>::Instruction;
 
         bool operator()(Registers& registers) const override;
     };

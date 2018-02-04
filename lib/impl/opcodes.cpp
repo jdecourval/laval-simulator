@@ -73,11 +73,6 @@ bool MXL::operator()(Registers& registers) const
     registers.status2.negative = registers.preload_negative;
     registers.status2.carry = false;
 
-    if (get_argument(0))
-    {
-        sync(registers);
-    }
-
     return true;
 }
 
@@ -99,11 +94,6 @@ bool MXA::operator()(Registers& registers) const
     registers.val = static_cast<uint8_t>(result);
     registers.status2.negative = result < 0;
 
-    if (get_argument(0))
-    {
-        sync(registers);
-    }
-
     return true;
 }
 
@@ -121,11 +111,6 @@ bool MXS::operator()(Registers& registers) const
     registers.status2.carry = checkcarry(result);
     registers.val = static_cast<uint8_t>(result);
     registers.status2.negative = result < 0;
-
-    if (get_argument(0))
-    {
-        sync(registers);
-    }
 
     return true;
 }
