@@ -21,9 +21,9 @@ TEST_CASE("Assembler")
     HLT
 )");
 
-    SECTION("build_ast")
+    SECTION("parse")
     {
-        auto [ast, settings] = Assembler::build_ast(stream);
+        auto [ast, settings] = Assembler::parse(stream);
 
         REQUIRE(ast.at(1).size() == 3);
         REQUIRE(ast.at(2).size() == 3);

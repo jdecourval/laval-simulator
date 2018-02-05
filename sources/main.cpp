@@ -75,7 +75,7 @@ int main(int argc, char* argv[])
         auto preprocessed_input = dynamic_cast<std::istream*>(preprocessed);
         cpu_assert(preprocessed_input, std::strerror(errno));
         preprocessed_input->seekg(0);
-        auto[ast, settings] = Assembler::build_ast(*preprocessed_input);
+        auto[ast, settings] = Assembler::parse(*preprocessed_input);
 
 
         if (!output_path.empty())

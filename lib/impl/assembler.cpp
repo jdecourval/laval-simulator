@@ -66,7 +66,7 @@ namespace Assembler
         }
     }
 
-    std::tuple<Ast, SettingMap> build_ast(std::istream& input)
+    std::tuple<Ast, SettingMap> parse(std::istream& input)
     {
         cpu_assert(input, "Invalid input");
 

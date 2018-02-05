@@ -39,7 +39,7 @@ void Cpu::link_memory(Memory&& memory, const Settings& settings)
 }
 
 
-void Cpu::handle_output(std::ostream& output)
+bool Cpu::handle_output(std::ostream& output)
 {
     auto first = true;
 
@@ -63,6 +63,8 @@ void Cpu::handle_output(std::ostream& output)
     {
         output << std::endl;
     }
+
+    return !first;
 }
 
 void Cpu::handle_input(std::istream& input, std::atomic<bool>& stop_signal, std::exception_ptr& thread_exception)
@@ -102,7 +104,7 @@ void Cpu::handle_input(std::istream& input, std::atomic<bool>& stop_signal, std:
                 if (input.eof())
                 {
                     stop_signal = true;
-                    return;
+                    break;
                 }
 
                 cpu_assert(delimiter == ' ', "Unexpected input");
@@ -155,7 +157,7 @@ uint8_t Cpu::start(std::istream& input, std::ostream& output, const std::chrono:
     try
     {
 
-        while (!stop_signal)
+        while (true)
         {
             time_before_execution = BenchmarkClock::now();
             auto time_since_report = time_before_execution - last_report_time;
@@ -168,7 +170,10 @@ uint8_t Cpu::start(std::istream& input, std::ostream& output, const std::chrono:
                 loops = 0;
             }
 
-            handle_output(output);
+            if (handle_output(output) && stop_signal)
+            {
+                break;
+            }
 
             std::for_each(std::begin(cores), std::end(cores), [](auto& core)
             { core.preload(); });

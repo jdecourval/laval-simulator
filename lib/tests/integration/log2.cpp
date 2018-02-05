@@ -11,7 +11,7 @@
 //    auto buffer = std::stringstream();
 //    auto assembly_input = std::ifstream("lib/tests/integration/log2.laval", std::ios::in | std::ios::out);
 //    Assembler::preprocess(assembly_input, buffer);
-//    auto [ast, settings] = Assembler::build_ast(buffer);
+//    auto [ast, settings] = Assembler::parse(buffer);
 //
 //    auto output = std::stringstream();
 //

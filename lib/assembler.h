@@ -34,7 +34,7 @@ namespace Assembler
     void preprocess(std::istream& input, std::ostream& output);
 
     /// Build an AST from an assembly file
-    std::tuple<Ast, SettingMap> build_ast(std::istream& input);
+    std::tuple<Ast, SettingMap> parse(std::istream& input);
 
     /// Assemble an AST to binary
     void assemble(const Ast&, const SettingMap&, std::ostream& output);

@@ -38,7 +38,7 @@ public:
     Cpu& operator=(Cpu&) = delete;
 
 private:
-    void handle_output(std::ostream&);
+    bool handle_output(std::ostream&);
     void handle_input(std::istream&, std::atomic<bool>& stop_signal, std::exception_ptr& thread_exception);
 
 
