@@ -78,36 +78,31 @@ void Cpu::handle_input(std::istream& input, std::atomic<bool>& stop_signal, std:
 
             while (true)
             {
-                auto core_id = 0ull;
-                auto value = 0;
-                auto comma = '\0';
-
-                if (!(input >> core_id >> comma >> value))
-                {
-                    cpu_assert(false, "Input error: " << std::strerror(errno));
-                }
-
-                auto delimiter = input.get();
-
-                cpu_assert(inputs.count(core_id), "No such core: " << core_id);
-                cpu_assert(comma == ',', "Unexpected input");
-
-                cpu_assert(value <= 0xff, "Too large input");
-                cpu_assert(value >= 0, "Only unsigned values are supported");
-                queue.emplace(core_id, value);
-
-                if (delimiter == '\n')
-                {
-                    break;
-                }
-
-                if (input.eof())
+                if (auto delimiter = input.get(); delimiter == std::char_traits<char>::eof())
                 {
                     stop_signal = true;
                     break;
                 }
+                else if (delimiter == '\n')
+                {
+                    break;
+                }
 
-                cpu_assert(delimiter == ' ', "Unexpected input");
+                input.unget();
+
+                auto core_id = 0ull;
+                auto value = 0;
+                auto comma = '\0';
+
+                input >> core_id >> comma >> value;
+
+                cpu_assert(input, "Input error");
+                cpu_assert(comma == ',', "Unexpected input");
+                cpu_assert(value <= 0xff, "Too large input");
+                cpu_assert(value >= 0, "Only unsigned values are supported");
+                cpu_assert(inputs.count(core_id), "No such core: " << core_id);
+
+                queue.emplace(core_id, value);
             }
 
             std::lock_guard lock(input_lock);
@@ -170,7 +165,7 @@ uint8_t Cpu::start(std::istream& input, std::ostream& output, const std::chrono:
                 loops = 0;
             }
 
-            if (handle_output(output) && stop_signal)
+            if ((handle_output(output) || thread_exception) && stop_signal)
             {
                 break;
             }
