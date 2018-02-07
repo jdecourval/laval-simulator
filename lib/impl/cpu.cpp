@@ -104,7 +104,7 @@ void Cpu::handle_input(std::istream& input, std::atomic<bool>& stop_signal, std:
                 queue.push_back(static_cast<uint8_t>(value));
             }
 
-            cpu_assert(queue.size() == inputs.size(), "Wrong number of parameters: " << queue.size() << ". Expected " << inputs.size());
+            cpu_assert(queue.size() == inputs.size()|| queue.empty(), "Wrong number of parameters: " << queue.size() << ". Expected " << inputs.size());
 
             auto i = std::cbegin(queue);
             std::lock_guard lock(input_lock);

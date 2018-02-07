@@ -6,7 +6,6 @@
     * Should be impossible to wire I/O to cores not on an edge
 - Add a 0x prefix to hexadecimal values
 - Deadlock detector (max number of cycles)
-- Simplify I/O format. Users should not have to know to which core values should be sent.
 - Check with the undefined behaviour sanitizer and valgrind
 - Output program size
 

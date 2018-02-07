@@ -17,8 +17,8 @@ int main(int argc, char* argv[])
     std::string file_path;
     app.add_option("file", file_path, "Assembly or binary program")->required()->check(CLI::ExistingFile);
 
-    std::vector<uint8_t> args;
-    app.add_option("args", args, "Program arguments");
+    std::string args_path;
+    app.add_option("ARGUMENTS", args_path, "Arguments file. With no ARGUMENTS, or when ARGUMENTS is -, read standard input");
 
     auto preprocess = false;
     auto preprocess_opt = app.add_flag("-E,--preprocess", preprocess, "Preprocess only, do not assemble or simulate");
@@ -103,7 +103,21 @@ int main(int argc, char* argv[])
         cpu_assert(binary_input, std::strerror(errno));
         binary_input->seekg(0);
         auto cpu = Assembler::load_binary(*binary_input);
-        auto answer = static_cast<int>(cpu.start(std::cin, std::cout));
+
+        int answer = 0;
+
+        if (args_path.empty() || args_path == "-")
+        {
+            answer = static_cast<int>(cpu.start(std::cin, std::cout));
+        }
+        else
+        {
+            std::cout << "file" << std::endl;
+            auto args_file = std::ifstream(args_path, std::ios::in);
+            cpu_assert(args_file, std::strerror(errno));
+            answer = static_cast<int>(cpu.start(args_file, std::cout));
+        }
+
         std::cout << "answer: " << answer << std::endl;
     }
 }
