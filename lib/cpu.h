@@ -6,8 +6,9 @@
 
 #include "throw_assert.h"
 
-#include <memory>
 #include <chrono>
+#include <map>
+#include <memory>
 
 
 class CoreArray;
@@ -45,7 +46,9 @@ private:
     Memory mem;
     CoreArray cores;
     std::vector<MemoryInterface::size_type> core_to_mem_map;
-    std::unordered_map<size_t, Input> inputs;
+
+    /// Map core_id to their input. The map is willingly ordered by the argument position.
+    std::map<size_t, Input> inputs;
     std::vector<size_t> outputs;
 
     std::mutex input_lock;

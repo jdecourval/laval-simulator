@@ -55,7 +55,8 @@ bool Cpu::handle_output(std::ostream& output)
             {
                 output << " ";
             }
-            output << output_id << "," << static_cast<int>(value->second);
+
+            output << static_cast<int>(value->second);
         }
     }
 
@@ -69,12 +70,14 @@ bool Cpu::handle_output(std::ostream& output)
 
 void Cpu::handle_input(std::istream& input, std::atomic<bool>& stop_signal, std::exception_ptr& thread_exception)
 {
+    std::vector<uint8_t> queue;
+    queue.reserve(inputs.size());
 
     while(!stop_signal)
     {
         try
         {
-            std::unordered_map<size_t, uint8_t> queue;
+            queue.clear();
 
             while (true)
             {
@@ -90,25 +93,24 @@ void Cpu::handle_input(std::istream& input, std::atomic<bool>& stop_signal, std:
 
                 input.unget();
 
-                auto core_id = 0ull;
                 auto value = 0;
-                auto comma = '\0';
 
-                input >> core_id >> comma >> value;
+                input >> value;
 
                 cpu_assert(input, "Input error");
-                cpu_assert(comma == ',', "Unexpected input");
                 cpu_assert(value <= 0xff, "Too large input");
                 cpu_assert(value >= 0, "Only unsigned values are supported");
-                cpu_assert(inputs.count(core_id), "No such core: " << core_id);
 
-                queue.emplace(core_id, value);
+                queue.push_back(static_cast<uint8_t>(value));
             }
 
+            cpu_assert(queue.size() == inputs.size(), "Wrong number of parameters: " << queue.size() << ". Expected " << inputs.size());
+
+            auto i = std::cbegin(queue);
             std::lock_guard lock(input_lock);
-            for (auto [core_id, value]: queue)
+            for (auto& core_input: inputs)
             {
-                inputs.at(core_id).put(value);
+                core_input.second.put(*(i++));
             }
         }
         catch(...)

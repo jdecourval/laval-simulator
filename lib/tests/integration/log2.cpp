@@ -22,7 +22,7 @@ TEST_CASE("Log2 ASM")
 
     for (auto a = 5_u8; a < 0xff_u8; a++)
     {
-        std::istringstream input("0," + std::to_string(a));
+        std::istringstream input(std::to_string(a));
         auto answer = static_cast<int>(cpu.start(input, std::cout));
         INFO(a);
         REQUIRE(answer == std::floor(std::log2(a)));

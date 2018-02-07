@@ -122,7 +122,7 @@ TEST_CASE("Multiplication ASM")
 
     auto cpu = Assembler::load_binary(output);
 
-    auto input_str = "0,2 2,3";
+    auto input_str = "2 3";
     std::istringstream input(input_str);
 
     auto answer = static_cast<int>(cpu.start(input, std::cout));

@@ -5,18 +5,18 @@
 #include "direction.h"
 #include "input.h"
 
-#include <unordered_map>
+#include <map>
 
 
 class CoreArray
 {
     static constexpr auto Wrap = false;
-    static inline std::unordered_map<size_t, Input> default_input;
+    static inline std::map<size_t, Input> default_input;
 
 public:
     explicit CoreArray(const std::vector<uint16_t>& dimensions, const MemoryInterface& mem);
 
-    explicit CoreArray(const std::vector<uint16_t>& dimensions, const MemoryInterface& mem, std::unordered_map<size_t, Input>& inputs);
+    explicit CoreArray(const std::vector<uint16_t>& dimensions, const MemoryInterface& mem, std::map<size_t, Input>& inputs);
 
     Core& operator[](const size_t& index);
 
@@ -56,7 +56,7 @@ public:
 private:
     std::vector<Core> cores;
     std::vector<size_t> index_operands;
-    std::unordered_map<size_t, Input>& inputs;
+    std::map<size_t, Input>& inputs;
 };
 
 

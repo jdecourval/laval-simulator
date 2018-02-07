@@ -7,7 +7,7 @@ CoreArray::CoreArray(const std::vector<uint16_t>& dimensions, const MemoryInterf
 
 }
 
-CoreArray::CoreArray(const std::vector<uint16_t>& dimensions, const MemoryInterface& mem, std::unordered_map<size_t, Input>& inputs)
+CoreArray::CoreArray(const std::vector<uint16_t>& dimensions, const MemoryInterface& mem, std::map<size_t, Input>& inputs)
 : inputs(inputs)
 {
     auto size = std::accumulate(dimensions.begin(), dimensions.end(), 1ull, std::multiplies<>());
