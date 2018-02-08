@@ -1,7 +1,7 @@
 #include "instruction_factory.h"
 
 
-std::unique_ptr<InstructionBase> InstructionFactory::create(uint8_t val)
+std::unique_ptr<InstructionBase> InstructionFactory::create(uint8_t val) const
 {
     // Check if the instruction is valid
     cpu_assert(val < counter, "Invalid instruction");
@@ -9,7 +9,7 @@ std::unique_ptr<InstructionBase> InstructionFactory::create(uint8_t val)
     return map.at(val)(val);
 }
 
-std::unique_ptr<InstructionBase> InstructionFactory::create(const std::pair<std::string, std::vector<uint8_t>>& ast)
+std::unique_ptr<InstructionBase> InstructionFactory::create(const std::pair<std::string, std::vector<uint8_t>>& ast) const
 {
     cpu_assert(name_to_instruction.count(ast.first), "Unknown instruction")
 

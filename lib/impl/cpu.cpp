@@ -136,11 +136,11 @@ uint8_t Cpu::start(std::istream& input, std::ostream& output, const std::chrono:
 
     if (period.count() != 0)
     {
-        std::cout << "starting cpu at " << 1000 / period.count() << " Hz" << std::endl;
+        std::cerr << "starting cpu at " << 1000 / period.count() << " Hz" << std::endl;
     }
     else
     {
-        std::cout << "starting cpu at max speed" << std::endl;
+        std::cerr << "starting cpu at max speed" << std::endl;
     }
 
     std::atomic<bool> stop_signal{};
@@ -224,6 +224,26 @@ uint8_t Cpu::start(std::istream& input, std::ostream& output, const std::chrono:
     }
 
     return 0;
+}
+
+std::ostream& operator<<(std::ostream& os, const Cpu& cpu)
+{
+    os << "Instruction space: " << static_cast<size_t>(cpu.cores[0].get_factory().size()) << "/" << 256 << "\n";
+    os << "Cores number: " << cpu.cores.size() << "\n";
+    os << "Memory banks number: " << static_cast<size_t>(cpu.mem.banks_number()) << "\n";
+    os << "Memory banks size: " << static_cast<size_t>(cpu.mem.banks_size()) << "\n";
+    os << "Inputs on cores: ";
+    for (auto& input: cpu.inputs)
+    {
+        os << input.first << " ";
+    }
+
+    os << "\n";
+
+    os << "Outputs on cores: ";
+    std::copy(cpu.outputs.begin(), cpu.outputs.end(), std::ostream_iterator<char>(os, " "));
+
+    return os;
 }
 
 

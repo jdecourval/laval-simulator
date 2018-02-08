@@ -67,11 +67,14 @@ Fetchable& CoreArray::offset(size_t id, const Direction::CoreDirection& offsets)
     {
         cpu_assert(false, "No such core at offset " << offsets.at(0) - 1 << ":" << offsets.at(1) - 1 << ":" << offsets.at(2) - 1);
     }
-
-    return cores[index];
 }
 
 Core& CoreArray::operator[](const size_t& index)
+{
+    return cores[index];
+}
+
+const Core& CoreArray::operator[](const size_t& index) const
 {
     return cores[index];
 }

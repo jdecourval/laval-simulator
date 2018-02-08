@@ -104,6 +104,11 @@ int main(int argc, char* argv[])
         binary_input->seekg(0);
         auto cpu = Assembler::load_binary(*binary_input);
 
+        binary_input->clear();
+        std::cerr << "Program size: " << binary_input->tellg() << "\n";
+
+        std::cerr << cpu << std::endl;
+
         int answer = 0;
 
         if (args_path.empty() || args_path == "-")
@@ -112,7 +117,6 @@ int main(int argc, char* argv[])
         }
         else
         {
-            std::cout << "file" << std::endl;
             auto args_file = std::ifstream(args_path, std::ios::in);
             cpu_assert(args_file, std::strerror(errno));
             answer = static_cast<int>(cpu.start(args_file, std::cout));

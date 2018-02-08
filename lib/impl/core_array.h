@@ -20,6 +20,8 @@ public:
 
     Core& operator[](const size_t& index);
 
+    const Core& operator[](const size_t& index) const;
+
     Core& operator[](const std::array<size_t, 3>& index_array);
 
     Fetchable& offset(size_t id, const Direction::CoreDirection& offsets);
@@ -44,7 +46,7 @@ public:
         return std::end(cores);
     }
 
-    decltype(auto) size() noexcept
+    decltype(auto) size() const noexcept
     {
         return cores.size();
     }

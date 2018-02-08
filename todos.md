@@ -5,11 +5,10 @@
 - Test I/O
     * Should be impossible to wire I/O to cores not on an edge
 - Deadlock detector (max number of cycles)
-- Check with the undefined behaviour sanitizer and valgrind
-- Output program size
-- Consistently direct CPU output to stdout and simulator messages to stderr
 
 # Optional for CSGames 2018
+- Check with the undefined behaviour sanitizer and valgrind
+- Remove wrap
 - Merge similar tests under the sames test cases
 - Consider adding other logical operators
 - Consider adding AND and OR instructions affecting the high part

@@ -62,8 +62,6 @@ void Core::initialize()
     factory.register_instruction<OpCodes::CSU>();
     factory.register_instruction<OpCodes::CAN>();
     factory.register_instruction<OpCodes::COR>();
-
-    std::cout << "Instructions space: " << static_cast<int>(factory.size()) << " / 256" << std::endl;
 }
 
 void Core::preload(bool force)
@@ -175,7 +173,7 @@ std::ostream& operator<<(std::ostream& os, const Core& core)
     return os;
 }
 
-InstructionFactory& Core::get_factory()
+const InstructionFactory& Core::get_factory() const
 {
     return factory;
 }

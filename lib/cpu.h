@@ -38,6 +38,8 @@ public:
 
     Cpu& operator=(Cpu&) = delete;
 
+    friend std::ostream& operator<<(std::ostream& os, const Cpu& cpu);
+
 private:
     bool handle_output(std::ostream&);
     void handle_input(std::istream&, std::atomic<bool>& stop_signal, std::exception_ptr& thread_exception);

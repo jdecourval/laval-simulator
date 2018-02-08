@@ -41,7 +41,7 @@ bool CTV::operator()(Registers& registers) const
 
 bool DBG::operator()(Registers& registers) const
 {
-    std::cout << registers << std::endl;
+    std::cerr << registers << std::endl;
 
     return true;
 }

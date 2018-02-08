@@ -44,7 +44,7 @@ public:
         }
     }
 
-    InstructionFactory& get_factory();
+    const InstructionFactory& get_factory() const;
 
     bool operator==(const Core&) const;
 

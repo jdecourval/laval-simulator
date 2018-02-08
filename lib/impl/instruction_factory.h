@@ -15,9 +15,9 @@ public:
     template<typename T>
     void register_instruction();
 
-    std::unique_ptr<InstructionBase> create(uint8_t val);
+    std::unique_ptr<InstructionBase> create(uint8_t val) const;
 
-    std::unique_ptr<InstructionBase> create(const std::pair<std::string, std::vector<uint8_t>>& ast);
+    std::unique_ptr<InstructionBase> create(const std::pair<std::string, std::vector<uint8_t>>& ast) const;
 
     uint8_t dump(const InstructionBase& instruction) const;
 
