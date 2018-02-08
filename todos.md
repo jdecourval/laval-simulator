@@ -4,10 +4,10 @@
 - Produce some figures to help documentation
 - Test I/O
     * Should be impossible to wire I/O to cores not on an edge
-- Add a 0x prefix to hexadecimal values
 - Deadlock detector (max number of cycles)
 - Check with the undefined behaviour sanitizer and valgrind
 - Output program size
+- Consistently direct CPU output to stdout and simulator messages to stderr
 
 # Optional for CSGames 2018
 - Merge similar tests under the sames test cases
