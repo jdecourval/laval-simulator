@@ -10,14 +10,36 @@ Its a novel architecture set to revolutionize the computing world with its massi
 
 LAVAL architecture lies somewhere between those of CPU, GPU and FPGA.
 It consists of a large number of simple locally connected cores.
+Core are connected together in a local basis following a cube pattern.
 Cores execute instructions stored in their linked memory bank.
 Branches are made by switching execution from one memory bank to another one.
 
 ### Core
 The main component of the LAVAL architecture is the CORE unit.
-It is a very low complexity core capable of executing a couple of different 8 bits instructions *(arguments included)*.
+It is a very low complexity core capable of executing a couple of different 8 bits instructions *arguments included*.
 
-pipeline depth = 2
+Execution takes place in two steps:
+
+1. Preload
+
+    1. If multiplexer' target core have its SYNC flag off, then this step is done
+    2. Load a value from the multiplexer into PRELOAD.
+    3. Set UNLOCK flag on multiplexer target if the next instruction to be executed will use PRELOAD
+
+
+2. Fetch and execute
+
+    1. Reset SYNC flag
+    2. Execute instruction
+        Instruction may or may not stall the execution pipeline for this core, refer to the instruction set documentation for further information.
+    3. PC is incremented and may freely wrap around
+    4. Reset UNLOCK flag
+
+This means each core is able to read
+Inter-core communication is heavily optimized for constant patterns.
+Reads take place using a multiplexer whose address can only be changed using dedicated instructions.
+
+
 
 #### VAL register
 
@@ -33,7 +55,8 @@ Two cores loading at the same time ...
 ### Memory bank
 
 
-## Instructions
+## Instruction set
+TODO: Add instruction effect on status bits
 
 ### Basic instructions
 
@@ -54,7 +77,9 @@ Sync
 
 **Description:**
 
-Sync VAL with connected mux(es)
+Sync VAL with connected mux(es).
+Multiple cores may receive the same synced value as long as they fetch it on the same cycle.
+This instruction will block until at least one core has fetched a value.
 
 
 #### DBG
@@ -65,7 +90,7 @@ Output to debugger
 
 **Description:**
 
-Output core status to connected debugger
+Output core status, which the values of all the registers, to connected debugger.
 
 
 #### HLT
@@ -101,28 +126,16 @@ Set multiplexer to another core
 
 **Description:**
 
-Point mux to another core as indicated by arguments
+Point mux to another core as indicated by arguments by setting the MUX register.
+
+**Notes:**
+A core may be connected to itself.
 
 **Example:**
 
 ```
 MUX CURRENT, BEFORE, AFTER
 ```
-
-
-#### MXR
-Set multiplexer to a register
-
-**Argument:**
-
-| Size | Description       |
-|:---:|:-----------------|
-| 0..1 | 0: PC, 1: MEMBANK |
-
-
-**Description:**
-
-Point mux to a core register as indicated by argument
 
 
 #### CTC
@@ -132,6 +145,9 @@ Connect to carry
 
 **Description:**
 
+**Notes:**
+
+The multiplexer may also be connected to the VAL register using CTV.
 
 
 #### CTV
@@ -141,7 +157,9 @@ Connect to VAL
 
 **Description:**
 
+**Notes:**
 
+The multiplexer may also be connected to the carry bit using CTC.
 
 
 
@@ -153,7 +171,29 @@ Multiplexer discard
 
 **Description:**
 
-Fetch and discard a value from the mux. Use this instruction to unlock a syncing core.
+Fetch and discard a value from the mux. Use this instruction to unlock a core blocked on a SYN instruction.
+
+**Notes:**
+This instruction keeps VAL unaffected.
+
+**Example:**
+
+```
+.cores 1, 1, 2
+.mem_number 2
+.mem_size 3
+.core_to_mem 0, 1
+
+0:
+    LCL 1
+    SYN     ; Will wait here for one cycle, the execute on the next
+    LCL 2   ; Will execute on the fourth cycle
+
+1:
+    NOP
+    NOP
+    MXD     ; VAL is still zero
+```
 
 
 #### MXL
@@ -189,7 +229,7 @@ Fetch and subtract the value from the mux to VAL.
 
 ### Jumping
 #### JMP
-Jump
+Jump unconditionally
 
 **Argument:**
 
@@ -200,6 +240,22 @@ Jump
 **Description:**
 
 Point current core to a new membank as indicated by the argument. PC is reset to 0.
+
+**Example:**
+
+```
+.cores 1, 1, 1
+.mem_number 2
+.mem_size 2
+.core_to_mem 0, 1
+
+0:
+    NOP     ; First cycle.
+    JMP 1   ; Second cycle.
+
+1:
+    NOP     ; Third cycle.
+```
 
 
 #### JLZ
@@ -258,6 +314,7 @@ Load constant into low part
 **Description:**
 
 Load a 4 bits constant into the 4 lower bits of VAL.
+The four higher bits are unaffected.
 
 **Notes:**
 
@@ -276,14 +333,15 @@ Load constant into high part
 **Description:**
 
 Load a 4 bits constant into the 4 higher bits of VAL.
+The four lower bits are unaffected.
 
 **Notes:**
 
 To load the lower bits, use LCL.
 
 
-#### LLS
-Left logical shift
+#### LSL
+Logical shift, left
 
 **Argument:** None
 
@@ -293,11 +351,14 @@ Left logical shift
 
 **Description:**
 
-Logically left shift VAL by a number of bits indicated by the argument.
+Logically left shift VAL by number of bits indicated by the argument.
+Every bit of VAL is moved a given number of bit positions.
+The vacant bit-positions are filled with zeros.
+Does not preserve a number's sign bit, if applicable.
 
 
-#### RLS
-Right logical shift
+#### LSR
+Logical shift, right
 
 **Argument:** None
 
@@ -307,7 +368,10 @@ Right logical shift
 
 **Description:**
 
-Logically right shift VAL by a number of bits indicated by the argument.
+Logically right shift VAL by number of bits indicated by the argument.
+Every bit of VAL is moved a given number of bit positions.
+The vacant bit-positions are filled with zeros.
+Does not preserve a number's sign bit, if applicable.
 
 
 #### CAD
@@ -363,28 +427,10 @@ Constant OR
 
 **Description:**
 
-Apply a logical OR to the four lower bits of VAL. The 4 higher bits are kept unmodified.
 
-
-
-### Input and output
-
-#### RET
-Return
-
-**Argument:** None
-
-**Description:**
-
-
-
-#### INP
-Input
-
-**Argument:** None
-
-**Description:**
-
+The COR instruction is unable by itself to affect all the bits of VAL.
+A single COR will apply a logical OR to the four lower bits of VAL. The 4 higher bits are kept unmodified.
+It may be useful to then use the CAN instruction to restrict output to affected values.
 
 
 
@@ -393,7 +439,13 @@ Input
 
 ## LAVAL-M
 LAVAL-M1 is the first version of the official embedded subset of LAVAL.
-Its made to have a very low memory requirement, power consumption and an high AL<sup>[1](#AL)</sup>.
+It imposes some restriction garantee a very low memory requirement, power consumption and an high AL<sup>[1](#AL)</sup>.
+
+- It possesses a single general purpose register
+- It only supports integer math
+- All its registers are 8 bits long
+- Since PC is 8 bits long, memory banks are limited to 256 bytes
+-
 
 TODO: two complement
 

@@ -615,7 +615,7 @@ TEST_CASE("LCS")
 
     SECTION("No overflow 1")
     {
-        OpCodes::LLS instruction({1});
+        OpCodes::LSL instruction({1});
         registers.val = 0b0101'0101;
         instruction(registers);
 
@@ -625,7 +625,7 @@ TEST_CASE("LCS")
 
     SECTION("No overflow 2")
     {
-        OpCodes::LLS instruction({3});
+        OpCodes::LSL instruction({3});
         registers.val = 0b0001'1101;
         instruction(registers);
 
@@ -636,7 +636,7 @@ TEST_CASE("LCS")
     SECTION("Overflow by 1")
     {
         // The carry flag is updated to the last bit shifted out, bit[n-1], of the register Rm.
-        OpCodes::LLS instruction({2});
+        OpCodes::LSL instruction({2});
         registers.val = 0b0101'0101;
         instruction(registers);
 
@@ -647,7 +647,7 @@ TEST_CASE("LCS")
 
     SECTION("Overflow by 2")
     {
-        OpCodes::LLS instruction({3});
+        OpCodes::LSL instruction({3});
         registers.val = 0b0101'0101;
         instruction(registers);
 
@@ -658,7 +658,7 @@ TEST_CASE("LCS")
 
     SECTION("Shift by 8")
     {
-        OpCodes::LLS instruction({8});
+        OpCodes::LSL instruction({8});
         registers.val = 0b1111'1111;
         instruction(registers);
 
@@ -670,14 +670,14 @@ TEST_CASE("LCS")
     REQUIRE(!registers.status1.sync);
 }
 
-TEST_CASE("RLS")
+TEST_CASE("LSR")
 {
     Registers registers;
     Registers registers_expected;
 
     SECTION("No overflow 1")
     {
-        OpCodes::RLS instruction({1});
+        OpCodes::LSR instruction({1});
         registers.val = 0b1010'1010;
         instruction(registers);
 
@@ -687,7 +687,7 @@ TEST_CASE("RLS")
 
     SECTION("No overflow 2")
     {
-        OpCodes::RLS instruction({3});
+        OpCodes::LSR instruction({3});
         registers.val = 0b0101'0000;
         instruction(registers);
 
@@ -698,7 +698,7 @@ TEST_CASE("RLS")
     SECTION("Overflow by 1")
     {
         // The carry flag is updated to the last bit shifted out
-        OpCodes::RLS instruction({2});
+        OpCodes::LSR instruction({2});
         registers.val = 0b1010'1010;
         instruction(registers);
 
@@ -709,7 +709,7 @@ TEST_CASE("RLS")
 
     SECTION("Overflow by 2")
     {
-        OpCodes::RLS instruction({3});
+        OpCodes::LSR instruction({3});
         registers.val = 0b1010'1010;
         instruction(registers);
 
@@ -720,7 +720,7 @@ TEST_CASE("RLS")
 
     SECTION("Shift by 8")
     {
-        OpCodes::RLS instruction({8});
+        OpCodes::LSR instruction({8});
         registers.val = 0b1111'1111;
         instruction(registers);
 

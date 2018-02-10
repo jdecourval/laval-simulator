@@ -11,7 +11,7 @@
 
 1:
     SYN
-    LLS 1
+    LSL 1
     JMP 1
 
 2:
@@ -41,7 +41,7 @@
     JEZ 6
     SYN
     MXD
-    RLS 1
+    LSR 1
     JMP 5
 
 6:
