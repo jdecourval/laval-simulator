@@ -14,7 +14,7 @@
 
 1:
     JEZ 2
-    RLS 1
+    LSR 1
     MXD
     SYN
     JMP 1

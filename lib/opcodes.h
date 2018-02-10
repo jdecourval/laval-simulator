@@ -199,7 +199,7 @@ namespace OpCodes
 
 // Left logical shift
 // arg 1:0xf: shift amount
-    struct LLS : public Instruction<0xf>
+    struct LSL : public Instruction<0xf>
     {
         using Instruction<0xf>::Instruction;
 
@@ -209,7 +209,7 @@ namespace OpCodes
 
 // Right logical shift
 // arg 1:0xf: shift amount
-    struct RLS : public Instruction<0xf>
+    struct LSR : public Instruction<0xf>
     {
         using Instruction<0xf>::Instruction;
 

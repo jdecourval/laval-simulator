@@ -187,7 +187,7 @@ bool JMP::operator()(Registers& registers) const
     return false;
 }
 
-bool LLS::operator()(Registers& registers) const
+bool LSL::operator()(Registers& registers) const
 {
     auto result = registers.val << get_argument(0);
     registers.val = static_cast<uint8_t>(result);
@@ -199,7 +199,7 @@ bool LLS::operator()(Registers& registers) const
     return true;
 }
 
-bool RLS::operator()(Registers& registers) const
+bool LSR::operator()(Registers& registers) const
 {
     // There is no way in C++ to check right overflow, it needs to be computed
     // Shift by one less and check if there is a bit at LSB

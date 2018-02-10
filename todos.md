@@ -7,6 +7,8 @@
 - Deadlock detector (max number of cycles)
 
 # Optional for CSGames 2018
+- Automatic mem_number and mem_size
+- Output statistics after assembling
 - Check with the undefined behaviour sanitizer and valgrind
 - Remove wrap
 - Merge similar tests under the sames test cases

@@ -188,7 +188,7 @@ TEST_CASE("Fetch from linked core")
 
     // Move one bit into carry
     core2.execute(OpCodes::LCH({8}));
-    core2.execute(OpCodes::LLS({1}));
+    core2.execute(OpCodes::LSL({1}));
 
     core2.execute(Debug{test_registers});
     REQUIRE(test_registers.status2.carry);

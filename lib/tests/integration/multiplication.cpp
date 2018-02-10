@@ -39,7 +39,7 @@ uint8_t multiplication(uint8_t a, uint8_t b)
 
     // Membank 1, shift a
     memory.at(1).at(0) = cpu.dump(SYN());
-    memory.at(1).at(1) = cpu.dump(LLS({1}));
+    memory.at(1).at(1) = cpu.dump(LSL({1}));
     memory.at(1).at(2) = cpu.dump(JMP({1}));
 
 
@@ -72,7 +72,7 @@ uint8_t multiplication(uint8_t a, uint8_t b)
     memory.at(5).at(0) = cpu.dump(JEZ({6}));
     memory.at(5).at(1) = cpu.dump(SYN());
     memory.at(5).at(2) = cpu.dump(MXD());
-    memory.at(5).at(3) = cpu.dump(RLS({1}));
+    memory.at(5).at(3) = cpu.dump(LSR({1}));
     memory.at(5).at(4) = cpu.dump(JMP({5}));
 
     // Membank 4: halt

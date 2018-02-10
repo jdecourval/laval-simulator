@@ -56,8 +56,8 @@ void Core::initialize()
     factory.register_instruction<OpCodes::JEZ>();
     factory.register_instruction<OpCodes::JGZ>();
     factory.register_instruction<OpCodes::JMP>();
-    factory.register_instruction<OpCodes::LLS>();
-    factory.register_instruction<OpCodes::RLS>();
+    factory.register_instruction<OpCodes::LSL>();
+    factory.register_instruction<OpCodes::LSR>();
     factory.register_instruction<OpCodes::CAD>();
     factory.register_instruction<OpCodes::CSU>();
     factory.register_instruction<OpCodes::CAN>();
