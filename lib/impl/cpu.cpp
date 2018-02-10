@@ -190,6 +190,7 @@ uint8_t Cpu::start(std::istream& input, std::ostream& output, const std::chrono:
                     std::rethrow_exception(thread_exception);
                 }
 
+                std::cerr << "Cycles simulated: " << loops << std::endl;
                 return answer.content;
             }
 
@@ -212,10 +213,12 @@ uint8_t Cpu::start(std::istream& input, std::ostream& output, const std::chrono:
     }
     catch(...)
     {
+        std::cerr << "Cycles simulated: " << loops << std::endl;
         stop_signal = true;
         throw;
     }
 
+    std::cerr << "Cycles simulated: " << loops << std::endl;
     input_handler.join();
 
     if (thread_exception)
