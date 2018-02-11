@@ -2,9 +2,9 @@
 
 ## Introduction
 LAVAL COMPUTER is the first computer to implement the revolutionary LAVAL CPU architecture.
- Like every good acronym, LAVAL is recursively defined: Laval Advanced Vectorized Architecture Laboratory.
+Like every good acronym, LAVAL is recursively defined: Laval Advanced Vectorized Architecture Laboratory.
 
-Its a novel architecture set to revolutionize the computing world with its massively parallel core organisation.
+Its a novel architecture, sets to revolutionize the computing world with its massively parallel cores organisation.
 
 ## Architecture
 
@@ -13,6 +13,8 @@ It consists of a large number of simple locally connected cores.
 Core are connected together in a local basis following a cube pattern.
 Cores execute instructions stored in their linked memory bank.
 Branches are made by switching execution from one memory bank to another one.
+
+![Cpu architecture](cores.svg "CPU Architecture")
 
 ### Core
 The main component of the LAVAL architecture is the CORE unit.
