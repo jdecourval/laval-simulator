@@ -30,7 +30,7 @@ struct Registers
         bool carry; //: 1;
         bool negative; //: 1;
         bool overflow; // : 1;  // TODO: This is unused, remove
-        bool unlock; // : 1;    // TODO: Move in status1 with sync
+        bool unlock; // : 1;   /// Is set to true when a core fetch from this core and reset to false after each cycle  // TODO: Move in status1 with sync
 
         bool operator==(const Status2& other) const;
     };

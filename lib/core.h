@@ -24,11 +24,13 @@ public:
 
     void preload(bool force = false);
 
-    void fetch();
+    /// @return true if core have not blocked
+    bool fetch();
 
     bool execute(const InstructionBase& raw_instruction);
 
-    void step();
+    /// @return true if core have not blocked
+    bool step();
 
     std::optional<std::pair<bool, uint8_t>> get_from(bool carry) override
     {

@@ -124,7 +124,7 @@ void Core::preload(bool force)
     }
 }
 
-void Core::fetch()
+bool Core::fetch()
 {
     try
     {
@@ -146,9 +146,12 @@ void Core::fetch()
         {
             // Safe to cast since the modulo limits the value and a check about that is done in initialize.
             registers.pc = static_cast<uint8_t>((registers.pc + 1) % mem->banks_size());
+            registers.status2.unlock = false;
+            return true;
         }
 
         registers.status2.unlock = false;
+        return false;
     }
     catch (CpuException& exception)
     {
@@ -178,8 +181,8 @@ const InstructionFactory& Core::get_factory() const
     return factory;
 }
 
-void Core::step()
+bool Core::step()
 {
     preload();
-    fetch();
+    return fetch();
 }
