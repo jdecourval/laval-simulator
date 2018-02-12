@@ -175,10 +175,13 @@ uint8_t Cpu::start(std::istream& input, std::ostream& output, const std::chrono:
             std::for_each(std::begin(cores), std::end(cores), [](auto& core)
             { core.preload(); });
 
+            auto not_staled = false;
             try
             {
-                std::for_each(std::begin(cores), std::end(cores), [](auto& core)
-                { core.fetch(); });
+                // Could be a little cleaner (and maybe even replace the thread pool) with std::transform_reduce
+                // which is not yet available in GCC
+                std::for_each(std::begin(cores), std::end(cores), [&not_staled](auto& core)
+                { not_staled |= core.fetch(); });
             }
             catch (const Answer& answer)
             {
@@ -208,7 +211,7 @@ uint8_t Cpu::start(std::istream& input, std::ostream& output, const std::chrono:
                 }
             }
 
-            loops++;
+            loops = not_staled ? loops + 1 : loops;
         }
     }
     catch(...)
