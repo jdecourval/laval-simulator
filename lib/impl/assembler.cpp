@@ -99,11 +99,11 @@ namespace Assembler
                 auto name = base_match[1];
                 auto args = split(base_match[2], ',');
 
-                std::vector<uint8_t> args_int;
+                std::vector<uint16_t> args_int;
                 std::transform(std::cbegin(args), std::cend(args), std::back_inserter(args_int), [&line_number](auto& arg)
                 {
                     auto arg_int = std::stol(arg);
-                    cpu_assert(arg_int <= 0xff, "Too large setting at line " << line_number);
+                    cpu_assert(arg_int <= 0xffff, "Too large setting at line " << line_number);
                     assert(arg_int >= 0);
                     return arg_int;
                 });

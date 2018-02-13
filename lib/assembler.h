@@ -28,7 +28,7 @@ namespace Assembler
     using Ast = std::unordered_map<BlockId, std::vector<Node>>;
 
     /// Parsed settings, part of the AST
-    using SettingMap = std::unordered_map<std::string, std::vector<uint8_t>>;
+    using SettingMap = std::unordered_map<std::string, std::vector<uint16_t>>;
 
     /// Preprocess input into output
     void preprocess(std::istream& input, std::ostream& output);

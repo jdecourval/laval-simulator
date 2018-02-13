@@ -247,7 +247,7 @@ std::ostream& operator<<(std::ostream& os, const Cpu& cpu)
     os << "\n";
 
     os << "Outputs on cores: ";
-    std::copy(cpu.outputs.begin(), cpu.outputs.end(), std::ostream_iterator<char>(os, " "));
+    std::copy(cpu.outputs.begin(), cpu.outputs.end(), std::ostream_iterator<size_t>(os, " "));
 
     return os;
 }

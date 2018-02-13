@@ -1,0 +1,49 @@
+.cores 2, 500, 500
+.mem_number 9
+.mem_size 7
+.mem_map 0-250000, 250001-500000
+.in 0-250000
+.out 250001-500000
+
+0:
+    MUX BEFORE, CURRENT, CURRENT
+    MXL
+    LSR 2
+    SYN
+    LSR 1
+    SYN
+    SYN
+    SYN
+    SYN
+    LSR 1
+    SYN
+    SYN
+    SYN
+    SYN
+    JMP 0
+
+1:
+    MUX BEFORE, CURRENT, CURRENT
+    MXL
+    MUX BEFORE, CURRENT, BEFORE
+    MXA
+    MUX BEFORE, CURRENT, AFTER
+    MXA
+    MUX BEFORE, BEFORE, BEFORE
+    MXA
+    MUX BEFORE, BEFORE, CURRENT
+    MXA
+    MUX BEFORE, BEFORE, AFTER
+    MXA
+    MUX BEFORE, AFTER, BEFORE
+    MXA
+    MUX BEFORE, AFTER, CURRENT
+    MXA
+    MUX BEFORE, AFTER, AFTER
+    MXA
+    SYN
+    JMP 1
+
+; TODO: Add range support
+; TODO: Change mem_map so that its indexes now represent membanks instead of cores
+; TODO: Figure out a way to deal with edges

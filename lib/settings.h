@@ -14,7 +14,7 @@ struct Settings
     std::vector<size_t> inputs;
     std::vector<size_t> outputs;
 
-    static Settings from_ast(const std::unordered_map<std::string, std::vector<uint8_t>>& ast);
+    static Settings from_ast(const std::unordered_map<std::string, std::vector<uint16_t>>& ast);
 
     template<class Archive>
     void serialize(Archive& archive)
