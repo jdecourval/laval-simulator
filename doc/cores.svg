@@ -111,14 +111,14 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.4"
-     inkscape:cx="185.62547"
+     inkscape:cx="1033.3452"
      inkscape:cy="260.27336"
      inkscape:document-units="mm"
-     inkscape:current-layer="layer5"
+     inkscape:current-layer="g4772"
      showgrid="false"
-     inkscape:window-width="3840"
+     inkscape:window-width="1920"
      inkscape:window-height="2129"
-     inkscape:window-x="0"
+     inkscape:window-x="1920"
      inkscape:window-y="31"
      inkscape:window-maximized="0"
      fit-margin-top="0"
@@ -133,7 +133,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -475,7 +475,7 @@
          id="tspan5221"
          x="42.49585"
          y="54.462238"
-         style="stroke-width:0.26458332"></tspan></text>
+         style="stroke-width:0.26458332" /></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:10.58333302px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
@@ -590,7 +590,7 @@
          style="stroke-width:0.21148609"
          y="166.88484"
          x="189.9436"
-         sodipodi:role="line">Bank ...</tspan></text>
+         sodipodi:role="line">Bank 5</tspan></text>
     <g
        id="g5931">
       <g
@@ -671,7 +671,7 @@
              id="tspan5563-5"
              x="181.97896"
              y="33.489357"
-             style="font-size:2.82222223px;stroke-width:0.26458332">Instruction ...</tspan></text>
+             style="font-size:2.82222223px;stroke-width:0.26458332">Instruction 3</tspan></text>
       </g>
     </g>
     <g
@@ -759,7 +759,7 @@
              id="tspan5563-5-5"
              x="181.97896"
              y="33.489357"
-             style="font-size:2.82222223px;stroke-width:0.26458332">Instruction ...</tspan></text>
+             style="font-size:2.82222223px;stroke-width:0.26458332">Instruction 3</tspan></text>
       </g>
     </g>
     <g
@@ -847,7 +847,7 @@
              id="tspan5563-5-56"
              x="181.97896"
              y="33.489357"
-             style="font-size:2.82222223px;stroke-width:0.26458332">Instruction ...</tspan></text>
+             style="font-size:2.82222223px;stroke-width:0.26458332">Instruction 3</tspan></text>
       </g>
     </g>
     <g
@@ -935,7 +935,7 @@
              id="tspan5563-5-561"
              x="181.97896"
              y="33.489357"
-             style="font-size:2.82222223px;stroke-width:0.26458332">Instruction ...</tspan></text>
+             style="font-size:2.82222223px;stroke-width:0.26458332">Instruction 3</tspan></text>
       </g>
     </g>
     <g
@@ -1023,7 +1023,7 @@
              id="tspan5563-5-9"
              x="181.97896"
              y="33.489357"
-             style="font-size:2.82222223px;stroke-width:0.26458332">Instruction ...</tspan></text>
+             style="font-size:2.82222223px;stroke-width:0.26458332">Instruction 3</tspan></text>
       </g>
     </g>
     <g
@@ -1111,7 +1111,7 @@
              id="tspan5563-5-6"
              x="181.97896"
              y="33.489357"
-             style="font-size:2.82222223px;stroke-width:0.26458332">Instruction ...</tspan></text>
+             style="font-size:2.82222223px;stroke-width:0.26458332">Instruction 3</tspan></text>
       </g>
     </g>
   </g>
