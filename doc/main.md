@@ -11,20 +11,35 @@ Its a novel architecture, sets to revolutionize the computing world with its mas
 LAVAL architecture lies somewhere between those of CPU, GPU and FPGA.
 It consists of a large number of simple locally connected cores.
 Core are connected together in a local basis following a cube pattern.
-Cores execute instructions stored in their linked memory bank.
+Cores execute instructions stored in their linked memory bank, which is read only.
 Branches are made by switching execution from one memory bank to another one.
 
+Many CPU settings, like the number of cores, are implementation defined.
+Refer to your specific CPU model for more information.
+
+For example, this figure presents a small 2x2x2 implementation with six memory banks of four bytes each.
+
 ![Cpu architecture](cores.svg "CPU Architecture")
+Do note that only some of the core-to-core links are drawn to reduce clutter.
 
 ### Core
 The main component of the LAVAL architecture is the CORE unit.
 It is a very low complexity core capable of executing a couple of different 8 bits instructions *arguments included*.
+Every instruction executes in a single clock cycle.
 
+A CORE owns a single general purpose register name VAL and cannot address RAM, therefore, as soon as an algorithm needs more than a single 8 bits variable, multiple cores are needed.
+Every instruction execute in a single cycle.
+
+A consequence of these characteristics is that no instruction allows to work with constant larger than 4 bits (0xf).
+To work around that, either use two instructions or use another core to generate the needed values.
+
+
+<!---
 Execution takes place in two steps:
 
 1. Preload
 
-    1. If multiplexer' target core have its SYNC flag off, then this step is done
+    1. If multiplexer' target core have its SYNC flag off, then preloading is skipped
     2. Load a value from the multiplexer into PRELOAD.
     3. Set UNLOCK flag on multiplexer target if the next instruction to be executed will use PRELOAD
 
@@ -36,25 +51,48 @@ Execution takes place in two steps:
         Instruction may or may not stall the execution pipeline for this core, refer to the instruction set documentation for further information.
     3. PC is incremented and may freely wrap around
     4. Reset UNLOCK flag
+--->
 
-This means each core is able to read
-Inter-core communication is heavily optimized for constant patterns.
-Reads take place using a multiplexer whose address can only be changed using dedicated instructions.
-
-
-
-#### VAL register
+Every core own a multiplexer that allow the core to target one of its 26 neighbors, ot itself.
+Inter-core communication is heavily optimized for constant patterns, since an instruction is needed to switch the multiplexer.
+Algorithms designed so that cores work on a minimal number of incoming values are therefore way more efficient.
+For example, to solve `?`, its more efficient, in term of speed, to dedicate a core TODO().
 
 
-#### MUX register
-Two cores loading at the same time ...
+### Registers
+
+Following is the description of every CPU register.
+Most operations on these registers are abstracted to the programmers by the ISA but understanding them is useful to better understand the CPU inner working.
+
+Every register is 8 bits long.
+
+#### VAL
+VAL is the single general purpose register of a CORE unit.
+Most instruction read or modify VAL.
+
+Negative numbers are encoded using a two complement representation.
 
 
-#### Status register
+#### MUX
+MUX is the core multiplexer register.
 
-#### PC register
+Its value defines which core a core may access in a given cycle.
 
-### Memory bank
+TODO: Encoding
+TODO: MUX is used to change ...
+TODO: Two cores loading at the same time ...
+
+#### PC
+PC is the program counter.
+
+Its value defines which instruction of the current memory bank will be executed next.
+PC is incremented after every instruction who does not stall the core pipeline.
+The pipeline is stalled when an instruction fetching a value from the multiplexer fails to do so.
+This happen when the pointed core have not yet issued a SYN instruction.
+
+### MEMBANK
+
+#### Status
 
 
 ## Instruction set
@@ -438,8 +476,9 @@ It may be useful to then use the CAN instruction to restrict output to affected 
 
 ## Simulator
 
+For simulator usage, refer to its included help: `simulator --help`.
 
-## LAVAL-M
+<!---## LAVAL-M
 LAVAL-M1 is the first version of the official embedded subset of LAVAL.
 It imposes some restriction garantee a very low memory requirement, power consumption and an high AL<sup>[1](#AL)</sup>.
 
@@ -449,11 +488,11 @@ It imposes some restriction garantee a very low memory requirement, power consum
 - Since PC is 8 bits long, memory banks are limited to 256 bytes
 -
 
-TODO: two complement
-
 TODO: Signed behaviours:
 - Shifts
 - Overflows
+
+--->
 
 <a name="AL">1. </a>Annoyance level: Defined as (1 - Percentage of student who would repeat their programming experiments with the CPU architecture)
 
