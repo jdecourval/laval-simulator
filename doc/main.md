@@ -114,8 +114,88 @@ A future ISA revision may standardize their layouts.
 ### Inputs/Outputs
 
 Each core owns a multiplexer which may be pointed toward one of the its 26 neighbours.
+A core may then use its multiplexer to **load** a value from the target core.
 
-TODO: Two cores loading at the same time ...
+Such transfers are synchronized, the loading instruction will not proceed and none of the CPU registers will get affected as long as the target core does not emit a synchronization instruction.
+The same is true for synchronization instructions, a core will block on such instruction until at least one core as fetched a value from it.
+
+A core executing a synchronization instruction make its registers available to all currently connected cores.
+This means many cores may load a value from a common core and a single synchronization is needed.
+
+When a core has been fetched, is synchronization flag is reset and another synchronization instruction will be needed for the next fetch.
+
+Examples in pseudo-code:
+
+```
+Core0:
+    VAL <- 5
+    Synchronize  ; Proceed immediatly since at least one core is fetching.
+
+Core1:
+    Connect to core 0
+    Load from connected core  ; Load immediatly since the target core is executing a synchronization instruction.
+    ; VAL is now 5
+
+Core2:
+    Connect to core 0
+    Load from connected core  ; Load immediatly since the target core is executing a synchronization instruction.
+    ; VAL is now 5
+```
+
+```
+Core0:
+    VAL <- 5
+    Do nothing
+    Synchronize  ; Proceed immediatly since at least one core is fetching.
+
+Core1:
+    Connect to core 0
+    Load from connected core  ; Wait for one cycle, since the target has not yet synchronized, then load.
+    ; VAL is now 5
+
+Core2:
+    Connect to core 0
+    Load from connected core  ; Wait for one cycle, since the target has not yet synchronized, then load.
+    ; VAL is now 5
+```
+
+```
+Core0:
+    VAL <- 5
+    Synchronize  ; Proceed immediatly since at least one core is fetching.
+
+Core1:
+    Connect to core 0
+    Load from connected core  ; Load immediatly since the target core is executing a synchronization instruction.
+    ; VAL is now 5
+
+Core2:
+    Connect to core 0
+    Do nothing
+    Load from connected core  ; The target core has reset is synchronzation flag. Wait indefinitely.
+```
+
+```
+Core0:
+    VAL <- 5
+    Synchronize  ; Wait for one cycle since no one is fetching from this core in this cycle.
+
+Core1:
+    Connect to core 0
+    Do nothing
+    Load from connected core  ; Load immediatly since the target core is executing a synchronization instruction.
+    ; VAL is now 5
+
+Core2:
+    Connect to core 0
+    Do nothing
+    Load from connected core  ; Load immediatly since the target core is executing a synchronization instruction.
+    ; VAL is now 5
+```
+
+
+CPU Inputs/outputs
+
 
 ## Assembler
 ### Settings
