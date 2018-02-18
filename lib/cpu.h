@@ -47,7 +47,7 @@ private:
 
     Memory mem;
     CoreArray cores;
-    std::vector<MemoryInterface::size_type> core_to_mem_map;
+    std::vector<MemoryInterface::size_type> core_to_mem;
 
     /// Map core_id to their input. The map is willingly ordered by the argument position.
     std::map<size_t, Input> inputs;

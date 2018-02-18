@@ -1,7 +1,7 @@
 .cores 1, 2, 3
 .mem_number 10
 .mem_size 10
-.mem_map 0, 2, 4, 9, 7, 9
+.core_to_mem 0, 2, 4, 9, 7, 9
 .in 0, 2
 
 0:

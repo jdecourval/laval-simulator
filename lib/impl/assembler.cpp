@@ -228,12 +228,6 @@ namespace Assembler
             assert(input);
         }
 
-        // TODO: How to handle arguments:
-        // 1. By restarting the CPU
-        //   1.a. Additionally return a vector of pointers to the memory cell having the arguments
-        //   1.b. Somehow store this vector inside Cpu and add a set_argument method
-        // 2. At runtime
-        //   2.a.
         return Cpu(settings, std::move(memory));
     }
 }

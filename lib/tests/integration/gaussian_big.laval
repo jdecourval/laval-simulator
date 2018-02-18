@@ -1,7 +1,7 @@
 .cores 2, 500, 500
 .mem_number 9
 .mem_size 7
-.mem_map 0-250000, 250001-500000
+.core_to_mem 0-250000, 250001-500000
 .in 0-250000
 .out 250001-500000
 
@@ -45,5 +45,5 @@
     JMP 1
 
 ; TODO: Add range support
-; TODO: Change mem_map so that its indexes now represent membanks instead of cores
+; TODO: Change core_to_mem so that its indexes now represent membanks instead of cores
 ; TODO: Figure out a way to deal with edges

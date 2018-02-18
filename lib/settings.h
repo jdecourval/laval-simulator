@@ -10,7 +10,7 @@ struct Settings
     std::array<uint16_t, 3> dimensions = {10, 10, 10};
     uint32_t bank_number = 16u;
     uint32_t bank_size = 256u;
-    std::vector<uint8_t> core_to_mem_map;
+    std::vector<uint8_t> core_to_mem;
     std::vector<size_t> inputs;
     std::vector<size_t> outputs;
 
@@ -19,7 +19,7 @@ struct Settings
     template<class Archive>
     void serialize(Archive& archive)
     {
-        archive(dimensions, bank_number, bank_size, core_to_mem_map, inputs, outputs);
+        archive(dimensions, bank_number, bank_size, core_to_mem, inputs, outputs);
     }
 };
 

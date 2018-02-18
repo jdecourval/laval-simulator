@@ -22,7 +22,7 @@ For example, this figure presents a small 2x2x2 implementation with six memory b
 ![Cpu architecture](cores.svg "CPU Architecture")
 Do note that only some of the core-to-core links are drawn to reduce clutter.
 
-### Core
+### Core overview
 The main component of the LAVAL architecture is the CORE unit.
 It is a very low complexity core capable of executing a couple of different 8 bits instructions *arguments included*.
 Every instruction executes in a single clock cycle.
@@ -72,15 +72,23 @@ Most instruction read or modify VAL.
 
 Negative numbers are encoded using a two complement representation.
 
-
 #### MUX
 MUX is the core multiplexer register.
 
 Its value defines which core a core may access in a given cycle.
 
-TODO: Encoding
+Its value is encoded as a base 3 number where the most significant trit addresses the Z dimension and the least significant trit addresses the X dimension.
+
+A trit encode an offset relative to the current core, as followed:
+- 0: BEFORE
+- 1: CURRENT
+- 2: AFTER
+
+For example, the direction `BEFORE, CURRENT, AFTER` is encoded as `(0 * 3^2) + (1 * 3^1) + (2 * 3^0)`.
+
+Refer Inputs/Outputs section for more details about the multiplexer usage.
+
 TODO: MUX is used to change ...
-TODO: Two cores loading at the same time ...
 
 #### PC
 PC is the program counter.
@@ -90,9 +98,27 @@ PC is incremented after every instruction who does not stall the core pipeline.
 The pipeline is stalled when an instruction fetching a value from the multiplexer fails to do so.
 This happen when the pointed core have not yet issued a SYN instruction.
 
-### MEMBANK
+#### MEMBANK
+MEMBANK is the memory pointer register.
 
-#### Status
+Its value defines from which memory bank the next instruction will be fetched.
+Its value is set at core initialization according to the `core_to_mem` setting.
+Its value may also be changed at runtime using one of the jump instructions.
+
+#### Statuses
+Each core also includes one or more status registers.
+As of today, they are not exposed to the end user and their exact layouts are implementation defined.
+A future ISA revision may standardize their layouts.
+
+
+### Inputs/Outputs
+
+Each core owns a multiplexer which may be pointed toward one of the its 26 neighbours.
+
+TODO: Two cores loading at the same time ...
+
+## Assembler
+### Settings
 
 
 ## Instruction set
@@ -492,7 +518,7 @@ TODO: Signed behaviours:
 - Shifts
 - Overflows
 
---->
 
 <a name="AL">1. </a>Annoyance level: Defined as (1 - Percentage of student who would repeat their programming experiments with the CPU architecture)
 
+--->

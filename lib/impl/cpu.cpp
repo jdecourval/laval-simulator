@@ -18,7 +18,7 @@ Cpu::Cpu(const Settings& settings)
 Cpu::Cpu(const Settings& settings, Memory&& memory)
     : mem{std::move(memory)}
     , cores{std::vector<std::remove_cv_t<std::remove_reference_t<decltype(settings.dimensions.at(0))>>>(std::cbegin(settings.dimensions), std::cend(settings.dimensions)), mem, inputs}
-    , core_to_mem_map{settings.core_to_mem_map}
+    , core_to_mem{settings.core_to_mem}
     , outputs{settings.outputs}
 {
     cpu_assert(settings.dimensions.size() == 3, "Incorrect number of dimensions");
@@ -34,7 +34,7 @@ Cpu::Cpu(const Settings& settings, Memory&& memory)
 void Cpu::link_memory(Memory&& memory, const Settings& settings)
 {
     mem = std::move(memory);
-    this->core_to_mem_map = settings.core_to_mem_map;
+    this->core_to_mem = settings.core_to_mem;
     // TODO: Add inputs
 }
 
@@ -125,13 +125,13 @@ void Cpu::handle_input(std::istream& input, std::atomic<bool>& stop_signal, std:
 uint8_t Cpu::start(std::istream& input, std::ostream& output, const std::chrono::milliseconds& period)
 {
     cpu_assert(period.count() >= 0, "Invalid period");
-    cpu_assert(cores.size() == core_to_mem_map.size(), "Non-matching number of cores and number of entries in core to memory map");
+    cpu_assert(cores.size() == core_to_mem.size(), "Non-matching number of cores and number of entries in core to memory map");
 
     // Wire cores
-    for(auto i = 0ull; i < core_to_mem_map.size(); i++)
+    for(auto i = 0ull; i < core_to_mem.size(); i++)
     {
-        cpu_assert(core_to_mem_map[i] < mem.banks_number(), "Core to memory map contains an out of range core");
-        cores[i].wire(core_to_mem_map[i]);      // TODO: Not yet initialized
+        cpu_assert(core_to_mem[i] < mem.banks_number(), "Core to memory map contains an out of range core");
+        cores[i].wire(core_to_mem[i]);      // TODO: Not yet initialized
     }
 
     if (period.count() != 0)

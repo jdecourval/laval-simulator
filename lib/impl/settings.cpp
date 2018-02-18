@@ -15,7 +15,7 @@ Settings Settings::from_ast(const std::unordered_map<std::string, std::vector<ui
     settings.dimensions.at(2) = ast.at("cores").at(2);
     settings.bank_number = ast.at("mem_number").at(0);
     settings.bank_size = ast.at("mem_size").at(0);
-    std::copy(std::cbegin(ast.at("mem_map")), std::cend(ast.at("mem_map")), std::back_inserter(settings.core_to_mem_map));
+    std::copy(std::cbegin(ast.at("core_to_mem")), std::cend(ast.at("core_to_mem")), std::back_inserter(settings.core_to_mem));
 
     if (ast.count("in"))
     {

@@ -7,7 +7,7 @@ TEST_CASE("Assembler")
 .cores 1, 1, 1
 .mem_number 3
 .mem_size 3
-.mem_map 2
+.core_to_mem 2
 
 1:
     MUX 1, 1, 1
