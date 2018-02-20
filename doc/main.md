@@ -24,14 +24,20 @@ Do note that only some of the core-to-core links are drawn to reduce clutter.
 
 ### Core overview
 The main component of the LAVAL architecture is the CORE unit.
-It is a very low complexity core capable of executing a couple of different 8 bits instructions *arguments included*.
+It is a very low complexity core capable of executing 8 bits instructions *arguments included*.
 Every instruction executes in a single clock cycle.
 
-A CORE owns a single general purpose register name VAL and cannot address RAM, therefore, as soon as an algorithm needs more than a single 8 bits variable, multiple cores are needed.
-Every instruction execute in a single cycle.
+A CORE owns a single general purpose register name VAL and cannot address RAM, instead, the collective memory of all the cores is used as the program state.
+Therefore, as soon as an algorithm needs more than a single 8 bits variable, multiple cores are needed.
 
 A consequence of these characteristics is that no instruction allows to work with constant larger than 4 bits (0xf).
 To work around that, either use two instructions or use another core to generate the needed values.
+
+Refer to the instruction set section for more information.
+
+Every core owns a multiplexer that allow the core to target one of its 26 neighbors.
+Inter-core communication is heavily optimized for constant patterns, since an instruction is needed to switch the multiplexer.
+Algorithms designed so that cores work on a minimal number of incoming values are therefore way more efficient.
 
 
 <!---
@@ -53,10 +59,6 @@ Execution takes place in two steps:
     4. Reset UNLOCK flag
 --->
 
-Every core own a multiplexer that allow the core to target one of its 26 neighbors, ot itself.
-Inter-core communication is heavily optimized for constant patterns, since an instruction is needed to switch the multiplexer.
-Algorithms designed so that cores work on a minimal number of incoming values are therefore way more efficient.
-For example, to solve `?`, its more efficient, in term of speed, to dedicate a core TODO().
 
 
 ### Registers
@@ -116,6 +118,8 @@ A future ISA revision may standardize their layouts.
 Each core owns a multiplexer which may be pointed toward one of the its 26 neighbours.
 A core may then use its multiplexer to **load** a value from the target core.
 
+Warning: You may not connect a core to itself.
+
 Such transfers are synchronized, the loading instruction will not proceed and none of the CPU registers will get affected as long as the target core does not emit a synchronization instruction.
 The same is true for synchronization instructions, a core will block on such instruction until at least one core as fetched a value from it.
 
@@ -123,6 +127,8 @@ A core executing a synchronization instruction make its registers available to a
 This means many cores may load a value from a common core and a single synchronization is needed.
 
 When a core has been fetched, is synchronization flag is reset and another synchronization instruction will be needed for the next fetch.
+
+Finally, a core may not fetch from an non-existent core, except if the fetching core is configured as a CPU input.
 
 Examples in pseudo-code:
 
@@ -194,11 +200,54 @@ Core2:
 ```
 
 
-CPU Inputs/outputs
 
 
 ## Assembler
 ### Settings
+
+### Examples
+
+```
+; Repeatly move value from a single input to a single output. Speed optimized.
+
+.cores 1, 1, 1
+.mem_number 2
+.mem_size 2
+.core_to_mem 0
+.in 0
+.out 0
+
+0:
+    MUX CURRENT, BEFORE, CURRENT
+    JMP 1
+
+1:
+    SYN
+    JMP 1
+```
+
+The above program is optimized for speed. It takes exactly two clock cycles to move a value from its input to its output.
+In a resource constrained system, it may be appropriate to sacrifice some speed for cost.
+The above program program may be modified for this objective like so:
+
+```
+; Repeatly move value from a single input to a single output. Cost optimized.
+
+.cores 1, 1, 1
+.mem_number 1
+.mem_size 3
+.core_to_mem 0
+.in 0
+.out 0
+
+0:
+    MUX CURRENT, BEFORE, CURRENT
+    SYN
+    JMP 0
+```
+
+Now, the program is smaller overall (1 membank x 3 bytes vs 2 membank x 2 bytes) but takes 3 clock cycles to move a value.
+Many programs may be optimized one way or another using similar tricks.
 
 
 ## Instruction set
