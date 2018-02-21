@@ -113,7 +113,7 @@ As of today, they are not exposed to the end user and their exact layouts are im
 A future ISA revision may standardize their layouts.
 
 
-### Inputs/Outputs
+### Inter-core transfers
 
 Each core owns a multiplexer which may be pointed toward one of the its 26 neighbours.
 A core may then use its multiplexer to **load** a value from the target core.
@@ -200,10 +200,88 @@ Core2:
 ```
 
 
+### Inputs/Outputs
 
+TODO: In and out on the same core
+TODO: A core may not be connected to more than one input
 
 ## Assembler
+
 ### Settings
+
+Assembler programs start with a setting section.
+Settings are used to list the requirement of a cpu running this program.
+Settings are written, one per line, using the following format:
+```
+\.(\w+) ([\d, ]*)
+```
+
+- First capture group is the setting name
+- Second capture group are the setting's argument
+
+#### .cores
+
+CPU dimensions
+
+| Argument | Size     | Description                    |
+|--------:|:-------:|:----------------------------|
+|         0| 0..65535 | Number of cores on Z dimension |
+|         1| 0..65535 | Number of cores on Y dimension |
+|         2| 0..65535 | Number of cores on X dimension |
+
+#### .mem_number
+
+Number of memory banks
+
+| Argument | Size     | Description          |
+|--------:|:-------:|:-------------------|
+|         0| 0..255 | Number of memory banks |
+
+#### .mem_size
+
+Memory banks size
+
+| Argument | Size     | Description          |
+|---------:|:-------:|:-------------------|
+|         0| 0..255 | Size in bytes of each memory bank |
+
+#### .core_to_mem
+
+Assign memory banks to cores at CPU initialization
+
+| Argument | Size     | Description                    |
+|--------:|:-------:|:----------------------------|
+|         0| 0..255 | Memory bank assigned at boot to core 0 |
+|         1| 0..255 | Memory bank assigned at boot to core 1 |
+|         n| 0..255 | Memory bank assigned at boot to core n |
+
+`n` is up to the total number of cores.
+
+#### .in
+
+Inputs assignment
+
+| Argument | Size     | Description                    |
+|--------:|:-------:|:----------------------------|
+|         0| 0..255 | Core to which input #0 is connected |
+|         1| 0..255 | Core to which input #1 is connected |
+|         n| 0..255 | Core to which input #n is connected |
+
+#### .out
+
+Ouputs assignment
+
+| Argument | Size     | Description                    |
+|--------:|:-------:|:----------------------------|
+|         0| 0..255 | Core to which output #0 is connected |
+|         1| 0..255 | Core to which output #1 is connected |
+|         n| 0..255 | Core to which output #n is connected |
+
+### Blocks
+
+### Instructions
+
+### Comment
 
 ### Examples
 
