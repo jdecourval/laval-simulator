@@ -207,6 +207,11 @@ TODO: A core may not be connected to more than one input
 
 ## Assembler
 
+This section describe how to use the assembler to write a program targeting the LAVAL ISA.
+
+The assembler does not care about whitespaces as long as the required whitespace are presents (for example between an instruction and its arguments) and the tokens are undivided (no space is allowed in the middle of an instruction mnemonic).
+
+
 ### Settings
 
 Assembler programs start with a setting section.
@@ -217,7 +222,10 @@ Settings are written, one per line, using the following format:
 ```
 
 - First capture group is the setting name
-- Second capture group are the setting's argument
+- Second capture group contains the setting's argument(s)
+
+Settings most not appear after the first memory bank.
+
 
 #### .cores
 
@@ -277,11 +285,50 @@ Ouputs assignment
 |         1| 0..255 | Core to which output #1 is connected |
 |         n| 0..255 | Core to which output #n is connected |
 
-### Blocks
+### Memory bank
+
+Memory banks are programmed by declaring a block of instructions starting with the following indicator:
+```
+(\d+):
+```
+
+- Capture group indicate the ID of the memory bank that will contains the following instructions.
+
+Do note that memory bank IDs are 0-indexed.
+
 
 ### Instructions
 
+Instruction respect the following format:
+```
+(\w{3})( -?\d+(?:, ?\d+)*)?
+```
+
+- First capture group is the instruction mnemonic
+- Second capture group contains the instruction argument(s)
+
+Please note that the specific number and length of the arguments depend on the instruction.
+Refer to their documentation for more information.
+
 ### Comment
+
+A line comment may be inserted using the `;` character.
+Everything following that character will get ignored by the assembler.
+
+
+### Preprocessor
+
+The assembler also mandates the use of a preprocessor.
+It is used to provide some constants to the programmer:
+
+| Constant | Value |
+|:--------:|:-----:|
+| BEFORE   | 0     |
+| CURRENT  | 1     |
+| AFTER    | 2     |
+
+Constant are simply textually replaced by their value before the file is passed to the assembler.
+
 
 ### Examples
 
