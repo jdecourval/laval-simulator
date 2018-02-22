@@ -90,7 +90,6 @@ For example, the direction `BEFORE, CURRENT, AFTER` is encoded as `(0 * 3^2) + (
 
 Refer Inputs/Outputs section for more details about the multiplexer usage.
 
-TODO: MUX is used to change ...
 
 #### PC
 PC is the program counter.
@@ -128,7 +127,7 @@ This means many cores may load a value from a common core and a single synchroni
 
 When a core has been fetched, is synchronization flag is reset and another synchronization instruction will be needed for the next fetch.
 
-Finally, a core may not fetch from an non-existent core, except if the fetching core is configured as a CPU input.
+Finally, a core may not fetch from an non-existent core, except if the fetching core is configured as a CPU input (more on that later).
 
 Examples in pseudo-code:
 
@@ -202,8 +201,42 @@ Core2:
 
 ### Inputs/Outputs
 
-TODO: In and out on the same core
-TODO: A core may not be connected to more than one input
+As described up to now, a CPU may only works on some predefined constants, which is pretty useless by itself.
+The get useful, a CPU must communicates with the real world.
+
+
+#### Inputs
+
+A core may be connected to a CPU input.
+Doing so enables that specific core to receive data from the outside.
+
+Refer to the assembler section for more information on how to configure inputs.
+
+Apart from the needed configuration, receiving data from the outside or from another core works in exactly the same way.
+
+To use its input a core must points its multiplexer to a normally invalid direction, but not itself.
+This means, by design, that only cores on the edge of the CPU may have an input.
+
+It is forbidden to wire two inputs or both inputs and outputs to the same core.
+
+
+#### Outputs
+
+A core may be connected to a CPU output.
+Doing so enables that specific core to send data to the outside.
+
+Refer to the assembler section for more information on how to configure outputs.
+
+Apart from that needed configuration, sending data to the outside or to another core works in exactly the same way.
+
+To use its output a core must simply synchronize (SYN) its current VAL.
+The CPU output will then automatically fetch the value and unlock the core.
+The result is the same as if another core loaded from it in the same clock cycle.
+
+By design, outputs are limited to cores on the edge of the CPU.
+
+It is forbidden to wire both inputs and outputs to the same core.
+
 
 ## Assembler
 
@@ -305,7 +338,7 @@ Instruction respect the following format:
 ```
 
 - First capture group is the instruction mnemonic
-- Second capture group contains the instruction argument(s)
+- Second (optional) capture group contains the instruction argument(s)
 
 Please note that the specific number and length of the arguments depend on the instruction.
 Refer to their documentation for more information.
@@ -376,7 +409,7 @@ Many programs may be optimized one way or another using similar tricks.
 
 
 ## Instruction set
-TODO: Add instruction effect on status bits
+<!--- TODO: Add instruction effect on status bits --->
 
 ### Basic instructions
 
