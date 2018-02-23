@@ -6,12 +6,12 @@ Like every good acronym, LAVAL is recursively defined: Laval Advanced Vectorized
 
 Its a novel architecture, sets to revolutionize the computing world with its massively parallel cores organisation.
 
+
 ## Architecture
 
 LAVAL architecture lies somewhere between those of CPU, GPU and FPGA.
-It consists of a large number of simple locally connected cores.
-Core are connected together in a local basis following a cube pattern.
-Cores execute instructions stored in their linked memory bank, which is read only.
+It consists of a large number of simple cores connected together in a local basis following a cube pattern.
+It is based on an Harvard architecture, cores execute instructions stored in their linked memory bank, which is read only.
 Branches are made by switching execution from one memory bank to another one.
 
 Many CPU settings, like the number of cores, are implementation defined.
@@ -64,7 +64,7 @@ Execution takes place in two steps:
 ### Registers
 
 Following is the description of every CPU register.
-Most operations on these registers are abstracted to the programmers by the ISA but understanding them is useful to better understand the CPU inner working.
+Most operations on these registers are abstracted to the programmers by the ISA but understanding them is useful to better grasp the CPU inner working.
 
 Every register is 8 bits long.
 
@@ -88,16 +88,19 @@ A trit encode an offset relative to the current core, as followed:
 
 For example, the direction `BEFORE, CURRENT, AFTER` is encoded as `(0 * 3^2) + (1 * 3^1) + (2 * 3^0)`.
 
-Refer Inputs/Outputs section for more details about the multiplexer usage.
+Refer to the Inputs/Outputs section for more details about the multiplexer usage.
 
 
 #### PC
 PC is the program counter.
 
 Its value defines which instruction of the current memory bank will be executed next.
-PC is incremented after every instruction who does not stall the core pipeline.
+PC is incremented after every instruction who does not stall the core's pipeline.
 The pipeline is stalled when an instruction fetching a value from the multiplexer fails to do so.
-This happen when the pointed core have not yet issued a SYN instruction.
+This happen when the pointed core have not yet issued a synchronization instruction (SYN).
+
+As with any register incrementing, its value may overflow.
+This means its value automatically reset to zero instead of getting to 0x100 (256).
 
 #### MEMBANK
 MEMBANK is the memory pointer register.
@@ -119,7 +122,7 @@ A core may then use its multiplexer to **load** a value from the target core.
 
 Warning: You may not connect a core to itself.
 
-Such transfers are synchronized, the loading instruction will not proceed and none of the CPU registers will get affected as long as the target core does not emit a synchronization instruction.
+Such transfers are synchronized, the *loading* instruction will not proceed and none of the CPU registers will get affected as long as the target core does not emit a *synchronization* instruction.
 The same is true for synchronization instructions, a core will block on such instruction until at least one core as fetched a value from it.
 
 A core executing a synchronization instruction make its registers available to all currently connected cores.
@@ -138,12 +141,14 @@ Core0:
 
 Core1:
     Connect to core 0
-    Load from connected core  ; Load immediatly since the target core is executing a synchronization instruction.
+    Load from connected core
+    ; Load immediatly since the target core is executing a synchronization instruction.
     ; VAL is now 5
 
 Core2:
     Connect to core 0
-    Load from connected core  ; Load immediatly since the target core is executing a synchronization instruction.
+    Load from connected core
+    ; Load immediatly since the target core is executing a synchronization instruction.
     ; VAL is now 5
 ```
 
@@ -155,12 +160,14 @@ Core0:
 
 Core1:
     Connect to core 0
-    Load from connected core  ; Wait for one cycle, since the target has not yet synchronized, then load.
+    Load from connected core
+    ; Wait for one cycle, since the target has not yet synchronized, then load.
     ; VAL is now 5
 
 Core2:
     Connect to core 0
-    Load from connected core  ; Wait for one cycle, since the target has not yet synchronized, then load.
+    Load from connected core
+    ; Wait for one cycle, since the target has not yet synchronized, then load.
     ; VAL is now 5
 ```
 
@@ -171,13 +178,15 @@ Core0:
 
 Core1:
     Connect to core 0
-    Load from connected core  ; Load immediatly since the target core is executing a synchronization instruction.
+    Load from connected core
+    ; Load immediatly since the target core is executing a synchronization instruction.
     ; VAL is now 5
 
 Core2:
     Connect to core 0
     Do nothing
-    Load from connected core  ; The target core has reset is synchronzation flag. Wait indefinitely.
+    Load from connected core
+    ; The target core has reset is synchronzation flag. Wait indefinitely.
 ```
 
 ```
@@ -188,13 +197,15 @@ Core0:
 Core1:
     Connect to core 0
     Do nothing
-    Load from connected core  ; Load immediatly since the target core is executing a synchronization instruction.
+    Load from connected core
+    ; Load immediatly since the target core is executing a synchronization instruction.
     ; VAL is now 5
 
 Core2:
     Connect to core 0
     Do nothing
-    Load from connected core  ; Load immediatly since the target core is executing a synchronization instruction.
+    Load from connected core
+    ; Load immediatly since the target core is executing a synchronization instruction.
     ; VAL is now 5
 ```
 
@@ -296,7 +307,7 @@ Assign memory banks to cores at CPU initialization
 |         1| 0..255 | Memory bank assigned at boot to core 1 |
 |         n| 0..255 | Memory bank assigned at boot to core n |
 
-`n` is up to the total number of cores.
+`n` is the total number of cores.
 
 #### .in
 
@@ -308,6 +319,8 @@ Inputs assignment
 |         1| 0..255 | Core to which input #1 is connected |
 |         n| 0..255 | Core to which input #n is connected |
 
+`n` is the number of inputs and must be smaller or equal to 65535.
+
 #### .out
 
 Ouputs assignment
@@ -317,6 +330,8 @@ Ouputs assignment
 |         0| 0..255 | Core to which output #0 is connected |
 |         1| 0..255 | Core to which output #1 is connected |
 |         n| 0..255 | Core to which output #n is connected |
+
+`n` is the number of outputs and must be smaller or equal to 65535.
 
 ### Memory bank
 
@@ -343,7 +358,7 @@ Instruction respect the following format:
 Please note that the specific number and length of the arguments depend on the instruction.
 Refer to their documentation for more information.
 
-### Comment
+### Comments
 
 A line comment may be inserted using the `;` character.
 Everything following that character will get ignored by the assembler.
