@@ -74,6 +74,9 @@ Most instruction read or modify VAL.
 
 Negative numbers are encoded using a two complement representation.
 
+VAL is zero initialized.
+
+
 #### MUX
 MUX is the core multiplexer register.
 
@@ -90,6 +93,8 @@ For example, the direction `BEFORE, CURRENT, AFTER` is encoded as `(0 * 3^2) + (
 
 Refer to the Inputs/Outputs section for more details about the multiplexer usage.
 
+Its default value is `CURRENT, CURRENT, CURRENT`, which is an illegal direction to fetch from.
+
 
 #### PC
 PC is the program counter.
@@ -101,6 +106,9 @@ This happen when the pointed core have not yet issued a synchronization instruct
 
 As with any register incrementing, its value may overflow.
 This means its value automatically reset to zero instead of getting to 0x100 (256).
+
+PC is zero initialized.
+
 
 #### MEMBANK
 MEMBANK is the memory pointer register.
@@ -358,10 +366,13 @@ Instruction respect the following format:
 Please note that the specific number and length of the arguments depend on the instruction.
 Refer to their documentation for more information.
 
+Instructions *must* be part of a memory bank.
+
+
 ### Comments
 
 A line comment may be inserted using the `;` character.
-Everything following that character will get ignored by the assembler.
+Everything following that character on the same line will get ignored by the assembler.
 
 
 ### Preprocessor
@@ -458,7 +469,7 @@ Output to debugger
 
 **Description:**
 
-Output core status, which the values of all the registers, to connected debugger.
+Output core status—i.e., the values of all the registers, to the connected debugger.
 
 
 #### HLT
@@ -494,10 +505,11 @@ Set multiplexer to another core
 
 **Description:**
 
-Point mux to another core as indicated by arguments by setting the MUX register.
+Point mux to another core by setting the MUX register as indicated by instruction's arguments.
 
 **Notes:**
-A core may be connected to itself.
+
+A core may not be connected to itself.
 
 **Example:**
 
@@ -513,6 +525,8 @@ Connect to carry
 
 **Description:**
 
+Connect the core multiplexer to its target carry bit.
+
 **Notes:**
 
 The multiplexer may also be connected to the VAL register using CTV.
@@ -524,6 +538,9 @@ Connect to VAL
 **Argument:** None
 
 **Description:**
+
+Connect the core multiplexer to its target VAL register.
+This is the default configuration.
 
 **Notes:**
 
@@ -542,6 +559,7 @@ Multiplexer discard
 Fetch and discard a value from the mux. Use this instruction to unlock a core blocked on a SYN instruction.
 
 **Notes:**
+
 This instruction keeps VAL unaffected.
 
 **Example:**
@@ -554,8 +572,8 @@ This instruction keeps VAL unaffected.
 
 0:
     LCL 1
-    SYN     ; Will wait here for one cycle, the execute on the next
-    LCL 2   ; Will execute on the fourth cycle
+    SYN     ; Will waits here for one cycle, then executes on the next
+    LCL 2   ; Will executes on the fourth cycle
 
 1:
     NOP
@@ -777,7 +795,7 @@ Constant AND
 
 | Size | Description       |
 |:---:|:-----------------|
-| 0..15 | Second AND operand |
+| 0..15 | Mask |
 
 **Description:**
 
@@ -791,14 +809,14 @@ Constant OR
 
 | Size | Description       |
 |:---:|:-----------------|
-| 0..15 | Second OR operand |
+| 0..15 | Mask |
 
 **Description:**
 
+Apply a logical OR to the four lower bits of VAL. The 4 higher bits are unaffected.
 
 The COR instruction is unable by itself to affect all the bits of VAL.
-A single COR will apply a logical OR to the four lower bits of VAL. The 4 higher bits are kept unmodified.
-It may be useful to then use the CAN instruction to restrict output to affected values.
+It may be useful to then use the CAN instruction to restrict VAL to affected values.
 
 
 

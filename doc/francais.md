@@ -93,6 +93,8 @@ Par exemple, la direction `BEFORE, CURRENT, AFTER` est encodée comme `(0 * 3^2)
 
 Reférez-vous à la section sur les Entrées/Sorties pour plus d'information au sujet de l'utilisation du multiplixeur.
 
+La valeur initiale de ce registre est `CURRENT, CURRENT, CURRENT`, qui n'est pas une direction légale d'acquisition.
+
 
 #### PC
 PC est le «program counter» (compteur ordinal).
@@ -104,6 +106,9 @@ Cela se produit quand le coeur pointé n'a pas exécuté une instruction de sync
 
 Comme tout registre incrémentant, sa valeur peut déborder.
 Cela signifie que sa valeur est remise à zéro plutôt que d'atteindre 0x100 (256).
+
+Ce registre est initialisée à zéro au démarrage.
+
 
 #### MEMBANK
 MEMBANK est le registre du pointeur de mémoire.
@@ -338,53 +343,56 @@ Assignation des sorties
 
 ### Memory bank
 
-Memory banks are programmed by declaring a block of instructions starting with the following indicator:
+Les banques de mémoire sont programmées en déclarant un bloc d'instructions démarrant par le jeton suivant:
 ```
 (\d+):
 ```
 
-- Capture group indicate the ID of the memory bank that will contains the following instructions.
+- Le groupe de capture indique quelle banque de mémoire va contenir les instructions qui suivent.
 
-Do note that memory bank IDs are 0-indexed.
+Prenez note que les identifiants de banque de mémoire sont indexés 0.
 
 
 ### Instructions
 
-Instruction respect the following format:
+Les instructions suivent le format suivant:
 ```
 (\w{3})( -?\d+(?:, ?\d+)*)?
 ```
 
-- First capture group is the instruction mnemonic
-- Second (optional) capture group contains the instruction argument(s)
+- Le premier groupe de capture est la mnémonique
+- Le second groupe de capture (optionnel) contient les arguments de l'instructions.
 
-Please note that the specific number and length of the arguments depend on the instruction.
-Refer to their documentation for more information.
+Prenez note que le nombre et la longueur spécifique des arguments dépendent de l'instruction.
+Référez-vous à leur documentation pour plus d'information.
 
-### Comments
-
-A line comment may be inserted using the `;` character.
-Everything following that character will get ignored by the assembler.
+Les instructions doivent obligatoirement faire parties d'une banque de mémoire.
 
 
-### Preprocessor
+### Commentaires
 
-The assembler also mandates the use of a preprocessor.
-It is used to provide some constants to the programmer:
+Un commentaire peut être déclaré en utilisant le caractère `;`.
+Le reste de la ligne sera alors ignoré par l'assembleur.
 
-| Constant | Value |
+
+### Préprocesseur
+
+L'assembleur mandate l'utilisation d'un preprocesseur.
+Celui-ci est utilisé pour fournir quelques constantes au programmeur:
+
+| Constante | Valeur |
 |:--------:|:-----:|
 | BEFORE   | 0     |
 | CURRENT  | 1     |
 | AFTER    | 2     |
 
-Constant are simply textually replaced by their value before the file is passed to the assembler.
+Les constantes sont simplement textuellement remplacées avant que le fichier soit passé à l'assembleur.
 
 
-### Examples
+### Exemples
 
 ```
-; Repeatly move value from a single input to a single output. Speed optimized.
+; Déplace à répétition une valeur d'une unique entrée vers une unique sortie. Optimisé pour la vitesse.
 
 .cores 1, 1, 1
 .mem_number 2
@@ -402,12 +410,12 @@ Constant are simply textually replaced by their value before the file is passed 
     JMP 1
 ```
 
-The above program is optimized for speed. It takes exactly two clock cycles to move a value from its input to its output.
-In a resource constrained system, it may be appropriate to sacrifice some speed for cost.
-The above program program may be modified for this objective like so:
+Ce programme est optimisé pour la vitesse. Il prend exactement deux cycles pour déplacer une valeur de l'entrée vers la sortie.
+Dans un système plutôt contraint en ressources, il pourrait être approprié de sacrifier un peu de vitesse pour réduire le coût.
+Le programme démontré plus haut peut être modifié pour atteindre cet objectif de cette façon:
 
 ```
-; Repeatly move value from a single input to a single output. Cost optimized.
+; Déplace à répétition une valeur d'une unique entrée vers une unique sortie. Optimisé pour le coût.
 
 .cores 1, 1, 1
 .mem_number 1
@@ -422,60 +430,60 @@ The above program program may be modified for this objective like so:
     JMP 0
 ```
 
-Now, the program is smaller overall (1 membank x 3 bytes vs 2 membank x 2 bytes) but takes 3 clock cycles to move a value.
-Many programs may be optimized one way or another using similar tricks.
+Dans cette version, le programme est plus petit (1 banque x 3 octets vs 2 banques x 2 octets) mais prend 3 cycles d'horloge pour bouger une valeur.
+Les programmes peuvent souvent être optmisé dans un sens ou dans l'autre en utilisant des techniques semblables.
 
 
-## Instruction set
+## Jeu d'instruction
 <!--- TODO: Add instruction effect on status bits --->
 
-### Basic instructions
+### Instructions de base
 
 #### NOP
 No operation
 
-**Argument:** None
+**Argument:** Aucun
 
 **Description:**
 
-Do nothing for one cycle
+Ne fait rien pour un cycle
 
 
 #### SYN
 Sync
 
-**Argument:** None
+**Argument:** Aucun
 
 **Description:**
 
-Sync VAL with connected mux(es).
-Multiple cores may receive the same synced value as long as they fetch it on the same cycle.
-This instruction will block until at least one core has fetched a value.
+Synchronise VAL avec le(s) multiplexeur(s) connecté(s).
+Plusieurs coeurs peuvent alors recevoir la même valeur tant qu'ils en font la demande dans le même cycle.
+Cette instruction va bloquer tant qu'au moins un coeur n'a pas récupéré la valeur.
 
 
 #### DBG
 Output to debugger
 
 
-**Argument:** None
+**Argument:** Aucun
 
 **Description:**
 
-Output core status, which the values of all the registers, to connected debugger.
+Envoie le status du coeur (la valuer de tous les registres) au débuggeur connecté.
 
 
 #### HLT
 Halt
 
-**Argument:** None
+**Argument:** Aucun
 
 **Description:**
 
-Stop CPU execution and return VAL. Two cores returning at the same time return an undefined VAL.
+Arrête l'exécution du CPU et retourne VAL. Deux coeurs retournant une valeur simultanément produit une valeur indéfinie.
 
 
 #### HCF
-**Argument:** None
+**Argument:** Aucun
 
 **Description:**
 
@@ -489,7 +497,7 @@ Set multiplexer to another core
 
 **Arguments:**
 
-| Size | Description          |
+| Taille | Description          |
 |:---:|:-------------------|
 | 0..2 | Offset on dimension 0 |
 | 0..2 | Offset on dimension 1 |
@@ -497,10 +505,11 @@ Set multiplexer to another core
 
 **Description:**
 
-Point mux to another core as indicated by arguments by setting the MUX register.
+Pointe le multiplexeur sur un autre coeur en assignant au registre MUX tel qu'indiqué par les arguments de l'instruction.
 
 **Notes:**
-A core may be connected to itself.
+
+Un coeur ne peut être connecté à lui-même.
 
 **Example:**
 
@@ -512,40 +521,46 @@ MUX CURRENT, BEFORE, AFTER
 #### CTC
 Connect to carry
 
-**Argument:** None
+**Argument:** Aucun
 
 **Description:**
 
+Connecte le multiplexeur du coeur au bit de retenue de sa cible.
+
 **Notes:**
 
-The multiplexer may also be connected to the VAL register using CTV.
+Le multiplexeur peut aussi être connecté au registre VAL de sa cible en utilisant l'instruction CTV.
 
 
 #### CTV
 Connect to VAL
 
-**Argument:** None
+**Argument:** Aucun
 
 **Description:**
 
+Connecte le multiplexeur du coeur au registre VAL de sa cible.
+Il s'agit de l'état par défaut.
+
 **Notes:**
 
-The multiplexer may also be connected to the carry bit using CTC.
+Le multiplexeur peut aussi être connecté au bit de retenue de sa cible en utilisant l'instruction CTC.
 
 
 
-### Reading from mux
+### Lire du multiplexeur
 #### MXD
 Multiplexer discard
 
-**Argument:** None
+**Argument:** Aucun
 
 **Description:**
 
-Fetch and discard a value from the mux. Use this instruction to unlock a core blocked on a SYN instruction.
+Récupère et ignore une valeur du multiplexeur. Utilisez cette instruction à des fins de synchronisation pour débloquer un coeur en attente sur une instruction SYN.
 
 **Notes:**
-This instruction keeps VAL unaffected.
+
+Cette instruction n'impacte pas le registre VAL.
 
 **Example:**
 
@@ -557,45 +572,44 @@ This instruction keeps VAL unaffected.
 
 0:
     LCL 1
-    SYN     ; Will wait here for one cycle, the execute on the next
-    LCL 2   ; Will execute on the fourth cycle
+    SYN     ; Va bloquer sur cette instruction pour un cycle puis s'exécuter sur le suivant
+    LCL 2   ; Cette instruction va donc s'exécuter sur le quatrième cycle
 
 1:
     NOP
     NOP
-    MXD     ; VAL is still zero
+    MXD     ; VAL est toujours de zéro
 ```
 
 
 #### MXL
 Multiplexer load
 
-**Argument:** None
+**Argument:** Aucun
 
 **Description:**
 
-Fetch and load into VAL the value from mux.
+Récupère et assigne à VAL une valeur du multiplexeur.
 
 
 #### MXA
 Multiplexer addition
 
-**Argument:** None
+**Argument:** Aucun
 
 **Description:**
 
-Fetch and add the value from the mux to VAL.
+Récupère et additionne à VAL une valeur du multiplexeur.
 
 
 #### MXS
 Multiplexer subtraction
 
-**Argument:** None
+**Argument:** Aucun
 
 **Description:**
 
-Fetch and subtract the value from the mux to VAL.
-
+Récupère et soustrait à VAL une valeur du multiplexeur.
 
 
 ### Jumping
@@ -604,13 +618,13 @@ Jump unconditionally
 
 **Argument:**
 
-| Size | Description       |
+| Taille | Description       |
 |:---:|:-----------------|
 | 0..15 | Membank id |
 
 **Description:**
 
-Point current core to a new membank as indicated by the argument. PC is reset to 0.
+Pointe le coeur courant sur une autre banque de mémoire tel qu'indiqué par l'argument. PC est réinitialisé à 0.
 
 **Example:**
 
@@ -621,11 +635,11 @@ Point current core to a new membank as indicated by the argument. PC is reset to
 .core_to_mem 0, 1
 
 0:
-    NOP     ; First cycle.
+    NOP     ; Premier cycle.
     JMP 1   ; Second cycle.
 
 1:
-    NOP     ; Third cycle.
+    NOP     ; Troisième cycle.
 ```
 
 
@@ -634,13 +648,13 @@ Jump if less than zero
 
 **Argument:**
 
-| Size | Description       |
+| Taille | Description       |
 |:---:|:-----------------|
 | 0..15 | Membank id |
 
 **Description:**
 
-Point current core to a new membank as indicated by the argument if VAL if less than 0. PC is reset to 0.
+Pointe le coeur courant sur une autre banque de mémoire tel qu'indiqué par l'argument si VAL est plus petit que 0. PC est réinitialisé à 0.
 
 
 #### JEZ
@@ -648,13 +662,13 @@ Jump if equal to zero
 
 **Argument:**
 
-| Size | Description       |
+| Taille | Description       |
 |:---:|:-----------------|
 | 0..15 | Membank id |
 
 **Description:**
 
-Point current core to a new membank as indicated by the argument if VAL if equal to 0. PC is reset to 0.
+Pointe le coeur courant sur une autre banque de mémoire tel qu'indiqué par l'argument si VAL est égal à 0. PC est réinitialisé à 0.
 
 
 #### JGZ
@@ -662,151 +676,152 @@ Jump if greater than zero
 
 **Argument:**
 
-| Size | Description       |
+| Taille | Description       |
 |:---:|:-----------------|
 | 0..15 | Membank id |
 
 **Description:**
 
-Point current core to a new membank as indicated by the argument if VAL if greater than 0. PC is reset to 0.
+Pointe le coeur courant sur une autre banque de mémoire tel qu'indiqué par l'argument si VAL est plus grand que 0. PC est réinitialisé à 0.
 
 
 
-### Using constants
+### Utilisation de constantes
 #### LCL
 Load constant into low part
 
-**Argument:** None
+**Argument:** Aucun
 
-| Size | Description       |
+| Taille | Description       |
 |:---:|:-----------------|
-| 0..15 | Value to load |
+| 0..15 | Valeur à charger |
 
 **Description:**
 
-Load a 4 bits constant into the 4 lower bits of VAL.
-The four higher bits are unaffected.
+Charge une constante de 4 bits dans les 4 bits les moins significatifs de VAL.
+Les 4 autres bits de VAL ne sont pas affectés.
 
 **Notes:**
 
-To load the higher bits, use LCH.
+Pour charger dans les autres bits de VAL, utilisez LCH.
 
 
 #### LCH
 Load constant into high part
 
-**Argument:** None
+**Argument:** Aucun
 
-| Size | Description       |
+| Taille | Description       |
 |:---:|:-----------------|
-| 0..15 | Value to load |
+| 0..15 | Valeur à charger |
 
 **Description:**
 
-Load a 4 bits constant into the 4 higher bits of VAL.
-The four lower bits are unaffected.
+Charge une constante de 4 bits dans les 4 bits les plus significatifs de VAL.
+Les 4 autres bits de VAL ne sont pas affectés.
 
 **Notes:**
 
-To load the lower bits, use LCL.
+Pour charger dans les autres bits de VAL, utilisez LCL.
 
 
 #### LSL
 Logical shift, left
 
-**Argument:** None
+**Argument:** Aucun
 
-| Size | Description       |
+| Taille | Description       |
 |:---:|:-----------------|
-| 0..15 | Value to shift by |
+| 0..15 | Nombre de position |
 
 **Description:**
 
-Logically left shift VAL by number of bits indicated by the argument.
-Every bit of VAL is moved a given number of bit positions.
-The vacant bit-positions are filled with zeros.
-Does not preserve a number's sign bit, if applicable.
+Effectue un décalage logique vers la gauche de VAL d'un nombre de position donné par l'argument.
+Les bits se retrouvant vacants sont remplacés par des zéros.
+Ne préserve pas le bit de signe, si applicable.
 
 
 #### LSR
 Logical shift, right
 
-**Argument:** None
+**Argument:** Aucun
 
-| Size | Description       |
+| Taille | Description       |
 |:---:|:-----------------|
-| 0..15 | Value to shift by |
+| 0..15 | Nombre de position |
 
 **Description:**
 
-Logically right shift VAL by number of bits indicated by the argument.
-Every bit of VAL is moved a given number of bit positions.
-The vacant bit-positions are filled with zeros.
-Does not preserve a number's sign bit, if applicable.
+Effectue un décalage logique vers la droite de VAL d'un nombre de position donné par l'argument.
+Les bits se retrouvant vacants sont remplacés par des zéros.
+Ne préserve pas le bit de signe, si applicable.
 
 
 #### CAD
 Constant addition
 
-**Argument:** None
+**Argument:** Aucun
 
-| Size | Description       |
+| Taille | Description       |
 |:---:|:-----------------|
-| 0..15 | Value to add |
+| 0..15 | Valeur à additionner |
 
 **Description:**
 
-Add a constant to VAL.
+Additionne une constante à VAL.
 
 
 #### CSU
 Constant subtraction
 
-**Argument:** None
+**Argument:** Aucun
 
-| Size | Description       |
+| Taille | Description       |
 |:---:|:-----------------|
-| 0..15 | Value to subtract |
+| 0..15 | Valeur à soustraire|
 
 **Description:**
 
-Subtract a constant to VAL.
+Soustrait une constante à VAL.
 
 
 #### CAN
 Constant AND
 
-**Argument:** None
+**Argument:** Aucun
 
-| Size | Description       |
+| Taille | Description       |
 |:---:|:-----------------|
-| 0..15 | Second AND operand |
+| 0..15 | Masque |
 
 **Description:**
 
-Apply a logical AND to the four lower bits of VAL. The 4 higher bits are cleared.
+Applique un masque logique ET aux quatres bits les moins significatifs de VAL.
+Les quatre bits les plus significatifs sont remis à zéros.
 
 
 #### COR
 Constant OR
 
-**Argument:** None
+**Argument:** Aucun
 
-| Size | Description       |
+| Taille | Description       |
 |:---:|:-----------------|
-| 0..15 | Second OR operand |
+| 0..15 | Masque |
 
 **Description:**
 
+Applique un masque logique OU aux quatres bits les moins significatifs de VAL.
+Les quatre bits les plus significatifs ne sont pas affectés.
 
-The COR instruction is unable by itself to affect all the bits of VAL.
-A single COR will apply a logical OR to the four lower bits of VAL. The 4 higher bits are kept unmodified.
-It may be useful to then use the CAN instruction to restrict output to affected values.
+L'instruction COR ne peut à elle seul affecter tous les bits de VAL.
+It pourrait alors être utile de la combiner avec l'instruction CAN pour restreindre VAL aux valeurs affectées.
 
 
 
-## Simulator
+## Simulateur
 
+Pour des détails sur l'utilisation du simulateur, référez-vous à son aide incluse: `simulator --help`.
 For simulator usage, refer to its included help: `simulator --help`.
 
 <!---## LAVAL-M
