@@ -4,7 +4,7 @@
 
 Each challenge (bonuses included) final score is evaluated with the following table.
 
-| Work for all inputs | Resources used  | Number of cycles  | total  |
+| Work for all inputs | Resources used  | Number of cycles  | Total  |
 |:-----------------:|:--------------:|:---------------:|:-----:|
 | bool                | %                | %                 |       |
 | 80                  | 10               | 10                | 100   |
@@ -16,15 +16,17 @@ Challenges will be tested with inputs different from the ones given as example i
 
 Objectives may be of different types:
 - bool: You either get all the point or none at all.
-- %: The best competitor get all the point, the worst, none.
+- %: The best competitor for this challenge get all the points, the worst, none.
 Every one else score is given by a linear interpolation between the two extremes.
-- pts: The competitor with the most point will win the challenge.
+You must succeed at boolean objectives before getting those points.
 
 Definitions:
 
 - Number of cycles: Number of cycles to get an output for all the test inputs.
 - Resources used: `(number of membanks) x (size of membanks) + cores`
 
+**Unless otherwise noted, programs must run in a loop.**
+That is, it must wait for the next input after one have been processed.
 
 
 ## 1. Value passing (10 pts)
@@ -140,7 +142,7 @@ B = result >> 8
 ```
 
 ### Description
-Output `A` must be `c` when `a < b`, `0` when `a = b` and `-c` when a > b
+Output `A` must be `c` when `a < b`, `0` when `a = b` and `-c` when `a > b`.
 
 ### Example inputs
 Input:
@@ -175,7 +177,7 @@ Note: Simulator does not know whether its output is a signed or unsigned number 
 For example, 221 is `0b11011101` which is -35 when interpreted as a signed 8 bits number.
 
 ### Bonus (5 pts)
-Output `max(A, B)` when `a = b`.
+Output `max(a, b)` when `a = b`.
 
 
 # 4. Parallel base 2 logarithm (20 pts)
@@ -222,13 +224,13 @@ Compute base-16 logarithms instead of base-2 logarithms.
 ### Restrictions
 
 ```
-- Two inputs (A, B)
-- One output (a)
+- Two inputs (a, b)
+- One output (A)
 ```
 
 ### Description
 
-Perform `a = A * B`. Overflows most wrap around.
+Perform `A = a * b`. Overflows most wrap around.
 
 ### Example inputs
 Input:
@@ -256,13 +258,13 @@ Output:
 
 ### Restrictions
 ```
-- 900 inputs (A)
-- 900 outputs (a)
+- 900 inputs (a)
+- 900 outputs (A)
 ```
 
 ### Description
 
-Given a 30x30 input image, output a 30x30 blurred image using the following kernel.
+Given a 30x30 input image, output a 30x30 blurred image using the following kernel:
 ```
 1/16 1/8 1/16
 1/8  1/4 1/8
@@ -271,10 +273,10 @@ Given a 30x30 input image, output a 30x30 blurred image using the following kern
 
 Such as
 $$\begin{split}
-a_{i,j} =
-1/16 A_{i-1,j-1} + 1/8 A_{i-1,j} + 1/16 A_{i-1,j+1} + \\
-1/8 A_{i,j-1} + 1/4 A_{i,j} + 1/8 A_{i,j+1} + \\
-1/16 A_{i+1,j-1} + 1/8 A_{i+1,j} + 1/16 A_{i+1,j+1} + \\
+A_{i,j} =
+1/16 a_{i-1,j-1} + 1/8 a_{i-1,j} + 1/16 a_{i-1,j+1} + \\
+1/8 a_{i,j-1} + 1/4 a_{i,j} + 1/8 a_{i,j+1} + \\
+1/16 a_{i+1,j-1} + 1/8 a_{i+1,j} + 1/16 a_{i+1,j+1} + \\
 \end{split}$$
 
 This challenge is special, for two reasons:
@@ -284,7 +286,7 @@ I suggest using a `Zx30x30` CPU with all cores on the first Z-layer used as inpu
 
 2. CPU configuration is tedious.
 Sadly, as today, the simulator does not support range input. Therefore, to use 900 inputs, you must list all of them.
-The same limitation applies to outputs and core_to_mem.
+The same limitation applies to outputs and `core_to_mem`.
 Please, does not try to list everything by hand and instead use a tool like Python to generate those lists for you.
 Here are some examples to base your work on:
 

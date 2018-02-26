@@ -841,7 +841,10 @@ It may be useful to then use the CAN instruction to restrict VAL to affected val
 
 For simulator usage, refer to its included help: `simulator --help`.
 
-<!---## LAVAL-M
+<!---
+TODO: Input format
+
+## LAVAL-M
 LAVAL-M1 is the first version of the official embedded subset of LAVAL.
 It imposes some restriction garantee a very low memory requirement, power consumption and an high AL<sup>[1](#AL)</sup>.
 
@@ -850,10 +853,6 @@ It imposes some restriction garantee a very low memory requirement, power consum
 - All its registers are 8 bits long
 - Since PC is 8 bits long, memory banks are limited to 256 bytes
 -
-
-TODO: Signed behaviours:
-- Shifts
-- Overflows
 
 
 <a name="AL">1. </a>Annoyance level: Defined as (1 - Percentage of student who would repeat their programming experiments with the CPU architecture)

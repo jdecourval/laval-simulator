@@ -1,47 +1,49 @@
 # Challenges
 
-## Scoring
+## Pointage
 
-Each challenge (bonuses included) final score is evaluated with the following table.
+Le pointage de chaque challenge et bonus est évalué avec le tableau suivant.
 
-| Work for all inputs | Resources used  | Number of cycles  | total  |
+| Fonctionne pour toutes les entrées | Ressources utilisées | Nombre de cycles | Total  |
 |:-----------------:|:--------------:|:---------------:|:-----:|
 | bool                | %                | %                 |       |
 | 80                  | 10               | 10                | 100   |
 
-That percentage is then multiplied to the question value to get a number of point.
-The final score is the sum of all those points.
+Ce pourcentage est ensuite multiplié par la valeur de la question pour obtenir un nombre de point.
+Le pointage final est la somme de tous ces points.
 
-Challenges will be tested with inputs different from the ones given as example in this document.
+Les challenges vont être testés avec différentes entrées que celles fournies en exemple dans ce document.
 
-Objectives may be of different types:
-- bool: You either get all the point or none at all.
-- %: The best competitor get all the point, the worst, none.
-Every one else score is given by a linear interpolation between the two extremes.
-- pts: The competitor with the most point will win the challenge.
+Les objectifs peuvent être de différents types:
+- bool: Soit vous avez tous les points ou aucun
+- %: Le meilleur compétiteur pour ce challenge fait tous les points de cette catégorie, le dernier, aucun.
+Le pointage de tous les autres participants est donné par une interpolation linéaire entre ces deux extrêmes.
+Vous devez d'abord réussir tous les objectifs booléen du challenge avant de pouvoir en faire dans cette catégorie.
 
-Definitions:
+Définitions:
 
-- Number of cycles: Number of cycles to get an output for all the test inputs.
-- Resources used: `(number of membanks) x (size of membanks) + cores`
+- Nombre de cycles: Nombre de cycles pour avoir une sortie pour toutes les entrées testées.
+- Ressources utilisées: `(nombre de banques de mémoire) x (taille des banques de mémoire) + (nombre de coeurs)`
+
+**Sauf si indication contraire, vos programmes doivent rouler dans une boucle.**
+C'est-à-dore qu'ils doivent attendre pour une prochaine entrée après en avoir traité une.
 
 
-
-## 1. Value passing (10 pts)
+## 1. Passage de valeurs (10 pts)
 
 ### Restrictions
 
 ```
-- Two inputs (a, b)
-- Two outputs (A, B)
+- Deux entrées (a, b)
+- Deux sorties (A, B)
 ```
 
 ### Description
 
-Move values from the two inputs to the two outputs (`A=a, B=b`).
+Déplacez les valeurs des deux entrées vers les deux sortie (`A=a, B=b`).
 
-### Example inputs
-Inputs:
+### Exemple d'entrées
+Entrées:
 ```
 235 225
 87  128
@@ -55,7 +57,7 @@ Inputs:
 140 65
 ```
 
-Outputs:
+Sorties:
 ```
 235 225
 87  128
@@ -72,25 +74,25 @@ Outputs:
 
 ### Bonus (5 pts)
 
-Move values from the two inputs to the two outputs but cross them so that `A=b, B=a`.
+Déplacer les valeurs des deux entrées vers les deux sorties, mais en les inversant de sorte que `A=b, B=a`.
 
 
-## 2. Simple sum (10 pts)
+## 2. Somme simple (10 pts)
 
 ### Restrictions
 
 ```
-- Two inputs (a, b)
-- One output (A)
+- Deux entrées (a, b)
+- Une sortie (A)
 ```
 
 ### Description
 
-Add values from the two inputs and return the result to the single output (`A=a+b`).
-Output should wrap if it exceeds maximum.
+Additionner les deux entrées et retourner le résultat sur une seule sortie (`A=a+b`).
+La sortie devrait dépasser si elle excède le maximum.
 
-### Example inputs
-Input:
+### Exemple d'entrées
+Entrées:
 ```
 0   0
 0   1
@@ -104,7 +106,7 @@ Input:
 228 145
 ```
 
-Output:
+Sorties:
 ```
 0
 1
@@ -121,29 +123,30 @@ Output:
 
 ### Bonus (10 pts)
 
-Do the same but with 16 bits little endian numbers.
-You most therefore have four inputs (a, b, c, d) and 2 outputs such as:
+Faites la même chose, mais avec des nombre 16 bits en little endian.
+Vous devrez ainsi avoir quatre entrées (a, b, c, d) and deux sorties tel que:
+
 ```
-result = b << 8 | a + d << 8 | c
-A = result & 0xff
-B = result >> 8
+resultat = b << 8 | a + d << 8 | c
+A = resultat & 0xff
+B = resultat >> 8
 ```
 
 
-# 3. Conditional negation (20 pts)
+# 3. Négation conditionnelle (20 pts)
 
 ### Restrictions
 
 ```
-- Three inputs (a, b, c)
-- One output (A)
+- Trois entrées (a, b, c)
+- Une sortie (A)
 ```
 
 ### Description
-Output `A` must be `c` when `a < b`, `0` when `a = b` and `-c` when a > b
+La sortie `A` doit être `c` quand `a < b`, `0` quand `a = b` and `-c` quand `a > b`.
 
-### Example inputs
-Input:
+### Exemple d'entrées
+Entrées:
 ```
 232 4 35
 222 75 35
@@ -157,7 +160,7 @@ Input:
 64 192 0
 ```
 
-Output:
+Sorties:
 ```
 221
 221
@@ -171,25 +174,26 @@ Output:
 0
 ```
 
-Note: Simulator does not know whether its output is a signed or unsigned number and therefore always display them as unsigned.
-For example, 221 is `0b11011101` which is -35 when interpreted as a signed 8 bits number.
+Note: Le simulateur ne sait pas s'il a affaire à des nombre signés ou non-signé et en conséquant, les affichent toujours comme des non-signés.
+Par exemple, 221 est `0b11011101` qui est aussi -35 quand interprété comme un nombre signé de 8 bits.
+
 
 ### Bonus (5 pts)
-Output `max(A, B)` when `a = b`.
+Retourner plutôt `max(a, b)` quand `a = b`.
 
 
-# 4. Parallel base 2 logarithm (20 pts)
+# 4. Logarithme en base 2 parallèle (20 pts)
 
 ### Restrictions
 
 ```
-- Three inputs (a, b, c)
-- Three outputs (A, B, C)
+- Trois entrées (a, b, c)
+- Trois sorties (A, B, C)
 ```
 
 ### Description
 
-Compute the base-2 logarithm for all inputs such as
+Calcule le logarithme en base 2 de tous ses entrées de sorte que:
 ```
 A = floor(log2(a))
 B = floor(log2(b))
@@ -197,15 +201,15 @@ C = floor(log2(c))
 ```
 
 
-### Example inputs
-Input:
+### Exemple d'entrées
+Entrées:
 ```
 113 167 204
 21  57  26
 201 121 204
 ```
 
-Output:
+Sorties:
 ```
 6 7 7
 4 5 4
@@ -214,7 +218,7 @@ Output:
 
 ### Bonus (5 pts)
 
-Compute base-16 logarithms instead of base-2 logarithms.
+Calculer le logarithme en base 16, plutôt que le logarithme en base 2.
 
 
 ## 5. Multiplication (30 pts)
@@ -222,16 +226,16 @@ Compute base-16 logarithms instead of base-2 logarithms.
 ### Restrictions
 
 ```
-- Two inputs (A, B)
-- One output (a)
+- Deux entrées (a, b)
+- Une sortie (A)
 ```
 
 ### Description
 
-Perform `a = A * B`. Overflows most wrap around.
+Calcule `A = a * b`. Les dépassement doivent «wrap around».
 
-### Example inputs
-Input:
+### Exemple d'entrées
+Entrées:
 ```
 0 3
 0 0
@@ -241,7 +245,7 @@ Input:
 66 56
 ```
 
-Output:
+Sorties:
 ```
 0
 0
@@ -252,51 +256,52 @@ Output:
 ```
 
 
-## 6. Gaussian blur
+## 6. Flou gaussien
 
 ### Restrictions
 ```
-- 900 inputs (A)
-- 900 outputs (a)
+- 900 entrées (a)
+- 900 sorties (A)
 ```
 
 ### Description
 
-Given a 30x30 input image, output a 30x30 blurred image using the following kernel.
+En partant d'une image d'entrée de 30x30, produisez une image floué de 30x30 en utilisant le noyau suivant:
 ```
 1/16 1/8 1/16
 1/8  1/4 1/8
 1/16 1/8 1/16
 ```
 
-Such as
+Tel que
 $$\begin{split}
-a_{i,j} =
-1/16 A_{i-1,j-1} + 1/8 A_{i-1,j} + 1/16 A_{i-1,j+1} + \\
-1/8 A_{i,j-1} + 1/4 A_{i,j} + 1/8 A_{i,j+1} + \\
-1/16 A_{i+1,j-1} + 1/8 A_{i+1,j} + 1/16 A_{i+1,j+1} + \\
+A_{i,j} =
+1/16 a_{i-1,j-1} + 1/8 a_{i-1,j} + 1/16 a_{i-1,j+1} + \\
+1/8 a_{i,j-1} + 1/4 a_{i,j} + 1/8 a_{i,j+1} + \\
+1/16 a_{i+1,j-1} + 1/8 a_{i+1,j} + 1/16 a_{i+1,j+1} + \\
 \end{split}$$
 
-This challenge is special, for two reasons:
-1. Its the first challenge which you should probably solve using a 3D CPU.
-I suggest using a Zx30x30 CPU with all cores on the first Z-layer used as inputs and all cores on the last Z-layer used as outputs.
-Z is up to you. You may use a few intermediate z-layers to perform your calculations.
+Ce challenge est spécial pour deux raisons:
+1. C'est le premier challenge pour lequel vous devriez absolument utiliser un CPU 3D.
+Je suggère d'utiliser un CPU de Zx30x30 avec tous les coeurs de la première couche en Z utilisés comme entrées et tous les coeurs de la dernière couche en Z utilisés comme sorties.
+Z est à votre guise. Vous pouvez utiliser plusieurs couche intermédiaire en Z pour exécuter vos calculs.
 
-2. CPU configuration is tedious.
-Sadly, as today, the simulator does not support range input. Therefore, to use 900 inputs, you must list all of them.
-The same limitation applies to outputs and core_to_mem.
-Please, does not try to list everything by hand and instead use a tool like Python to generate those lists for you.
-Here are some examples to base your work on:
+2. La configuration du CPU est difficile
+Malheureusement, à ce jour, le simulator ne supporte pas les plages de paramètres.
+En effet, pour utiliser 900 entrées, vous devrez toutes les lister.
+La même limitation s'applique aux sorties et à `core_to_mem`.
+S'il vous plait, n'essayer pas de tout lister à la main et utiliser plutôt un outil comme Python pour générer ces listes pour vous.
+Voici quelques exemples pour baser votre travail:
 
 ```python3
-# Print a list of 900 elements in the format accepted by the LAVAL simulator
+# Affiche une liste de 900 éléments dans le format accepté par le simulateur LAVAL.
 print(", ".join([str(i) for i in range(900)]))
 
-# Print every cores ID part of the second column of the first layer
+# Affiche tous les identifiants de coeurs membres de la deuxième colomne de la première couche.
 print(", ".join([str(i) for i in range(1, 30*30, 30)]))
 ```
 
 
-### Example inputs
+### Exemple d'entrées
 
-Too big to include here.
+Trop gros pour être inclus ici.
