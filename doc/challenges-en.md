@@ -6,7 +6,7 @@ Each challenge (bonuses included) final score is evaluated with the following ta
 
 | Work for all inputs | Resources used  | Number of cycles  | total  |
 |:-----------------:|:--------------:|:---------------:|:-----:|
-| bool                | %                | %                 | %     |
+| bool                | %                | %                 |       |
 | 80                  | 10               | 10                | 100   |
 
 That percentage is then multiplied to the question value to get a number of point.
@@ -140,7 +140,7 @@ B = result >> 8
 ```
 
 ### Description
-Output (`A`) must be `c` when `a < b`, `0` when `a = b` and `-c` when a > b
+Output `A` must be `c` when `a < b`, `0` when `a = b` and `-c` when a > b
 
 ### Example inputs
 Input:
@@ -175,7 +175,7 @@ Note: Simulator does not know whether its output is a signed or unsigned number 
 For example, 221 is `0b11011101` which is -35 when interpreted as a signed 8 bits number.
 
 ### Bonus (5 pts)
-Output `max(A, B)` when `a = b`
+Output `max(A, B)` when `a = b`.
 
 
 # 4. Parallel base 2 logarithm (20 pts)
@@ -191,43 +191,30 @@ Output `max(A, B)` when `a = b`
 
 Compute the base-2 logarithm for all inputs such as
 ```
-A = log2(a)
-B = log2(
+A = floor(log2(a))
+B = floor(log2(b))
+C = floor(log2(c))
 ```
 
 
 ### Example inputs
 Input:
 ```
-113
-21
-201
-171
-172
-94
-251
-249
-97
-2
+113 167 204
+21  57  26
+201 121 204
 ```
 
 Output:
 ```
-113 6
-21  4
-201 7
-171 7
-172 7
-94  6
-251 7
-249 7
-97  6
-2   1
+6 7 7
+4 5 4
+7 6 7
 ```
 
 ### Bonus (5 pts)
 
-Compute the base-16 logarithm instead of a base-2 logarithm.
+Compute base-16 logarithms instead of base-2 logarithms.
 
 
 ## 5. Multiplication (30 pts)
@@ -241,7 +228,7 @@ Compute the base-16 logarithm instead of a base-2 logarithm.
 
 ### Description
 
-`a = A * B`. Overflow most wrap around.
+Perform `a = A * B`. Overflows most wrap around.
 
 ### Example inputs
 Input:
@@ -267,22 +254,49 @@ Output:
 
 ## 6. Gaussian blur
 
+### Restrictions
 ```
-- 900 inputs
-- 900 outputs
+- 900 inputs (A)
+- 900 outputs (a)
 ```
 
 ### Description
 
-Given a 30x30 input image, output a 30x30 blured image using the following kernel.
+Given a 30x30 input image, output a 30x30 blurred image using the following kernel.
 ```
 1/16 1/8 1/16
 1/8  1/4 1/8
 1/16 1/8 1/16
 ```
 
+Such as
+$$\begin{split}
+a_{i,j} =
+1/16 A_{i-1,j-1} + 1/8 A_{i-1,j} + 1/16 A_{i-1,j+1} + \\
+1/8 A_{i,j-1} + 1/4 A_{i,j} + 1/8 A_{i,j+1} + \\
+1/16 A_{i+1,j-1} + 1/8 A_{i+1,j} + 1/16 A_{i+1,j+1} + \\
+\end{split}$$
+
 This challenge is special, for two reasons:
 1. Its the first challenge which you should probably solve using a 3D CPU.
+I suggest using a `Zx30x30` CPU with all cores on the first Z-layer used as inputs and all cores on the last Z-layer used as outputs.
+`Z` is up to you. You may use a few intermediate z-layers to perform your calculations.
+
 2. CPU configuration is tedious.
+Sadly, as today, the simulator does not support range input. Therefore, to use 900 inputs, you must list all of them.
+The same limitation applies to outputs and core_to_mem.
+Please, does not try to list everything by hand and instead use a tool like Python to generate those lists for you.
+Here are some examples to base your work on:
+
+```python3
+# Print a list of 900 elements in the format accepted by the LAVAL simulator
+print(", ".join([str(i) for i in range(900)]))
+
+# Print every cores ID part of the second column of the first layer
+print(", ".join([str(i) for i in range(1, 30*30, 30)]))
+```
 
 
+### Example inputs
+
+Too big to include here.
