@@ -600,6 +600,8 @@ Multiplexer addition
 **Description:**
 
 Fetch and add the value from the mux to VAL.
+MXA always performs a signed addition—i.e., VAL is considered negative if the core's sign bit is true.
+MXA set the sign bit if the operation results in a negative number.
 
 
 #### MXS
@@ -610,7 +612,8 @@ Multiplexer subtraction
 **Description:**
 
 Fetch and subtract the value from the mux to VAL.
-
+MXS always performs a signed subtraction—i.e., VAL is considered negative if the core's sign bit is true.
+MXS set the sign bit if the operation results in a negative number.
 
 
 ### Jumping
@@ -740,7 +743,12 @@ Logical shift, left
 Logically left shift VAL by number of bits indicated by the argument.
 Every bit of VAL is moved a given number of bit positions.
 The vacant bit-positions are filled with zeros.
-Does not preserve a number's sign bit, if applicable.
+
+**Note:**
+
+The sign bit is left untouched.
+This means that you may use this instruction to multiply negative number.
+For example: `-1 << 1 = -2`.
 
 
 #### LSR
@@ -757,7 +765,12 @@ Logical shift, right
 Logically right shift VAL by number of bits indicated by the argument.
 Every bit of VAL is moved a given number of bit positions.
 The vacant bit-positions are filled with zeros.
-Does not preserve a number's sign bit, if applicable.
+
+**Note:**
+
+The sign bit is left untouched.
+This means you must be extremely careful to use this instruction with negative numbers since its behaviour is probably not what you want.
+Example: `-65 >> 1 = 95`
 
 
 #### CAD
@@ -772,6 +785,8 @@ Constant addition
 **Description:**
 
 Add a constant to VAL.
+CAD always performs a signed addition—i.e., VAL is considered negative if the core's sign bit is true.
+CAD set the sign bit if the operation results in a negative number.
 
 
 #### CSU
@@ -786,6 +801,8 @@ Constant subtraction
 **Description:**
 
 Subtract a constant to VAL.
+CSU always performs a signed subtraction—i.e., VAL is considered negative if the core's sign bit is true.
+CSU set the sign bit if the operation results in a negative number.
 
 
 #### CAN
