@@ -2,23 +2,23 @@
 
 ## Scoring
 
-Each challenge (bonuses included) final score is evaluated with the following table.
+The final score for each challenge (bonuses included) will be evaluated with the following table.
 
 | Work for all inputs | Resources used  | Number of cycles  | Total  |
 |:-----------------:|:--------------:|:---------------:|:-----:|
 | bool                | %                | %                 |       |
 | 80                  | 10               | 10                | 100   |
 
-That percentage is then multiplied to the question value to get a number of point.
+That percentage is then multiplied by the question value to get a number of points.
 The final score is the sum of all those points.
 
-Challenges will be tested with inputs different from the ones given as example in this document.
+Challenges will be tested with inputs different from the ones given as examples in this document.
 
 Objectives may be of different types:
-- bool: You either get all the point or none at all.
-- %: The best competitor for this challenge get all the points, the worst, none.
-Every one else score is given by a linear interpolation between the two extremes.
-You must succeed at boolean objectives before getting those points.
+- bool: You either get all the points or none at all.
+- %: The best competitor for this challenge gets all the points and the worst competitor gets none.
+Everyone else's points are determined by a linear interpolation between the two extremes.
+You must succeed at the boolean objectives before getting these points.
 
 Definitions:
 
@@ -26,7 +26,7 @@ Definitions:
 - Resources used: `(number of membanks) x (size of membanks) + cores`
 
 **Unless otherwise noted, programs must run in a loop.**
-That is, it must wait for the next input after one have been processed.
+That is, they must wait for the next input after one has been processed.
 
 
 ## 1. Value passing (10 pts)
@@ -89,7 +89,7 @@ Move values from the two inputs to the two outputs but cross them so that `A=b, 
 ### Description
 
 Add values from the two inputs and return the result to the single output (`A=a+b`).
-Output should wrap if it exceeds maximum.
+Output should wrap if it exceeds the maximum.
 
 ### Example inputs
 Input:
@@ -123,8 +123,8 @@ Output:
 
 ### Bonus (10 pts)
 
-Do the same but with 16 bits little endian numbers.
-You most therefore have four inputs (a, b, c, d) and 2 outputs such as:
+Do the same thing but with 16-bit little-endian numbers.
+That means you must have four inputs (a, b, c, d) and two outputs, i.e.:
 ```
 result = b << 8 | a + d << 8 | c
 A = result & 0xff
@@ -173,14 +173,14 @@ Output:
 0
 ```
 
-Note: Simulator does not know whether its output is a signed or unsigned number and therefore always display them as unsigned.
-For example, 221 is `0b11011101` which is -35 when interpreted as a signed 8 bits number.
+Note: The simulator does not know whether its output is a signed or unsigned number and therefore always displays them as unsigned.
+For example, 221 is `0b11011101` which is -35 when interpreted as a signed 8-bit number.
 
 ### Bonus (5 pts)
 Output `max(a, b)` when `a = b`.
 
 
-# 4. Parallel base 2 logarithm (20 pts)
+# 4. Parallel base-2 logarithm (20 pts)
 
 ### Restrictions
 
@@ -191,7 +191,7 @@ Output `max(a, b)` when `a = b`.
 
 ### Description
 
-Compute the base-2 logarithm for all inputs such as
+Compute the base-2 logarithm for all inputs, i.e.:
 ```
 A = floor(log2(a))
 B = floor(log2(b))
@@ -230,7 +230,7 @@ Compute base-16 logarithms instead of base-2 logarithms.
 
 ### Description
 
-Perform `A = a * b`. Overflows most wrap around.
+Perform `A = a * b`. Overflows must wrap around.
 
 ### Example inputs
 Input:
@@ -271,7 +271,7 @@ Given a 30x30 input image, output a 30x30 blurred image using the following kern
 1/16 1/8 1/16
 ```
 
-Such as
+More specifically:
 $$\begin{split}
 A_{i,j} =
 1/16 a_{i-1,j-1} + 1/8 a_{i-1,j} + 1/16 a_{i-1,j+1} + \\
@@ -279,22 +279,22 @@ A_{i,j} =
 1/16 a_{i+1,j-1} + 1/8 a_{i+1,j} + 1/16 a_{i+1,j+1} + \\
 \end{split}$$
 
-This challenge is special, for two reasons:
-1. Its the first challenge which you should probably solve using a 3D CPU.
+This challenge is special for two reasons:
+1. It's the first challenge that you should solve using a 3D CPU.
 I suggest using a `Zx30x30` CPU with all cores on the first Z-layer used as inputs and all cores on the last Z-layer used as outputs.
 `Z` is up to you. You may use a few intermediate z-layers to perform your calculations.
 
 2. CPU configuration is tedious.
-Sadly, as today, the simulator does not support range input. Therefore, to use 900 inputs, you must list all of them.
+Unfortunately, the simulator does not support range input yet. Therefore, to use 900 inputs, you must list all of them.
 The same limitation applies to outputs and `core_to_mem`.
-Please, does not try to list everything by hand and instead use a tool like Python to generate those lists for you.
+Please do not try to list everything by hand and instead use a tool like Python to generate those lists for you.
 Here are some examples to base your work on:
 
 ```python3
 # Print a list of 900 elements in the format accepted by the LAVAL simulator
 print(", ".join([str(i) for i in range(900)]))
 
-# Print every cores ID part of the second column of the first layer
+# Print all the core IDs of the second column of the first layer
 print(", ".join([str(i) for i in range(1, 30*30, 30)]))
 ```
 
