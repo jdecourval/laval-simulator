@@ -77,6 +77,9 @@ La plupars des instructions lisent ou modifient VAL.
 
 Les nombres négatifs sont encodés avec la notation complément 2.
 
+VAL est initialisé à zéro.
+
+
 #### MUX
 MUX est le registre du multiplexeur de coeur.
 
