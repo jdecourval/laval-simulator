@@ -4,14 +4,14 @@
 LAVAL COMPUTER is the first computer to implement the revolutionary LAVAL CPU architecture.
 Like every good acronym, LAVAL is recursively defined: Laval Advanced Vectorized Architecture Laboratory.
 
-Its a novel architecture, sets to revolutionize the computing world with its massively parallel cores organisation.
+It is a novel architecture that is ready to revolutionize the computing world with its massively parallel organization.
 
 
 ## Architecture
 
-LAVAL architecture lies somewhere between those of CPU, GPU and FPGA.
+LAVAL architecture lies somewhere amongst those of CPU, GPU and FPGA.
 It consists of a large number of simple cores connected together in a local basis following a cube pattern.
-It is based on an Harvard architecture, cores execute instructions stored in their linked memory bank, which is read only.
+It is based on an Harvard architecture, where cores execute instructions stored in their linked memory bank, which is read-only.
 Branches are made by switching execution from one memory bank to another one.
 
 Many CPU settings, like the number of cores, are implementation defined.
@@ -20,24 +20,24 @@ Refer to your specific CPU model for more information.
 For example, this figure presents a small 2x2x2 implementation with six memory banks of four bytes each.
 
 ![Cpu architecture](cores.svg "CPU Architecture")
-Do note that only some of the core-to-core links are drawn to reduce clutter.
+Note that for clarity, only some of the core-to-core links are drawn.
 
 ### Core overview
 The main component of the LAVAL architecture is the CORE unit.
-It is a very low complexity core capable of executing 8 bits instructions *arguments included*.
+It is a very low complexity core capable of executing 8 bits instructions, *arguments included*.
 Every instruction executes in a single clock cycle.
 
-A CORE owns a single general purpose register name VAL and cannot address RAM, instead, the collective memory of all the cores is used as the program state.
-Therefore, as soon as an algorithm needs more than a single 8 bits variable, multiple cores are needed.
+A core owns a single general purpose register named VAL and cannot address RAM. Instead, the collective memory of all the cores is used as the program state.
+Therefore, as soon as an algorithm needs more than a single 8-bit variable, multiple cores are needed.
 
-A consequence of these characteristics is that no instruction allows to work with constant larger than 4 bits (0xf).
-To work around that, either use two instructions or use another core to generate the needed values.
+A consequence of these characteristics is that no instruction is allowed to work with constant larger than 4 bits (0xf).
+To work around this, you can either use two instructions or use another core to generate the necessary values.
 
 Refer to the instruction set section for more information.
 
-Every core owns a multiplexer that allow the core to target one of its 26 neighbors.
+Every core owns a multiplexer that allows the core to target one of its 26 neighbours.
 Inter-core communication is heavily optimized for constant patterns, since an instruction is needed to switch the multiplexer.
-Algorithms designed so that cores work on a minimal number of incoming values are therefore way more efficient.
+That means that algorithms designed for the cores to work on a minimal number of incoming values are way more efficient.
 
 
 <!---
@@ -45,7 +45,7 @@ Execution takes place in two steps:
 
 1. Preload
 
-    1. If multiplexer' target core have its SYNC flag off, then preloading is skipped
+    1. If multiplexer's target core has its SYNC flag off, then preloading is skipped
     2. Load a value from the multiplexer into PRELOAD.
     3. Set UNLOCK flag on multiplexer target if the next instruction to be executed will use PRELOAD
 
@@ -63,35 +63,35 @@ Execution takes place in two steps:
 
 ### Registers
 
-Following is the description of every CPU register.
-Most operations on these registers are abstracted to the programmers by the ISA but understanding them is useful to better grasp the CPU inner working.
+The following is the description of each CPU register.
+Most operations on these registers are abstracted to the programmers by the ISA but understanding them is useful to better understand the internal function of the CPU.
 
-Every register is 8 bits long.
+Each register is 8 bits wide.
 
 #### VAL
 VAL is the single general purpose register of a CORE unit.
-Most instruction read or modify VAL.
+Most instructions read or modify VAL.
 
-Negative numbers are encoded using a two complement representation.
+Negative numbers are encoded using a two's complement representation.
 
-VAL is zero initialized.
+VAL is zero initialized. <!-- This isn't in the French version? -->
 
 
 #### MUX
 MUX is the core multiplexer register.
 
-Its value defines which core a core may access in a given cycle.
+Its value defines which core a core can access in a given cycle.
 
-Its value is encoded as a base 3 number where the most significant trit addresses the Z dimension and the least significant trit addresses the X dimension.
+Its value is encoded as a base-3 number where the most significant trit addresses the Z dimension and the least significant trit addresses the X dimension.
 
-A trit encode an offset relative to the current core, as followed:
+A trit encodes an offset relative to the current core, as follows:
 - 0: BEFORE
 - 1: CURRENT
 - 2: AFTER
 
 For example, the direction `BEFORE, CURRENT, AFTER` is encoded as `(0 * 3^2) + (1 * 3^1) + (2 * 3^0)`.
 
-Refer to the Inputs/Outputs section for more details about the multiplexer usage.
+Refer to the Inputs/Outputs section for more details about usage of the multiplexer.
 
 Its default value is `CURRENT, CURRENT, CURRENT`, which is an illegal direction to fetch from.
 
@@ -100,12 +100,12 @@ Its default value is `CURRENT, CURRENT, CURRENT`, which is an illegal direction 
 PC is the program counter.
 
 Its value defines which instruction of the current memory bank will be executed next.
-PC is incremented after every instruction who does not stall the core's pipeline.
+The PC is incremented after each instruction that does not stall the core's pipeline.
 The pipeline is stalled when an instruction fetching a value from the multiplexer fails to do so.
-This happen when the pointed core have not yet issued a synchronization instruction (SYN).
+This happens when the selected core has not yet issued a synchronization instruction (SYN).
 
-As with any register incrementing, its value may overflow.
-This means its value automatically reset to zero instead of getting to 0x100 (256).
+As with any incrementing register, its value may overflow.
+This means that its value automatically resets to zero instead of reaching 0x100 (256).
 
 PC is zero initialized.
 
@@ -125,38 +125,38 @@ A future ISA revision may standardize their layouts.
 
 ### Inter-core transfers
 
-Each core owns a multiplexer which may be pointed toward one of the its 26 neighbours.
+Each core owns a multiplexer which can be pointed toward one of the its 26 neighbours.
 A core may then use its multiplexer to **load** a value from the target core.
 
 Warning: You may not connect a core to itself.
 
-Such transfers are synchronized, the *loading* instruction will not proceed and none of the CPU registers will get affected as long as the target core does not emit a *synchronization* instruction.
-The same is true for synchronization instructions, a core will block on such instruction until at least one core as fetched a value from it.
+Such transfers are synchronized, the *loading* instruction will not proceed and none of the CPU registers will be affected as long as the target core does not emit a *synchronization* instruction.
+The same is true for synchronization instructions, a core will block on such instructions until at least one core has fetched a value from it.
 
-A core executing a synchronization instruction make its registers available to all currently connected cores.
-This means many cores may load a value from a common core and a single synchronization is needed.
+A core executing a synchronization instruction makes its registers available to all currently connected cores.
+This means many cores may load a value from a common core and onlt a single synchronization is needed.
 
-When a core has been fetched, is synchronization flag is reset and another synchronization instruction will be needed for the next fetch.
+When a core has been fetched, it's synchronization flag is reset and another synchronization instruction will be needed for the next fetch.
 
-Finally, a core may not fetch from an non-existent core, except if the fetching core is configured as a CPU input (more on that later).
+Finally, a core may not fetch from an non-existent core, unless the fetching core is configured as a CPU input (more on that later).
 
 Examples in pseudo-code:
 
 ```
 Core0:
     VAL <- 5
-    Synchronize  ; Proceed immediatly since at least one core is fetching.
+    Synchronize  ; Proceed immediately since at least one core is fetching.
 
 Core1:
     Connect to core 0
     Load from connected core
-    ; Load immediatly since the target core is executing a synchronization instruction.
+    ; Load immediately since the target core is executing a synchronization instruction.
     ; VAL is now 5
 
 Core2:
     Connect to core 0
     Load from connected core
-    ; Load immediatly since the target core is executing a synchronization instruction.
+    ; Load immediately since the target core is executing a synchronization instruction.
     ; VAL is now 5
 ```
 
@@ -164,37 +164,37 @@ Core2:
 Core0:
     VAL <- 5
     Do nothing
-    Synchronize  ; Proceed immediatly since at least one core is fetching.
+    Synchronize  ; Proceed immediately since at least one core is fetching.
 
 Core1:
     Connect to core 0
     Load from connected core
-    ; Wait for one cycle, since the target has not yet synchronized, then load.
+    ; Wait for one cycle since the target has not yet synchronized, then load.
     ; VAL is now 5
 
 Core2:
     Connect to core 0
     Load from connected core
-    ; Wait for one cycle, since the target has not yet synchronized, then load.
+    ; Wait for one cycle since the target has not yet synchronized, then load.
     ; VAL is now 5
 ```
 
 ```
 Core0:
     VAL <- 5
-    Synchronize  ; Proceed immediatly since at least one core is fetching.
+    Synchronize  ; Proceed immediately since at least one core is fetching.
 
 Core1:
     Connect to core 0
     Load from connected core
-    ; Load immediatly since the target core is executing a synchronization instruction.
+    ; Load immediately since the target core is executing a synchronization instruction.
     ; VAL is now 5
 
 Core2:
     Connect to core 0
     Do nothing
     Load from connected core
-    ; The target core has reset is synchronzation flag. Wait indefinitely.
+    ; The target core has reset its synchronzation flag. Wait indefinitely.
 ```
 
 ```
@@ -206,35 +206,35 @@ Core1:
     Connect to core 0
     Do nothing
     Load from connected core
-    ; Load immediatly since the target core is executing a synchronization instruction.
+    ; Load immediately since the target core is executing a synchronization instruction.
     ; VAL is now 5
 
 Core2:
     Connect to core 0
     Do nothing
     Load from connected core
-    ; Load immediatly since the target core is executing a synchronization instruction.
+    ; Load immediately since the target core is executing a synchronization instruction.
     ; VAL is now 5
 ```
 
 
 ### Inputs/Outputs
 
-As described up to now, a CPU may only works on some predefined constants, which is pretty useless by itself.
-The get useful, a CPU must communicates with the real world.
+As described up to now, a CPU may only work on some predefined constants, which is pretty useless by itself.
+To be useful, a CPU must communicate with the real world.
 
 
 #### Inputs
 
 A core may be connected to a CPU input.
-Doing so enables that specific core to receive data from the outside.
+Doing so enables that specific core to receive external data.
 
 Refer to the assembler section for more information on how to configure inputs.
 
-Apart from the needed configuration, receiving data from the outside or from another core works in exactly the same way.
+Apart from the necessary configuration, receiving external data or data from another core works in exactly the same way.
 
-To use its input a core must points its multiplexer to a normally invalid direction, but not itself.
-This means, by design, that only cores on the edge of the CPU may have an input.
+To use its input, a core must point its multiplexer to a normally invalid direction, but not itself.
+This means that by design, only cores on the edge of the CPU may have an input.
 
 It is forbidden to wire two inputs or both inputs and outputs to the same core.
 
@@ -242,13 +242,13 @@ It is forbidden to wire two inputs or both inputs and outputs to the same core.
 #### Outputs
 
 A core may be connected to a CPU output.
-Doing so enables that specific core to send data to the outside.
+Doing so enables that specific core to send data externally.
 
 Refer to the assembler section for more information on how to configure outputs.
 
-Apart from that needed configuration, sending data to the outside or to another core works in exactly the same way.
+Apart from that necessary configuration, sending data externally or to another core works in exactly the same way.
 
-To use its output a core must simply synchronize (SYN) its current VAL.
+To use its output, a core must simply synchronize (SYN) its current VAL.
 The CPU output will then automatically fetch the value and unlock the core.
 The result is the same as if another core loaded from it in the same clock cycle.
 
@@ -259,24 +259,24 @@ It is forbidden to wire both inputs and outputs to the same core.
 
 ## Assembler
 
-This section describe how to use the assembler to write a program targeting the LAVAL ISA.
+This section describes how to use the assembler to write a program targeting the LAVAL ISA.
 
-The assembler does not care about whitespaces as long as the required whitespace are presents (for example between an instruction and its arguments) and the tokens are undivided (no space is allowed in the middle of an instruction mnemonic).
+The assembler does not care about whitespace as long as the required whitespace is present (for example between an instruction and its arguments) and the tokens are not divided (no space is allowed in the middle of an instruction mnemonic).
 
 
 ### Settings
 
-Assembler programs start with a setting section.
-Settings are used to list the requirement of a cpu running this program.
-Settings are written, one per line, using the following format:
+Assembler programs start with a settings section.
+Settings are used to list the requirement of a CPU running this program.
+Settings are listed one per line using the following format:
 ```
 \.(\w+) ([\d, ]*)
 ```
 
-- First capture group is the setting name
-- Second capture group contains the setting's argument(s)
+- The first capture group is the setting's name
+- The second capture group contains the setting's argument(s)
 
-Settings most not appear after the first memory bank.
+Settings must not appear after the first memory bank.
 
 
 #### .cores
@@ -299,7 +299,7 @@ Number of memory banks
 
 #### .mem_size
 
-Memory banks size
+Memory bank size
 
 | Argument | Size     | Description          |
 |---------:|:-------:|:-------------------|
@@ -307,7 +307,7 @@ Memory banks size
 
 #### .core_to_mem
 
-Assign memory banks to cores at CPU initialization
+Assignment of memory banks to cores at CPU initialization
 
 | Argument | Size     | Description                    |
 |--------:|:-------:|:----------------------------|
@@ -319,25 +319,25 @@ Assign memory banks to cores at CPU initialization
 
 #### .in
 
-Inputs assignment
+Assignment of inputs
 
 | Argument | Size     | Description                    |
 |--------:|:-------:|:----------------------------|
-|         0| 0..255 | Core to which input #0 is connected |
-|         1| 0..255 | Core to which input #1 is connected |
-|         n| 0..255 | Core to which input #n is connected |
+|         0| 0..255 | Core connected to input #0 |
+|         1| 0..255 | Core connected to input #1 |
+|         n| 0..255 | Core connected to input #n |
 
 `n` is the number of inputs and must be smaller or equal to 65535.
 
 #### .out
 
-Ouputs assignment
+Assignment of outputs
 
 | Argument | Size     | Description                    |
 |--------:|:-------:|:----------------------------|
-|         0| 0..255 | Core to which output #0 is connected |
-|         1| 0..255 | Core to which output #1 is connected |
-|         n| 0..255 | Core to which output #n is connected |
+|         0| 0..255 | Core connected to output #0 |
+|         1| 0..255 | Core connected to output #1 |
+|         n| 0..255 | Core connected to output #n |
 
 `n` is the number of outputs and must be smaller or equal to 65535.
 
@@ -348,36 +348,36 @@ Memory banks are programmed by declaring a block of instructions starting with t
 (\d+):
 ```
 
-- Capture group indicate the ID of the memory bank that will contains the following instructions.
+- The capture group indicates the ID of the memory bank that will contain the instructions that follow.
 
-Do note that memory bank IDs are 0-indexed.
+Note that memory bank IDs are zero-indexed.
 
 
 ### Instructions
 
-Instruction respect the following format:
+Instructions must respect the following format:
 ```
 (\w{3})( -?\d+(?:, ?\d+)*)?
 ```
 
-- First capture group is the instruction mnemonic
-- Second (optional) capture group contains the instruction argument(s)
+- The first capture group is the instruction mnemonic
+- The second (optional) capture group contains the instruction argument(s)
 
-Please note that the specific number and length of the arguments depend on the instruction.
-Refer to their documentation for more information.
+Please note that the specific number and length of the arguments depends on the instruction.
+Refer to specific argument documentation for more information.
 
 Instructions *must* be part of a memory bank.
 
 
 ### Comments
 
-A line comment may be inserted using the `;` character.
-Everything following that character on the same line will get ignored by the assembler.
+A comment may be inserted using the `;` character.
+Everything following this character on the same line will be ignored by the assembler.
 
 
 ### Preprocessor
 
-The assembler also mandates the use of a preprocessor.
+The assembler also requires the use of a preprocessor.
 It is used to provide some constants to the programmer:
 
 | Constant | Value |
@@ -386,13 +386,13 @@ It is used to provide some constants to the programmer:
 | CURRENT  | 1     |
 | AFTER    | 2     |
 
-Constant are simply textually replaced by their value before the file is passed to the assembler.
+Constants are simply textually replaced by the corresponding value before the file is passed to the assembler.
 
 
 ### Examples
 
 ```
-; Repeatly move value from a single input to a single output. Speed optimized.
+; Repeatedly move a value from a single input to a single output. Speed optimized.
 
 .cores 1, 1, 1
 .mem_number 2
@@ -410,12 +410,12 @@ Constant are simply textually replaced by their value before the file is passed 
     JMP 1
 ```
 
-The above program is optimized for speed. It takes exactly two clock cycles to move a value from its input to its output.
-In a resource constrained system, it may be appropriate to sacrifice some speed for cost.
-The above program program may be modified for this objective like so:
+The preceding program is optimized for speed. It takes exactly two clock cycles to move a value from its input to its output.
+In a resource-constrained system, it may be appropriate to sacrifice some speed to reduce the cost.
+The preceding program program may be modified for this objective like so:
 
 ```
-; Repeatly move value from a single input to a single output. Cost optimized.
+; Repeatedly move a value from a single input to a single output. Cost optimized.
 
 .cores 1, 1, 1
 .mem_number 1
@@ -430,8 +430,8 @@ The above program program may be modified for this objective like so:
     JMP 0
 ```
 
-Now, the program is smaller overall (1 membank x 3 bytes vs 2 membank x 2 bytes) but takes 3 clock cycles to move a value.
-Many programs may be optimized one way or another using similar tricks.
+Now the program is smaller (1 membank x 3 bytes vs 2 membank x 2 bytes) but takes 3 clock cycles to move a value.
+Many programs may be optimized in one way or another using similar tricks.
 
 
 ## Instruction set
@@ -457,7 +457,7 @@ Sync
 **Description:**
 
 Sync VAL with connected mux(es).
-Multiple cores may receive the same synced value as long as they fetch it on the same cycle.
+Multiple cores may receive the same synced value as long as they fetch on the same cycle.
 This instruction will block until at least one core has fetched a value.
 
 
@@ -469,7 +469,7 @@ Output to debugger
 
 **Description:**
 
-Output core status—i.e., the values of all the registers, to the connected debugger.
+Output core status, i.e., the values of all the registers, to the connected debugger.
 
 
 #### HLT
@@ -479,7 +479,7 @@ Halt
 
 **Description:**
 
-Stop CPU execution and return VAL. Two cores returning at the same time return an undefined VAL.
+Stop CPU execution and return VAL. Two cores returning a value at the same time return an undefined VAL.
 
 
 #### HCF
@@ -548,7 +548,7 @@ The multiplexer may also be connected to the carry bit using CTC.
 
 
 
-### Reading from mux
+### Reading from MUX
 #### MXD
 Multiplexer discard
 
@@ -572,8 +572,8 @@ This instruction keeps VAL unaffected.
 
 0:
     LCL 1
-    SYN     ; Will waits here for one cycle, then executes on the next
-    LCL 2   ; Will executes on the fourth cycle
+    SYN     ; Will wait here for one cycle, then executes on the next cycle
+    LCL 2   ; Will execute on the fourth cycle
 
 1:
     NOP
@@ -599,9 +599,9 @@ Multiplexer addition
 
 **Description:**
 
-Fetch and add the value from the mux to VAL.
-MXA always performs a signed addition—i.e., VAL is considered negative if the core's sign bit is true.
-MXA set the sign bit if the operation results in a negative number.
+Fetches and adds the value from the mux to VAL.
+MXA always performs signed addition—i.e., VAL is considered negative if the core's sign bit is true.
+MXA sets the sign bit if the operation results in a negative number.
 
 
 #### MXS
@@ -611,9 +611,9 @@ Multiplexer subtraction
 
 **Description:**
 
-Fetch and subtract the value from the mux to VAL.
-MXS always performs a signed subtraction—i.e., VAL is considered negative if the core's sign bit is true.
-MXS set the sign bit if the operation results in a negative number.
+Fetches and subtracts the value from the mux to VAL.
+MXS always performs signed subtraction—i.e., VAL is considered negative if the core's sign bit is true.
+MXS sets the sign bit if the operation results in a negative number.
 
 
 ### Jumping
@@ -628,7 +628,7 @@ Jump unconditionally
 
 **Description:**
 
-Point current core to a new membank as indicated by the argument. PC is reset to 0.
+Points current core to a new membank as indicated by the argument. PC is reset to 0.
 
 **Example:**
 
@@ -658,7 +658,7 @@ Jump if less than zero
 
 **Description:**
 
-Point current core to a new membank as indicated by the argument if VAL if less than 0. PC is reset to 0.
+Points current core to a new membank as indicated by the argument if VAL if less than 0. PC is reset to 0.
 
 
 #### JEZ
@@ -672,7 +672,7 @@ Jump if equal to zero
 
 **Description:**
 
-Point current core to a new membank as indicated by the argument if VAL if equal to 0. PC is reset to 0.
+Points current core to a new membank as indicated by the argument if VAL if equal to 0. PC is reset to 0.
 
 
 #### JGZ
@@ -686,7 +686,7 @@ Jump if greater than zero
 
 **Description:**
 
-Point current core to a new membank as indicated by the argument if VAL if greater than 0. PC is reset to 0.
+Points current core to a new membank as indicated by the argument if VAL if greater than 0. PC is reset to 0.
 
 
 
@@ -702,12 +702,12 @@ Load constant into low part
 
 **Description:**
 
-Load a 4 bits constant into the 4 lower bits of VAL.
-The four higher bits are unaffected.
+Load a 4-bit constant into the 4 least significant bits of VAL.
+The four other bits are unaffected.
 
 **Notes:**
 
-To load the higher bits, use LCH.
+To load the other bits, use LCH.
 
 
 #### LCH
@@ -721,12 +721,12 @@ Load constant into high part
 
 **Description:**
 
-Load a 4 bits constant into the 4 higher bits of VAL.
-The four lower bits are unaffected.
+Load a 4-bit constant into the 4 most significant bits of VAL.
+The four other bits are unaffected.
 
 **Notes:**
 
-To load the lower bits, use LCL.
+To load the other bits, use LCL.
 
 
 #### LSL
@@ -740,7 +740,7 @@ Logical shift, left
 
 **Description:**
 
-Logically left shift VAL by number of bits indicated by the argument.
+Logically left-shift VAL by the number of bits indicated by the argument.
 Every bit of VAL is moved a given number of bit positions.
 The vacant bit-positions are filled with zeros.
 
@@ -762,14 +762,14 @@ Logical shift, right
 
 **Description:**
 
-Logically right shift VAL by number of bits indicated by the argument.
+Logically right-shift VAL by the number of bits indicated by the argument.
 Every bit of VAL is moved a given number of bit positions.
 The vacant bit-positions are filled with zeros.
 
 **Note:**
 
 The sign bit is left untouched.
-This means you must be extremely careful to use this instruction with negative numbers since its behaviour is probably not what you want.
+This means you must be extremely careful in using this instruction with negative numbers since its behaviour is probably not what you want.
 Example: `-65 >> 1 = 95`
 
 
@@ -785,7 +785,7 @@ Constant addition
 **Description:**
 
 Add a constant to VAL.
-CAD always performs a signed addition—i.e., VAL is considered negative if the core's sign bit is true.
+CAD always performs signed addition—i.e., VAL is considered negative if the core's sign bit is true.
 CAD set the sign bit if the operation results in a negative number.
 
 
@@ -801,8 +801,8 @@ Constant subtraction
 **Description:**
 
 Subtract a constant to VAL.
-CSU always performs a signed subtraction—i.e., VAL is considered negative if the core's sign bit is true.
-CSU set the sign bit if the operation results in a negative number.
+CSU always performs signed subtraction—i.e., VAL is considered negative if the core's sign bit is true.
+CSU sets the sign bit if the operation results in a negative number.
 
 
 #### CAN
@@ -816,7 +816,7 @@ Constant AND
 
 **Description:**
 
-Apply a logical AND to the four lower bits of VAL. The 4 higher bits are cleared.
+Apply a logical AND to the four least significant bits of VAL. The 4 most significant bits are set to zero.
 
 
 #### COR
@@ -830,10 +830,10 @@ Constant OR
 
 **Description:**
 
-Apply a logical OR to the four lower bits of VAL. The 4 higher bits are unaffected.
+Apply a logical OR to the four least significant bits of VAL. The 4 most significant bits are unaffected.
 
-The COR instruction is unable by itself to affect all the bits of VAL.
-It may be useful to then use the CAN instruction to restrict VAL to affected values.
+By itself, the COR instruction is unable to affect all the bits of VAL.
+It may be useful to use the CAN instruction to restrict VAL to affected values.
 
 
 
@@ -846,12 +846,12 @@ TODO: Input format
 
 ## LAVAL-M
 LAVAL-M1 is the first version of the official embedded subset of LAVAL.
-It imposes some restriction garantee a very low memory requirement, power consumption and an high AL<sup>[1](#AL)</sup>.
+It imposes some restriction guarantees to a very low memory requirement, power consumption and an high AL<sup>[1](#AL)</sup>.
 
 - It possesses a single general purpose register
 - It only supports integer math
 - All its registers are 8 bits long
-- Since PC is 8 bits long, memory banks are limited to 256 bytes
+- Since the PC is 8 bits long, memory banks are limited to 256 bytes
 -
 
 

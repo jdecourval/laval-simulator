@@ -140,7 +140,7 @@ Cela signifie que plusieurs coeurs peuvent charger une valeur d'un même coeur e
 
 Une fois un qu'une donnée a été acquise d'un coeur, la drapeau de synchronisation de ce dernier est remis à 0 et une autre instruction de synchronisation sera requise pour la prochaine acquisition.
 
-Finalement, un coeur ne peut acquérir d'un coeur iexistant, sauf si ce premier est configuré comme entrée du CPU (plus de détails plus tard).
+Finalement, un coeur ne peut acquérir d'un coeur inexistant, sauf si ce premier est configuré comme entrée du CPU (plus de détails plus tard).
 
 Exemple en pseudo-code:
 
@@ -202,7 +202,7 @@ Core2:
 ```
 Core0:
     VAL <- 5
-    Synchroniser  ; Wait for one cycle since no one is fetching from this core in this cycle.
+    Synchroniser  ; Attend pour un cycle puisque le coeur cible n'a pas encore synchronisé, puis charge.
 
 Core1:
     Connecter au coeur 0
@@ -818,14 +818,13 @@ Applique un masque logique OU aux quatres bits les moins significatifs de VAL.
 Les quatre bits les plus significatifs ne sont pas affectés.
 
 L'instruction COR ne peut à elle seul affecter tous les bits de VAL.
-It pourrait alors être utile de la combiner avec l'instruction CAN pour restreindre VAL aux valeurs affectées.
+Il pourrait alors être utile de la combiner avec l'instruction CAN pour restreindre VAL aux valeurs affectées.
 
 
 
 ## Simulateur
 
 Pour des détails sur l'utilisation du simulateur, référez-vous à son aide incluse: `simulator --help`.
-For simulator usage, refer to its included help: `simulator --help`.
 
 <!---## LAVAL-M
 LAVAL-M1 is the first version of the official embedded subset of LAVAL.
