@@ -11,7 +11,7 @@
 class CoreArray;
 
 
-class Core : public Fetchable
+class Core final : public Fetchable
 {
 public:
     Core();
@@ -32,7 +32,7 @@ public:
     /// @return true if core have not blocked
     bool step();
 
-    std::optional<std::pair<bool, uint8_t>> get_from(bool carry) override
+    std::optional<std::pair<bool, uint8_t>> get_from(bool carry) override final
     {
         if (registers.status1.sync)
         {

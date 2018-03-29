@@ -74,7 +74,7 @@ void Core::preload(bool force)
 
         auto direction = std::get<Direction::CoreDirection>(direction_complex);
 
-        auto& pointed_core = cores->offset(registers.id, direction);
+        auto& pointed = cores->offset(registers.id, direction);
 
         // TODO: This is duplicated
         auto raw_instruction = mem->at(registers.status2.membank).at(registers.pc);
@@ -87,7 +87,12 @@ void Core::preload(bool force)
             dynamic_cast<OpCodes::MXD*>(instruction.get())
                 )
         {
-            if (auto import = pointed_core.get_from(registers.status1.ctc))
+            if (auto pointed_core = dynamic_cast<Core*>(&pointed))
+            {
+                cpu_assert(!(*pointed_core == *this), "A core may not fetch from itself");
+            }
+
+            if (auto import = pointed.get_from(registers.status1.ctc))
             {
                 registers.preload = import->second;
                 registers.preload_negative = import->first;

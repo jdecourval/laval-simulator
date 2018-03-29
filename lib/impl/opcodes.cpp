@@ -109,7 +109,12 @@ bool MXS::operator()(Registers& registers) const
     auto result = first_term - second_term;
 
     registers.status2.carry = checkcarry(result);
-    registers.val = static_cast<uint8_t>(result);
+//    registers.status2.carry = registers.preload_negative == result && ? result > registers.preload : result < registers.preload;
+
+    // TODO: Maybe possible to check carry with greater than
+
+    auto result_short = static_cast<uint8_t>(result);
+    registers.val = result_short;
     registers.status2.negative = result < 0;
 
     return true;
@@ -132,6 +137,7 @@ bool MXR::operator()(Registers &registers) const
 bool LCL::operator()(Registers& registers) const
 {
     registers.val = static_cast<uint8_t>((registers.val & 0xf0) | get_argument(0));
+    registers.status2.negative = false;
 
     return true;
 }
@@ -139,6 +145,7 @@ bool LCL::operator()(Registers& registers) const
 bool LCH::operator()(Registers& registers) const
 {
     registers.val = static_cast<uint8_t>((get_argument(0) << 4) | (registers.val & 0x0f));
+    registers.status2.negative = false;
 
     return true;
 }
@@ -232,6 +239,7 @@ bool CSU::operator()(Registers& registers) const
     registers.status2.carry = checkcarry(result);
     // TODO: Undefined behaviour, value cannot be represented in the destination type
     registers.val = static_cast<uint8_t>(result);
+    registers.status2.negative = result < 0;
 
     return true;
 }

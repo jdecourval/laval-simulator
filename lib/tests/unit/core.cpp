@@ -393,4 +393,4 @@ TEST_CASE("Synchronization tests")
     }
 }
 
-// TODO: Test wire
+// TODO: Test self targeting

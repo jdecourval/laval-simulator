@@ -254,12 +254,17 @@ TEST_CASE("MXS")
         SECTION("Negative carry, initially negative")
         {
             registers.val = static_cast<uint8_t>(-127);
-            registers.preload = 15;
+            registers.status2.negative = true;
+            registers.preload = 200;
 
             OpCodes::MXS instruction;
             instruction(registers);
 
-            REQUIRE(static_cast<int>(registers.val) == static_cast<int>(static_cast<uint8_t>(-127 - 15)));
+            // TODO: Cannot represent a negative value smaller than -127 since we must encode using complement two
+            // But, we can subtract by 255 since the second argument is then positive...
+            // .. but only if doing an unsigned addition (without considering sign)
+            // or ? ...
+            REQUIRE(static_cast<int>(registers.val) == static_cast<int>(static_cast<uint8_t>(-127 - 200)));
             REQUIRE(registers.status2.carry);
             REQUIRE(!registers.status2.negative);
             REQUIRE(registers.preload == static_cast<uint8_t>(-15));

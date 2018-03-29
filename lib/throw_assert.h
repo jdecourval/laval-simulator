@@ -13,7 +13,7 @@
 
 
 /// Exception type for assertion failures
-class CpuException : public std::exception
+class CpuException final : public std::exception
 {
 public:
     /// Helper class for formatting assertion message
@@ -38,7 +38,7 @@ public:
     CpuException(const char* expression, const char* file, int line, const std::string& message);
 
     /// The assertion message
-    const char* what() const noexcept override;
+    const char* what() const noexcept override final;
 
     /// The expression which was asserted to be true
     const char* Expression() const noexcept;
