@@ -100,11 +100,6 @@ This also allows you to provide inputs using a file:
 * [GSL](https://github.com/Microsoft/GSL) - A useful library to support modern and safe C++ development
 
 
-## Contributing
-
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on the process for submitting pull requests.
-
-
 ## Authors
 
 * **Jérôme de Courval** - [jdecourval](https://github.com/jdecourval)
