@@ -10,7 +10,47 @@ For more information on the architecture, refer to the manual:
 
 [Documentation française](doc/manual-fr.md)
 
-Some examples programs are available [here](lib/tests/integration).
+![LAVAL computer](doc/cores.svg)
+
+Some examples programs are available [here](lib/tests/integration):
+```
+; Compute the base 2 logarithm of a rounded down. result = floor(log2(a))
+
+.cores 1, 1, 2
+.mem_number 5
+.mem_size 5
+.core_to_mem 0, 3
+.in 0
+
+0:
+    MUX CURRENT, BEFORE, CURRENT
+    MXL
+    MUX CURRENT, CURRENT, AFTER
+    JMP 1
+
+1:
+    JEZ 2
+    LSR 1
+    MXD
+    SYN
+    JMP 1
+
+2:
+    MXL
+    SYN
+    CSU 1
+    HLT
+
+3:
+    MUX CURRENT, CURRENT, BEFORE
+    JMP 4
+
+4:
+    SYN
+    MXD
+    CAD 1
+    JMP 4
+```
 
 
 ## Getting Started
